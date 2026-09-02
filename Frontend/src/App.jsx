@@ -7,6 +7,8 @@ import Footer from './components/common/Footer';
 import HomePage from './pages/HomePage';
 import GiveawayDetailsPage from './pages/GiveawayDetailsPage';
 import WinnersPage from './pages/WinnersPage';
+import LoginPage from './pages/LoginPage';
+import RegisterPage from './pages/RegisterPage';
 
 function App() {
   return (
@@ -20,6 +22,8 @@ function App() {
               <Route path="/giveaway/:slug" element={<GiveawayDetailsPage />} />
               <Route path="/giveaway/:id" element={<GiveawayDetailsPage />} />
               <Route path="/winners" element={<WinnersPage />} />
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/register" element={<RegisterPage />} />
             </Routes>
           </main>
           <Footer />

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { useParams, useNavigate, Link, useLocation } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   ArrowLeft,
   Clock,
@@ -13,7 +13,10 @@ import {
   ExternalLink,
   ChevronRight,
   PlusCircle,
-  Coins
+  Coins,
+  Lock,
+  LogIn,
+  UserPlus
 } from 'lucide-react';
 import { useGiveaway } from '../context/GiveawayContext';
 import ConfirmationModal from '../components/modals/ConfirmationModal';
@@ -22,11 +25,13 @@ import CustomLoader from '../components/common/CustomLoader';
 export default function GiveawayDetailsPage() {
   const { id, slug } = useParams();
   const navigate = useNavigate();
-  const { giveaways, balances, hasJoined, getBalanceCheck, addFunds } = useGiveaway();
+  const location = useLocation();
+  const { giveaways, balances, hasJoined, getBalanceCheck, addFunds, isAuthenticated, currentUser } = useGiveaway();
 
   const [loading, setLoading] = useState(true);
   const [giveaway, setGiveaway] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isLoginBarrierOpen, setIsLoginBarrierOpen] = useState(false);
   const [timeLeft, setTimeLeft] = useState({ hours: 0, minutes: 0, seconds: 0 });
 
   // Match by slug or id
@@ -143,6 +148,12 @@ export default function GiveawayDetailsPage() {
               <img
                 src={giveaway.image}
                 alt={giveaway.title}
+                onError={(e) => {
+                  e.currentTarget.onerror = null;
+                  const title = (giveaway.title || '').toLowerCase();
+                  const is2000 = title.includes('2000') || title.includes('2,000') || title.includes('2k');
+                  e.currentTarget.src = is2000 ? '/amazon-2000.svg' : '/amazon-20.svg';
+                }}
                 className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500 opacity-90"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-deep-card via-transparent to-transparent opacity-80" />
@@ -298,7 +309,13 @@ export default function GiveawayDetailsPage() {
               ) : balanceCheck.isSufficient ? (
                 /* Sufficient Balance: Enable Confirmation Trigger */
                 <button
-                  onClick={() => setIsModalOpen(true)}
+                  onClick={() => {
+                    if (!isAuthenticated || !currentUser) {
+                      setIsLoginBarrierOpen(true);
+                      return;
+                    }
+                    setIsModalOpen(true);
+                  }}
                   className="w-full py-4 px-6 rounded-2xl font-bold text-white bg-gradient-to-r from-accent-purple via-purple-600 to-accent-purple hover:opacity-95 transition-all shadow-[0_10px_25px_-5px_rgba(124,58,237,0.5)] flex items-center justify-center gap-2 group"
                 >
                   <Sparkles className="w-5 h-5 text-reward-gold group-hover:rotate-12 transition-transform" />
@@ -367,6 +384,59 @@ export default function GiveawayDetailsPage() {
         onClose={() => setIsModalOpen(false)}
         onSuccess={() => setIsModalOpen(false)}
       />
+
+      {/* Login Barrier Modal (Clauses #55 & #98) */}
+      <AnimatePresence>
+        {isLoginBarrierOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 15 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 15 }}
+              className="relative w-full max-w-md rounded-3xl bg-deep-card border border-slate-700/80 p-6 md:p-8 shadow-2xl text-center space-y-4 overflow-hidden"
+            >
+              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-accent-purple via-reward-gold to-accent-purple" />
+
+              <div className="w-16 h-16 mx-auto rounded-2xl bg-accent-purple/20 border border-accent-purple/40 flex items-center justify-center text-purple-400 shadow-[0_0_30px_rgba(124,58,237,0.3)]">
+                <Lock className="w-8 h-8" />
+              </div>
+
+              <div>
+                <h3 className="text-xl font-bold text-white tracking-tight">Login Required</h3>
+                <p className="text-sm text-slate-300 mt-2 leading-relaxed">
+                  Login Required: Please login to your VELOOP Rewards account before participating in this giveaway
+                </p>
+              </div>
+
+              <div className="pt-2 space-y-2.5">
+                <Link
+                  to="/login"
+                  state={{ from: location.pathname }}
+                  className="w-full py-3 px-4 rounded-xl font-bold text-white bg-accent-purple hover:bg-purple-600 transition flex items-center justify-center gap-2 shadow-lg shadow-purple-950/50"
+                >
+                  <LogIn className="w-4 h-4" />
+                  <span>Log In to Account</span>
+                </Link>
+
+                <Link
+                  to="/register"
+                  className="w-full py-3 px-4 rounded-xl font-medium text-slate-300 hover:text-white bg-slate-900 border border-slate-800 hover:bg-slate-800 transition flex items-center justify-center gap-2"
+                >
+                  <UserPlus className="w-4 h-4" />
+                  <span>Create Account (Get 5,500 Credits)</span>
+                </Link>
+              </div>
+
+              <button
+                onClick={() => setIsLoginBarrierOpen(false)}
+                className="text-xs text-slate-500 hover:text-slate-400 pt-2 block mx-auto underline"
+              >
+                Close and continue exploring
+              </button>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
