@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" width="100%" height="100%">
+  <defs>
+    <linearGradient id="cardBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#141923" />
+      <stop offset="50%" stop-color="#0E121A" />
+      <stop offset="100%" stop-color="#06080C" />
+    </linearGradient>
+    <linearGradient id="goldGlow" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#FF9900" />
+      <stop offset="100%" stop-color="#FFC266" />
+    </linearGradient>
+    <linearGradient id="accentLine" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#FF9900" stop-opacity="0.8" />
+      <stop offset="50%" stop-color="#7C3AED" stop-opacity="0.8" />
+      <stop offset="100%" stop-color="#FF9900" stop-opacity="0.8" />
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="10" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <!-- Background Base -->
+  <rect width="800" height="500" rx="32" fill="url(#cardBg)" />
+  <rect width="796" height="496" x="2" y="2" rx="30" fill="none" stroke="#2A3245" stroke-width="2" />
+
+  <!-- Ambient Light Sphere -->
+  <circle cx="680" cy="100" r="160" fill="#FF9900" opacity="0.08" filter="url(#glow)" />
+  <circle cx="100" cy="400" r="140" fill="#7C3AED" opacity="0.08" filter="url(#glow)" />
+
+  <!-- Decorative Top Banner Line -->
+  <rect x="0" y="0" width="800" height="6" fill="url(#accentLine)" />
+
+  <!-- Amazon Brand Text -->
+  <g transform="translate(60, 75)">
+    <text x="0" y="42" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="44" font-weight="900" fill="#FFFFFF" letter-spacing="-1">amazon<tspan fill="#FF9900">.in</tspan></text>
+    <!-- Amazon Smile Arrow -->
+    <path d="M 5 62 Q 85 92 165 62" fill="none" stroke="#FF9900" stroke-width="5" stroke-linecap="round" />
+    <path d="M 158 55 L 172 63 L 160 73 Z" fill="#FF9900" />
+  </g>
+
+  <!-- Gift Card Pill Badge -->
+  <rect x="580" y="70" width="160" height="38" rx="19" fill="#1F2839" stroke="#37435B" stroke-width="1.5" />
+  <text x="660" y="94" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="700" fill="#FF9900" text-anchor="middle" letter-spacing="1">GIFT CARD</text>
+
+  <!-- Center Value Display -->
+  <g transform="translate(60, 230)">
+    <text x="0" y="0" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="16" font-weight="700" fill="#94A3B8" letter-spacing="2">DIGITAL SHOPPING VOUCHER</text>
+    <text x="0" y="85" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="88" font-weight="900" fill="url(#goldGlow)" letter-spacing="-2">₹2,000</text>
+  </g>
+
+  <!-- Chip Graphic -->
+  <g transform="translate(660, 230)">
+    <rect width="80" height="62" rx="10" fill="#242F42" stroke="#475569" stroke-width="1.5" />
+    <line x1="26" y1="0" x2="26" y2="62" stroke="#334155" stroke-width="1.5" />
+    <line x1="54" y1="0" x2="54" y2="62" stroke="#334155" stroke-width="1.5" />
+    <line x1="0" y1="31" x2="80" y2="31" stroke="#334155" stroke-width="1.5" />
+    <circle cx="40" cy="31" r="10" fill="#1A2230" stroke="#475569" stroke-width="1" />
+  </g>
+
+  <!-- Bottom Details Bar -->
+  <line x1="60" y1="395" x2="740" y2="395" stroke="#1E2738" stroke-width="1.5" />
+
+  <g transform="translate(60, 440)">
+    <text x="0" y="0" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="600" fill="#64748B">REDEEMABLE ON AMAZON.IN</text>
+    <text x="0" y="20" font-family="monospace" font-size="12" fill="#475569">CODE DISPATCHED VIA EMAIL • PROVABLY FAIR POOL</text>
+  </g>
+
+  <g transform="translate(740, 445)">
+    <text x="0" y="0" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="800" fill="#94A3B8" text-anchor="end">VELOOP REWARDS</text>
+  </g>
+</svg>

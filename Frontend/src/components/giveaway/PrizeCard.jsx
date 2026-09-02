@@ -39,6 +39,12 @@ export default function PrizeCard({ giveaway }) {
           <img
             src={giveaway.image}
             alt={giveaway.title}
+            onError={(e) => {
+              e.currentTarget.onerror = null;
+              const title = (giveaway.title || '').toLowerCase();
+              const is2000 = title.includes('2000') || title.includes('2,000') || title.includes('2k');
+              e.currentTarget.src = is2000 ? '/amazon-2000.svg' : '/amazon-20.svg';
+            }}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-90"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-deep-card via-transparent to-transparent opacity-80" />

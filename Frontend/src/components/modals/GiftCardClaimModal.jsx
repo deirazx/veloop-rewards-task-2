@@ -27,23 +27,26 @@ export default function GiftCardClaimModal({ giveaway, isOpen, onClose }) {
     setIsSubmitting(true);
     setError('');
 
-    await new Promise((res) => setTimeout(res, 1200));
+    try {
+      await claimPrize(giveaway.id, {
+        type: 'GIFT_CARD',
+        prize: giveaway.title,
+        email: email.trim()
+      });
 
-    claimPrize(giveaway.id, {
-      type: 'GIFT_CARD',
-      prize: giveaway.title,
-      email: email.trim()
-    });
+      confetti({
+        particleCount: 90,
+        spread: 75,
+        origin: { y: 0.55 },
+        colors: ['#10B981', '#7C3AED', '#F59E0B']
+      });
 
-    confetti({
-      particleCount: 90,
-      spread: 75,
-      origin: { y: 0.55 },
-      colors: ['#10B981', '#7C3AED', '#F59E0B']
-    });
-
-    setIsSubmitting(false);
-    setIsSuccess(true);
+      setIsSuccess(true);
+    } catch (err) {
+      setError(err.message || 'Failed to dispatch voucher pin.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (

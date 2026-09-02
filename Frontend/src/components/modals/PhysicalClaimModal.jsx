@@ -55,22 +55,25 @@ export default function PhysicalClaimModal({ giveaway, isOpen, onClose }) {
     if (!validate()) return;
 
     setIsSubmitting(true);
-    await new Promise((res) => setTimeout(res, 1200));
+    try {
+      await claimPrize(giveaway.id, {
+        type: 'PHYSICAL',
+        prize: giveaway.title,
+        shipping: formData
+      });
 
-    claimPrize(giveaway.id, {
-      type: 'PHYSICAL',
-      prize: giveaway.title,
-      shipping: formData
-    });
+      confetti({
+        particleCount: 100,
+        spread: 80,
+        origin: { y: 0.5 }
+      });
 
-    confetti({
-      particleCount: 100,
-      spread: 80,
-      origin: { y: 0.5 }
-    });
-
-    setIsSubmitting(false);
-    setIsSuccess(true);
+      setIsSuccess(true);
+    } catch (err) {
+      setErrors({ form: err.message || 'Failed to submit physical claim.' });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (

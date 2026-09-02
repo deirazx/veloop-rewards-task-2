@@ -23,8 +23,13 @@ export default function HistoryWinnersTab() {
     <div className="space-y-6">
       <div className="grid grid-cols-1 gap-6">
         {endedGiveaways.map((item) => {
-          // Check if current user is listed in winners
-          const userWinnerRecord = item.winners?.find((w) => w.userId === currentUser.id);
+          // Strict Winner Identity Check (Clause #26 & #34)
+          const userWinnerRecord = item.winners?.find(
+            (w) =>
+              (currentUser?.customUserId && w.customUserId === currentUser.customUserId) ||
+              (currentUser?.id && w.userId === currentUser.id) ||
+              (currentUser?.customUserId && w.userId === currentUser.customUserId)
+          );
           const hasUserClaimed = claims[item.id] || userWinnerRecord?.claimStatus === 'CLAIMED';
 
           return (
@@ -33,7 +38,7 @@ export default function HistoryWinnersTab() {
               className="rounded-3xl bg-deep-card border border-slate-800 overflow-hidden shadow-2xl relative"
             >
               {/* Exclusive Winner Claim Banner */}
-              {userWinnerRecord && (
+              {userWinnerRecord ? (
                 <div className="bg-gradient-to-r from-accent-purple via-indigo-900 to-reward-gold/90 p-4 md:p-5 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-b border-purple-500/40">
                   <div className="flex items-center gap-3">
                     <div className="w-12 h-12 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-reward-gold shrink-0 shadow-lg">
@@ -71,7 +76,18 @@ export default function HistoryWinnersTab() {
                     )}
                   </div>
                 </div>
-              )}
+              ) : currentUser ? (
+                /* Supportive Non-Winner Message (Clause #26 & #34) */
+                <div className="bg-slate-900/60 px-5 py-3 border-b border-slate-800 flex items-center justify-between text-xs text-slate-400">
+                  <span className="flex items-center gap-2">
+                    <Sparkles className="w-4 h-4 text-purple-400 shrink-0" />
+                    <span>Better luck next time! Keep participating in active pools to claim upcoming rewards.</span>
+                  </span>
+                  <a href="/" className="text-purple-400 font-bold hover:underline shrink-0">
+                    Explore Active Pools →
+                  </a>
+                </div>
+              ) : null}
 
               {/* Main Content Area */}
               <div className="p-6 md:p-8">

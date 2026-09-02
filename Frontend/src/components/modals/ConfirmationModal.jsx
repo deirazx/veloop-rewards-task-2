@@ -10,6 +10,7 @@ export default function ConfirmationModal({ giveaway, isOpen, onClose, onSuccess
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [joinedSuccess, setJoinedSuccess] = useState(false);
+  const [confirmedTicket, setConfirmedTicket] = useState('');
 
   if (!isOpen || !giveaway) return null;
 
@@ -45,9 +46,12 @@ export default function ConfirmationModal({ giveaway, isOpen, onClose, onSuccess
     setErrorMsg('');
 
     try {
-      // Simulate realistic async verification and smart contract / API locking
-      await new Promise((resolve) => setTimeout(resolve, 1400));
-      await joinGiveaway(giveaway.id, giveaway.cost, giveaway.currency);
+      const prizeId = giveaway.prizes?.[0]?.prizeId || giveaway.prizeId || 'default';
+      const result = await joinGiveaway(giveaway.id, giveaway.cost, giveaway.currency, prizeId);
+      
+      if (result?.ticketNumber) {
+        setConfirmedTicket(result.ticketNumber);
+      }
       
       triggerConfetti();
       setJoinedSuccess(true);
@@ -113,7 +117,7 @@ export default function ConfirmationModal({ giveaway, isOpen, onClose, onSuccess
                   </p>
                 </div>
                 <div className="p-3 bg-obsidian/60 rounded-xl border border-slate-800 text-xs text-slate-400 font-mono">
-                  Ticket ID: #{Math.floor(100000 + Math.random() * 900000)} • Deducted {giveaway.cost} {giveaway.currency}
+                  Ticket ID: {confirmedTicket || `#${Math.floor(100000 + Math.random() * 900000)}`} • Deducted {giveaway.cost} {giveaway.currency}
                 </div>
                 <button
                   onClick={onClose}
