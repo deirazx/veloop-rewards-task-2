@@ -1,0 +1,25 @@
+{
+  "name": "veloop-rewards-backend",
+  "version": "1.0.0",
+  "description": "Production-ready backend for VELOOP Rewards Giveaway Platform",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "seed": "node src/scripts/seed.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": ["veloop", "giveaway", "rewards", "fintech", "provably-fair"],
+  "author": "Veloop Engineering",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^9.9.4"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14"
+  }
+}
