@@ -1,0 +1,9 @@
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
+
+@layer base {
+  body {
+    @apply bg-obsidian text-white font-sans antialiased selection:bg-accent-purple/30;
+  }
+}
