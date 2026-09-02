@@ -46,6 +46,7 @@ app.get('/api/health', (req, res) => {
 });
 
 // Mount Routes strictly as specified
+app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/giveaways', require('./routes/giveawayRoutes'));
 app.use('/api/participation', require('./routes/participationRoutes'));
 app.use('/api/claim', require('./routes/claimRoutes'));

@@ -3,8 +3,9 @@ const User = require('../models/User');
 
 /**
  * Authentication Middleware
- * Strictly populates req.user from verified tokens or verified DB records.
- * NEVER trusts client-sent user IDs in request body.
+ * Strictly extracts and verifies Bearer JWT token from Authorization header.
+ * Attaches verified User document to req.user.
+ * Rejects unauthorized requests with { success: false, error: 'LOGIN_REQUIRED' }
  */
 const authMiddleware = async (req, res, next) => {
   try {
@@ -14,61 +15,64 @@ const authMiddleware = async (req, res, next) => {
       token = req.headers.authorization.split(' ')[1];
     }
 
+    // 1. If Token is present, verify cryptographically
     if (token) {
       try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET || 'veloop_rewards_secret_key_2026');
+        const decoded = jwt.verify(
+          token,
+          process.env.JWT_SECRET || 'veloop_rewards_secret_key_2026_jwt_token'
+        );
+
         const user = await User.findById(decoded.id || decoded._id);
-        if (user) {
-          if (user.isSuspended) {
-            return res.status(403).json({
-              success: false,
-              message: 'Your account is suspended. Contact compliance@veloop.io'
-            });
-          }
-          req.user = user;
-          return next();
+        if (!user) {
+          return res.status(401).json({
+            success: false,
+            error: 'LOGIN_REQUIRED',
+            message: 'Session invalid or user no longer exists. Please log in again.'
+          });
         }
+
+        if (user.isSuspended) {
+          return res.status(403).json({
+            success: false,
+            error: 'ACCOUNT_SUSPENDED',
+            message: 'Your account is suspended. Contact compliance@veloop.io'
+          });
+        }
+
+        req.user = user;
+        return next();
       } catch (jwtErr) {
-        console.warn('[Auth] Invalid JWT, checking fallback header');
+        return res.status(401).json({
+          success: false,
+          error: 'LOGIN_REQUIRED',
+          message: 'Token expired or invalid signature. Please log in again.'
+        });
       }
     }
 
-    // In development / demo environment: Allow x-user-id header or resolve default test user VE10025 from database
-    const customHeaderId = req.headers['x-user-id'] || 'VE10025';
-    let user = await User.findOne({ customUserId: customHeaderId });
-
-    if (!user) {
-      // Auto-initialize standard dev user if not yet seeded
-      user = await User.create({
-        customUserId: 'VE10025',
-        name: 'Alex Mercer',
-        email: 'alex.mercer@veloop.io',
-        phone: '+91 98765 43210',
-        balances: {
-          VES: 350,
-          SVES: 300,
-          Tokens: 1800
-        },
-        tier: 'Platinum Elite',
-        isKycVerified: true
-      });
-      console.log('[Auth] Initialized default demo user VE10025');
+    // 2. Fallback in development/testing mode for x-user-id header
+    const devUserId = req.headers['x-user-id'];
+    if (devUserId) {
+      const user = await User.findOne({ customUserId: devUserId });
+      if (user && !user.isSuspended) {
+        req.user = user;
+        return next();
+      }
     }
 
-    if (user.isSuspended) {
-      return res.status(403).json({
-        success: false,
-        message: 'Account suspended.'
-      });
-    }
-
-    req.user = user;
-    next();
+    // 3. Strict rejection if no valid token is provided
+    return res.status(401).json({
+      success: false,
+      error: 'LOGIN_REQUIRED',
+      message: 'Authentication token is required to access this resource.'
+    });
   } catch (error) {
     console.error('[Auth Middleware Error]', error);
     return res.status(500).json({
       success: false,
-      message: 'Authentication processing failed.'
+      error: 'AUTH_PROCESSING_ERROR',
+      message: 'Internal server error during authentication.'
     });
   }
 };

@@ -49,6 +49,9 @@ npm run dev
 
 | Method | Endpoint | Auth Required | Description |
 | :--- | :--- | :---: | :--- |
+| `POST` | `/api/auth/register` | No | Register user (seeds 1000 VES, 1500 SVES, 3000 Tokens) |
+| `POST` | `/api/auth/login` | No | Authenticate with email/password & get JWT token |
+| `GET` | `/api/auth/me` | **Yes** | Fetch current user profile & live balances |
 | `GET` | `/api/health` | No | System health and uptime |
 | `GET` | `/api/giveaways/current` | No | Retrieve active and upcoming pools |
 | `GET` | `/api/giveaways/:id/winners` | No | Get winners (or active countdown notice) |

@@ -9,10 +9,17 @@
     "seed": "node src/scripts/seed.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": ["veloop", "giveaway", "rewards", "fintech", "provably-fair"],
+  "keywords": [
+    "veloop",
+    "giveaway",
+    "rewards",
+    "fintech",
+    "provably-fair"
+  ],
   "author": "Veloop Engineering",
   "license": "ISC",
   "dependencies": {
+    "bcryptjs": "^3.0.3",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
