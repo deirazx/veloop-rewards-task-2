@@ -29,7 +29,7 @@ const participationSchema = new mongoose.Schema(
     },
     entryCurrency: {
       type: String,
-      enum: ['VES', 'SVES', 'Tokens'],
+      enum: ['VES', 'SVES', 'Tokens', 'VEs', 'SVEs'],
       required: true
     },
     entryAmount: {

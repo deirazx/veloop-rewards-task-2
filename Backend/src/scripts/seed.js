@@ -34,6 +34,7 @@ const seedData = async () => {
       customUserId: 'VE10025',
       name: 'Alex Mercer',
       email: 'alex.mercer@veloop.io',
+      password: 'Password@123',
       phone: '+91 98765 43210',
       balances: {
         VES: 350,
@@ -67,7 +68,8 @@ const seedData = async () => {
             currency: 'VES',
             entryFee: 250,
             retailPrice: '₹1,34,900',
-            winnerCount: 1
+            winnerCount: 1,
+            image: 'https://images.unsplash.com/photo-1695048133142-1a20484d2569?auto=format&fit=crop&w=1000&q=80'
           }
         ]
       },
@@ -90,7 +92,8 @@ const seedData = async () => {
             currency: 'VES',
             entryFee: 200,
             retailPrice: '₹44,900',
-            winnerCount: 1
+            winnerCount: 1,
+            image: 'https://images.unsplash.com/photo-1508685096489-7aacd43bd3b1?auto=format&fit=crop&w=1000&q=80'
           }
         ]
       },
@@ -113,7 +116,8 @@ const seedData = async () => {
             currency: 'SVES',
             entryFee: 500,
             retailPrice: '₹24,900',
-            winnerCount: 1
+            winnerCount: 1,
+            image: 'https://images.unsplash.com/photo-1600294037681-c80b4cb5b434?auto=format&fit=crop&w=1000&q=80'
           }
         ]
       },
@@ -136,7 +140,8 @@ const seedData = async () => {
             currency: 'VES',
             entryFee: 500,
             retailPrice: '₹2,000',
-            winnerCount: 5
+            winnerCount: 5,
+            image: 'https://images.unsplash.com/photo-1556742049-0a67c5574f73?auto=format&fit=crop&w=1000&q=80'
           }
         ]
       },
@@ -159,7 +164,8 @@ const seedData = async () => {
             currency: 'Tokens',
             entryFee: 2000,
             retailPrice: '₹20',
-            winnerCount: 50
+            winnerCount: 50,
+            image: 'https://images.unsplash.com/photo-1559526324-4b87b5e36e44?auto=format&fit=crop&w=1000&q=80'
           }
         ]
       }
@@ -185,7 +191,8 @@ const seedData = async () => {
           currency: 'VES',
           entryFee: 800,
           retailPrice: '₹1,99,900',
-          winnerCount: 1
+          winnerCount: 1,
+          image: 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=1000&q=80'
         }
       ]
     });

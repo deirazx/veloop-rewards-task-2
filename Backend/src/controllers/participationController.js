@@ -90,16 +90,20 @@ exports.joinGiveaway = async (req, res) => {
     });
   }
 
-  // 5. Match Authoritative Prize & Cost
-  const prize = giveaway.prizes.find((p) => p.prizeId === prizeId) || giveaway.prizes[0];
-  if (!prize) {
-    return res.status(400).json({
-      success: false,
-      message: 'Specified prize not found in this giveaway pool.'
-    });
+  // 5. Match Authoritative Prize & Cost (Support both prizes array and root-level fields)
+  let prize = null;
+  if (Array.isArray(giveaway.prizes) && giveaway.prizes.length > 0) {
+    prize = giveaway.prizes.find((p) => p.prizeId === prizeId) || giveaway.prizes[0];
   }
 
-  const { currency, entryFee } = prize;
+  const rawCurrency = prize?.currency || giveaway.currency || 'VES';
+  const currency = (rawCurrency.toUpperCase() === 'VES' || rawCurrency === 'VEs') ? 'VES'
+                 : (rawCurrency.toUpperCase() === 'SVES' || rawCurrency === 'SVEs') ? 'SVES'
+                 : rawCurrency || 'VES';
+
+  const entryFee = Number(prize?.entryFee ?? giveaway.entryFee ?? giveaway.cost ?? 0);
+  const prizeName = prize?.name || giveaway.title || 'Giveaway Reward';
+  const resolvedPrizeId = prize?.prizeId || prizeId || 'default';
 
   // 6. Pre-Check Duplicate Join at Application Level (Secondary check before unique index)
   const existingJoin = await Participation.findOne({
@@ -118,10 +122,15 @@ exports.joinGiveaway = async (req, res) => {
 
   // 7. Validate Currency Balance against authoritative DB User
   const freshUser = await User.findById(user._id);
-  const currentBalance = freshUser.balances[currency] || 0;
+  const currentBalance = Number(
+    freshUser?.balances?.[currency] ??
+    freshUser?.balances?.[rawCurrency] ??
+    freshUser?.balances?.['VES'] ??
+    0
+  );
 
   if (currentBalance < entryFee) {
-    const deficit = entryFee - currentBalance;
+    const deficit = Math.max(0, entryFee - currentBalance);
     await AuditLog.create({
       action: 'PARTICIPATION_FAILED',
       userId: user._id,
@@ -171,7 +180,7 @@ exports.joinGiveaway = async (req, res) => {
     const updatedUser = await User.findOneAndUpdate(
       updateQuery,
       { $inc: { [`balances.${currency}`]: -entryFee } },
-      { new: true, ...opts }
+      { returnDocument: 'after', ...opts }
     );
 
     if (!updatedUser) {
@@ -192,7 +201,7 @@ exports.joinGiveaway = async (req, res) => {
           referenceId: giveaway.giveawayId,
           referenceModel: 'Giveaway',
           status: 'SUCCESS',
-          metadata: { prizeId: prize.prizeId, prizeName: prize.name, ticketNumber }
+          metadata: { prizeId: resolvedPrizeId, prizeName: prizeName, ticketNumber }
         }
       ],
       opts
@@ -206,7 +215,7 @@ exports.joinGiveaway = async (req, res) => {
           customUserId: user.customUserId,
           giveawayId: giveaway.giveawayId,
           giveawayDocId: giveaway._id,
-          prizeId: prize.prizeId,
+          prizeId: resolvedPrizeId,
           entryCurrency: currency,
           entryAmount: entryFee,
           deviceHash,
@@ -226,13 +235,13 @@ exports.joinGiveaway = async (req, res) => {
       opts
     );
 
-    // Commit Transaction
-    if (supportsTransactions) {
+    // Commit Transaction safely
+    if (supportsTransactions && session.inTransaction()) {
       await session.commitTransaction();
     }
 
-    // Write Financial Audit Log
-    await AuditLog.create({
+    // Non-blocking Financial Audit Log
+    AuditLog.create({
       action: 'PARTICIPATION_SUCCESS',
       userId: user._id,
       customUserId: user.customUserId,
@@ -246,7 +255,7 @@ exports.joinGiveaway = async (req, res) => {
         deducted: entryFee,
         balanceAfter
       }
-    });
+    }).catch((logErr) => console.warn('[AuditLog Log Note]', logErr.message));
 
     return res.status(201).json({
       success: true,
@@ -254,7 +263,7 @@ exports.joinGiveaway = async (req, res) => {
       data: {
         ticketNumber: participation.ticketNumber,
         giveawayId: giveaway.giveawayId,
-        prize: prize.name,
+        prize: prizeName,
         deducted: entryFee,
         currency,
         remainingBalance: balanceAfter,
@@ -262,8 +271,12 @@ exports.joinGiveaway = async (req, res) => {
       }
     });
   } catch (error) {
-    if (supportsTransactions) {
-      await session.abortTransaction();
+    if (supportsTransactions && session.inTransaction()) {
+      try {
+        await session.abortTransaction();
+      } catch (abortErr) {
+        console.warn('[Abort Transaction Note]', abortErr.message);
+      }
     }
 
     // Catch MongoDB E11000 duplicate key error on compound index { userId, giveawayId }

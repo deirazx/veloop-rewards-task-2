@@ -20,7 +20,7 @@ const transactionSchema = new mongoose.Schema(
     },
     currency: {
       type: String,
-      enum: ['VES', 'SVES', 'Tokens'],
+      enum: ['VES', 'SVES', 'Tokens', 'VEs', 'SVEs'],
       required: true
     },
     amount: {
