@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import api, { getDeviceHash } from '../services/api';
+import api, { getDeviceHash, API_BASE_URL } from '../services/api';
 import CustomLoader from '../components/common/CustomLoader';
 import { RefreshCw, WifiOff } from 'lucide-react';
 import { mockGiveaways, CURRENT_USER } from '../data/mockGiveaways';
@@ -166,6 +166,8 @@ export const GiveawayProvider = ({ children }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [usingMockFallback, setUsingMockFallback] = useState(false);
+  const [isWarmingUp, setIsWarmingUp] = useState(false);
+  const [warmingUpMessage, setWarmingUpMessage] = useState('');
 
   // Authenticate user session from localStorage token on boot
   useEffect(() => {
@@ -194,50 +196,77 @@ export const GiveawayProvider = ({ children }) => {
     initAuth();
   }, []);
 
-  // Fetch active giveaways from live backend
+  // Fetch active giveaways from live backend with cold-start retry handling
   const loadBackendData = useCallback(async (allowFallback = false) => {
     setIsLoading(true);
     setError(null);
 
-    try {
-      const currentList = await api.fetchCurrentGiveaway();
+    const MAX_RETRIES = 3;
+    const RETRY_DELAY_MS = 3000;
 
-      if (Array.isArray(currentList) && currentList.length > 0) {
-        const normalized = currentList.map(normalizeGiveaway);
-        setGiveaways(normalized);
-        setUsingMockFallback(false);
-
-        // Fetch user's participation status if token is present
-        const token = localStorage.getItem('veloop_token');
-        if (token) {
-          const statusChecks = await Promise.allSettled(
-            normalized.map((g) => api.fetchMyStatus(g.id))
+    for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+      try {
+        if (attempt > 1) {
+          setIsWarmingUp(true);
+          setWarmingUpMessage(
+            `Backend service is warming up, please wait a moment... (Attempt ${attempt}/${MAX_RETRIES})`
           );
-
-          const activeJoined = [];
-          statusChecks.forEach((res, index) => {
-            if (res.status === 'fulfilled' && res.value?.hasJoined) {
-              activeJoined.push(normalized[index].id);
-            }
-          });
-          setJoinedGiveaways(activeJoined);
         }
-      } else {
-        setGiveaways([]);
-      }
-    } catch (err) {
-      console.warn('[GiveawayContext] Backend API call failed:', err.message);
 
-      if (allowFallback) {
-        console.info('[GiveawayContext] Loading local authoritative fallback data');
-        setGiveaways(mockGiveaways);
-        setUsingMockFallback(true);
-      } else {
-        setError(err.message || 'Unable to communicate with the VELOOP backend cluster.');
+        const currentList = await api.fetchCurrentGiveaway();
+
+        if (Array.isArray(currentList) && currentList.length > 0) {
+          const normalized = currentList.map(normalizeGiveaway);
+          setGiveaways(normalized);
+          setUsingMockFallback(false);
+
+          // Fetch user's participation status if token is present
+          const token = localStorage.getItem('veloop_token');
+          if (token) {
+            const statusChecks = await Promise.allSettled(
+              normalized.map((g) => api.fetchMyStatus(g.id))
+            );
+
+            const activeJoined = [];
+            statusChecks.forEach((res, index) => {
+              if (res.status === 'fulfilled' && res.value?.hasJoined) {
+                activeJoined.push(normalized[index].id);
+              }
+            });
+            setJoinedGiveaways(activeJoined);
+          }
+        } else {
+          setGiveaways([]);
+        }
+
+        setIsWarmingUp(false);
+        setIsLoading(false);
+        return;
+      } catch (err) {
+        console.warn(`[GiveawayContext] API call failed (Attempt ${attempt}/${MAX_RETRIES}):`, err.message);
+
+        // If cold-start network error and more attempts remaining
+        if (attempt < MAX_RETRIES && !allowFallback) {
+          setIsWarmingUp(true);
+          setWarmingUpMessage(
+            `Backend service is warming up, please wait a moment... (Attempt ${attempt}/${MAX_RETRIES})`
+          );
+          await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY_MS));
+          continue;
+        }
+
+        setIsWarmingUp(false);
+        if (allowFallback) {
+          console.info('[GiveawayContext] Loading local authoritative fallback data');
+          setGiveaways(mockGiveaways);
+          setUsingMockFallback(true);
+        } else {
+          setError(err.message || 'Unable to communicate with the VELOOP backend cluster.');
+        }
       }
-    } finally {
-      setIsLoading(false);
     }
+
+    setIsLoading(false);
   }, []);
 
   useEffect(() => {
@@ -403,7 +432,13 @@ export const GiveawayProvider = ({ children }) => {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-obsidian flex flex-col items-center justify-center p-4">
-        <CustomLoader />
+        <CustomLoader text={isWarmingUp ? warmingUpMessage : undefined} />
+        {isWarmingUp && (
+          <div className="mt-4 px-4 py-2 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-mono animate-pulse flex items-center gap-2">
+            <span className="inline-block w-2 h-2 rounded-full bg-amber-400 animate-ping" />
+            <span>Render cloud instance is spinning up from idle state...</span>
+          </div>
+        )}
       </div>
     );
   }
@@ -438,7 +473,7 @@ export const GiveawayProvider = ({ children }) => {
         </div>
         
         <p className="text-xs text-slate-500 mt-6 font-mono">
-          Target: {import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api'}
+          Target: {API_BASE_URL}
         </p>
       </div>
     );
