@@ -1,10 +1,35 @@
 /**
  * VELOOP Rewards – Centralized API Client
  * Dynamically resolves base URL via import.meta.env.VITE_API_BASE_URL
+ * In production (Netlify), connects directly to live Render backend:
+ * https://veloop-giveaway-backend.onrender.com/api
  * Automatically attaches Authorization: Bearer <token>
  */
 
-const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api').replace(/\/$/, '');
+const resolveBaseUrl = () => {
+  const envUrl = import.meta.env.VITE_API_BASE_URL;
+  const isProduction =
+    typeof window !== 'undefined' &&
+    window.location.hostname !== 'localhost' &&
+    window.location.hostname !== '127.0.0.1';
+
+  if (isProduction) {
+    if (!envUrl || envUrl.includes('localhost') || envUrl.includes('127.0.0.1')) {
+      console.info(
+        '[VELOP API] Running in production. Directing requests to live Render backend: https://veloop-giveaway-backend.onrender.com/api'
+      );
+      return 'https://veloop-giveaway-backend.onrender.com/api';
+    }
+    return envUrl.trim().replace(/\/$/, '');
+  }
+
+  if (envUrl && envUrl.trim() !== '') {
+    return envUrl.trim().replace(/\/$/, '');
+  }
+  return 'http://localhost:5000/api';
+};
+
+export const API_BASE_URL = resolveBaseUrl();
 
 // Persistent hardware device fingerprint simulation
 export const getDeviceHash = () => {
@@ -115,6 +140,7 @@ export async function submitClaim(giveawayId, payload) {
 }
 
 export default {
+  API_BASE_URL,
   register,
   login,
   fetchMe,
