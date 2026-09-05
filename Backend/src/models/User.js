@@ -70,7 +70,7 @@ const userSchema = new mongoose.Schema(
 );
 
 // Pre-save hook: Auto-generate customUserId & Hash password
-userSchema.pre('save', async function (next) {
+userSchema.pre('save', async function () {
   // 1. Auto-generate unique customUserId (e.g. VE10025) if not already set
   if (!this.customUserId) {
     let uniqueFound = false;
@@ -87,12 +87,11 @@ userSchema.pre('save', async function (next) {
 
   // 2. Hash password if modified or newly created
   if (!this.isModified('password')) {
-    return next();
+    return;
   }
 
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);
-  next();
 });
 
 // Method to verify password on login
