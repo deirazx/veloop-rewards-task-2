@@ -13,6 +13,28 @@ const connectDB = async () => {
     });
 
     console.log(`[MongoDB] Connected successfully: ${conn.connection.host}/${conn.connection.name}`);
+
+    // Drop stale legacy indexes that cause E11000 duplicate key errors
+    // Old schema had a 'userId' unique index; new schema uses 'customUserId'
+    try {
+      const db = conn.connection.db;
+      const usersCollection = db.collection('users');
+      const indexes = await usersCollection.indexes();
+
+      const staleIndexNames = ['userId_1', 'userId_1_unique'];
+      for (const staleIdx of staleIndexNames) {
+        const exists = indexes.some((idx) => idx.name === staleIdx);
+        if (exists) {
+          await usersCollection.dropIndex(staleIdx);
+          console.log(`[MongoDB] Dropped stale index: ${staleIdx}`);
+        }
+      }
+    } catch (idxErr) {
+      // Non-fatal: index may not exist or already dropped
+      if (!idxErr.message.includes('index not found')) {
+        console.warn('[MongoDB] Index cleanup note:', idxErr.message);
+      }
+    }
   } catch (error) {
     console.error(`[MongoDB Connection Error] ${error.message}`);
     process.exit(1);
