@@ -6,6 +6,8 @@
  * Automatically attaches Authorization: Bearer <token>
  */
 
+const LIVE_RENDER_BACKEND = 'https://veloop-giveaway-backend.onrender.com/api';
+
 const resolveBaseUrl = () => {
   const envUrl = import.meta.env.VITE_API_BASE_URL;
   const isProduction =
@@ -16,17 +18,18 @@ const resolveBaseUrl = () => {
   if (isProduction) {
     if (!envUrl || envUrl.includes('localhost') || envUrl.includes('127.0.0.1')) {
       console.info(
-        '[VELOP API] Running in production. Directing requests to live Render backend: https://veloop-giveaway-backend.onrender.com/api'
+        '[VELOP API] Running in production. Directing requests to live Render backend: ' + LIVE_RENDER_BACKEND
       );
-      return 'https://veloop-giveaway-backend.onrender.com/api';
+      return LIVE_RENDER_BACKEND;
     }
     return envUrl.trim().replace(/\/$/, '');
   }
 
+  // Local development: use envUrl if explicitly set, else default to live Render backend
   if (envUrl && envUrl.trim() !== '') {
     return envUrl.trim().replace(/\/$/, '');
   }
-  return 'http://localhost:5000/api';
+  return LIVE_RENDER_BACKEND;
 };
 
 export const API_BASE_URL = resolveBaseUrl();
@@ -43,7 +46,7 @@ export const getDeviceHash = () => {
 
 // Generic request wrapper
 async function request(endpoint, options = {}) {
-  const url = `${API_BASE_URL}${endpoint}`;
+  let url = `${API_BASE_URL}${endpoint}`;
   const token = localStorage.getItem('veloop_token');
   
   const headers = {
@@ -58,7 +61,20 @@ async function request(endpoint, options = {}) {
   };
 
   try {
-    const response = await fetch(url, config);
+    let response;
+    try {
+      response = await fetch(url, config);
+    } catch (fetchErr) {
+      // If localhost failed (e.g. local backend isn't started), auto-fallback to live Render backend
+      if (API_BASE_URL.includes('localhost') || API_BASE_URL.includes('127.0.0.1')) {
+        console.warn(`[VELOP API] Local backend (${API_BASE_URL}) unreachable. Automatically routing to live Render backend: ${LIVE_RENDER_BACKEND}`);
+        url = `${LIVE_RENDER_BACKEND}${endpoint}`;
+        response = await fetch(url, config);
+      } else {
+        throw fetchErr;
+      }
+    }
+
     const data = await response.json().catch(() => ({}));
 
     if (!response.ok) {
@@ -72,7 +88,7 @@ async function request(endpoint, options = {}) {
     return data;
   } catch (err) {
     if (err.name === 'TypeError' && err.message.includes('fetch')) {
-      const networkErr = new Error('Backend server is unreachable. Please verify backend is running on ' + API_BASE_URL);
+      const networkErr = new Error('Backend server is unreachable. Please verify backend is running on ' + url);
       networkErr.isNetworkError = true;
       throw networkErr;
     }
