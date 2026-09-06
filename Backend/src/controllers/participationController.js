@@ -58,7 +58,7 @@ exports.joinGiveaway = async (req, res) => {
   // 3. Query Authoritative Giveaway from DB (Disregard any client-sent prices/status)
   const giveaway = await Giveaway.findOne({
     $or: [{ giveawayId }, { slug: giveawayId }]
-  });
+  }).lean();
 
   if (!giveaway) {
     return res.status(404).json({
@@ -93,10 +93,15 @@ exports.joinGiveaway = async (req, res) => {
   // 5. Match Authoritative Prize & Cost (Support both prizes array and root-level fields)
   let prize = null;
   if (Array.isArray(giveaway.prizes) && giveaway.prizes.length > 0) {
-    prize = giveaway.prizes.find((p) => p.prizeId === prizeId) || giveaway.prizes[0];
+    const firstPrize = giveaway.prizes[0];
+    // Guard: if prizes are raw ObjectId refs (not embedded objects), skip prize lookup
+    const isEmbeddedPrize = firstPrize && typeof firstPrize === "object" && firstPrize.entryFee !== undefined;
+    if (isEmbeddedPrize) {
+      prize = giveaway.prizes.find((p) => p.prizeId === prizeId) || firstPrize;
+    }
   }
 
-  const rawCurrency = prize?.currency || giveaway.currency || 'VES';
+  const rawCurrency = prize?.currency || giveaway.entryCurrency || giveaway.currency || 'VES';
   const currency = (rawCurrency.toUpperCase() === 'VES' || rawCurrency === 'VEs') ? 'VES'
                  : (rawCurrency.toUpperCase() === 'SVES' || rawCurrency === 'SVEs') ? 'SVES'
                  : rawCurrency || 'VES';
