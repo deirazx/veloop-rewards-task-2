@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Home, Gift, Plus, BookOpen, User } from 'lucide-react';
 
 const NAV_ITEMS = [
@@ -12,6 +12,7 @@ const NAV_ITEMS = [
 
 export default function BottomNav() {
   const { pathname } = useLocation();
+  const navigate = useNavigate();
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 bg-[#13131a] border-t border-white/10 safe-area-inset-bottom">
@@ -23,12 +24,17 @@ export default function BottomNav() {
             return (
               <div key="center" className="flex flex-col items-center relative" style={{ marginBottom: '8px' }}>
                 <button
+                  onClick={() => {
+                    navigate('/');
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }}
                   className="w-14 h-14 rounded-full bg-gradient-to-r from-[#6366F1] to-[#a855f7]
                     shadow-[0_0_24px_rgba(168,85,247,0.6)]
                     flex items-center justify-center
                     -translate-y-4
-                    active:scale-90 transition-transform duration-150"
-                  aria-label="Create"
+                    active:scale-90 transition-transform duration-150 cursor-pointer"
+                  aria-label="Explore Giveaways"
+                  title="Explore Giveaways"
                 >
                   <Plus className="w-7 h-7 text-white" strokeWidth={2.5} />
                 </button>

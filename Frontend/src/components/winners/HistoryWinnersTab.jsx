@@ -136,7 +136,11 @@ export default function HistoryWinnersTab() {
                     <div className="space-y-2">
                       {item.winners && item.winners.length > 0 ? (
                         item.winners.map((winner, idx) => {
-                          const isMe = winner.userId === currentUser.id;
+                          const isMe = Boolean(
+                            currentUser &&
+                              ((currentUser.id && winner.userId === currentUser.id) ||
+                                (currentUser.customUserId && (winner.customUserId === currentUser.customUserId || winner.userId === currentUser.customUserId)))
+                          );
                           return (
                             <div
                               key={idx}

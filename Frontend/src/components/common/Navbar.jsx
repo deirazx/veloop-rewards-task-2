@@ -6,7 +6,13 @@ import { useGiveaway } from '../../context/GiveawayContext';
 export default function Navbar() {
   const { balances, currentUser, logoutUser, isAuthenticated } = useGiveaway();
   const location = useLocation();
-  const [menuOpen, setMenuOpen] = useState(false);
+  const [bellOpen, setBellOpen] = useState(false);
+
+  const notifications = [
+    { id: 1, title: 'iPhone 15 Pro Draw', desc: 'Pool closing in 2 hours! 1 ticket active.', time: '10m ago' },
+    { id: 2, title: 'Recent Winner Alert', desc: 'Rohit Sharma won ₹5,000 Amazon Gift Card!', time: '1h ago' },
+    { id: 3, title: 'Welcome Bonus', desc: '1,000 VEs credited to your test wallet.', time: '2h ago' },
+  ];
 
   const navLinks = [
     { label: 'Discover',     path: '/' },
@@ -88,9 +94,44 @@ export default function Navbar() {
             </>
           ) : (
             <>
-              <button className="hidden md:flex p-2.5 rounded-xl text-slate-400 hover:text-white transition">
-                <Bell className="w-5 h-5" strokeWidth={1.5} />
-              </button>
+              <div className="relative">
+                <button
+                  onClick={() => setBellOpen((v) => !v)}
+                  className="hidden md:flex p-2.5 rounded-xl text-slate-400 hover:text-white transition relative cursor-pointer"
+                  title="Notifications"
+                >
+                  <Bell className="w-5 h-5" strokeWidth={1.5} />
+                  <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-[#a855f7] animate-pulse" />
+                </button>
+
+                {bellOpen && (
+                  <div className="absolute right-0 mt-2 w-80 rounded-2xl bg-[#13131a] border border-white/10 shadow-2xl p-4 z-50 space-y-3">
+                    <div className="flex items-center justify-between pb-2 border-b border-white/5">
+                      <span className="text-xs font-bold text-white flex items-center gap-1.5">
+                        <Bell className="w-3.5 h-3.5 text-[#a855f7]" /> Notifications
+                      </span>
+                      <button
+                        onClick={() => setBellOpen(false)}
+                        className="text-[10px] text-slate-400 hover:text-white"
+                      >
+                        Close
+                      </button>
+                    </div>
+
+                    <div className="space-y-2">
+                      {notifications.map((n) => (
+                        <div key={n.id} className="p-2.5 rounded-xl bg-[#09090b] border border-white/5 space-y-1 text-left">
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs font-bold text-white truncate">{n.title}</span>
+                            <span className="text-[10px] text-slate-500">{n.time}</span>
+                          </div>
+                          <p className="text-[11px] text-slate-400 leading-snug">{n.desc}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
 
               <div className="hidden sm:flex items-center gap-2">
                 <Link

@@ -58,14 +58,17 @@ export default function ActiveGiveaways() {
             ))}
           </div>
 
-          <Link
-            to="/winners"
+          <button
+            onClick={() => {
+              setFilter('ALL');
+              document.getElementById('active-giveaways-grid')?.scrollIntoView({ behavior: 'smooth' });
+            }}
             className="hidden sm:flex items-center gap-1 px-4 py-2 rounded-xl text-sm font-medium
               text-[#a855f7] border border-purple-500/20 bg-purple-500/8
-              hover:bg-purple-500/15 transition-colors"
+              hover:bg-purple-500/15 transition-colors cursor-pointer"
           >
             View All <ArrowRight className="w-3.5 h-3.5" />
-          </Link>
+          </button>
         </div>
       </div>
 
@@ -76,7 +79,7 @@ export default function ActiveGiveaways() {
            XL:      4 cols (if many cards)
       ── */}
       {filtered.length > 0 ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+        <div id="active-giveaways-grid" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
           {filtered.map((giveaway) => (
             <PrizeCard key={giveaway.id} giveaway={giveaway} />
           ))}
