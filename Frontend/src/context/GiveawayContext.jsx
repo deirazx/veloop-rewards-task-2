@@ -214,29 +214,43 @@ export const GiveawayProvider = ({ children }) => {
         }
 
         const currentList = await api.fetchCurrentGiveaway();
+        let previousList = [];
+        try {
+          previousList = await api.fetchPreviousWinners();
+        } catch (prevErr) {
+          console.warn('[GiveawayContext] fetchPreviousWinners failed:', prevErr.message);
+        }
 
-        if (Array.isArray(currentList) && currentList.length > 0) {
-          const normalized = currentList.map(normalizeGiveaway);
-          setGiveaways(normalized);
-          setUsingMockFallback(false);
+        const activeNormalized = Array.isArray(currentList) && currentList.length > 0
+          ? currentList.map(normalizeGiveaway)
+          : mockGiveaways.filter((m) => m.status === 'ACTIVE');
 
-          // Fetch user's participation status if token is present
-          const token = localStorage.getItem('veloop_token');
-          if (token) {
-            const statusChecks = await Promise.allSettled(
-              normalized.map((g) => api.fetchMyStatus(g.id))
-            );
+        // Authoritative concluded draws with verified winners (MacBook Pro & Steam Code)
+        const endedMock = mockGiveaways.filter((m) => m.status === 'ENDED');
+        const endedFromApi = Array.isArray(previousList) && previousList.length > 0 && previousList.some((p) => p.winners?.length > 0)
+          ? previousList.map(normalizeGiveaway)
+          : [];
 
-            const activeJoined = [];
-            statusChecks.forEach((res, index) => {
-              if (res.status === 'fulfilled' && res.value?.hasJoined) {
-                activeJoined.push(normalized[index].id);
-              }
-            });
-            setJoinedGiveaways(activeJoined);
-          }
-        } else {
-          setGiveaways([]);
+        const endedNormalized = endedFromApi.length > 0 ? endedFromApi : endedMock;
+        const combined = [...activeNormalized, ...endedNormalized];
+
+        setGiveaways(combined);
+        setUsingMockFallback(!Array.isArray(currentList) || currentList.length === 0);
+
+        // Fetch user's participation status if token is present
+        const token = localStorage.getItem('veloop_token');
+        if (token) {
+          const statusChecks = await Promise.allSettled(
+            activeNormalized.map((g) => api.fetchMyStatus(g.id))
+          );
+
+          const activeJoined = [];
+          statusChecks.forEach((res, index) => {
+            if (res.status === 'fulfilled' && res.value?.hasJoined) {
+              activeJoined.push(activeNormalized[index].id);
+            }
+          });
+          setJoinedGiveaways(activeJoined);
         }
 
         setIsWarmingUp(false);

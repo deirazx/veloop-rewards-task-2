@@ -21,22 +21,33 @@ export default function HistoryWinnersTab() {
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-1 gap-6">
-        {endedGiveaways.map((item) => {
-          // Strict Winner Identity Check (Clause #26 & #34)
-          const userWinnerRecord = item.winners?.find(
-            (w) =>
-              (currentUser?.customUserId && w.customUserId === currentUser.customUserId) ||
-              (currentUser?.id && w.userId === currentUser.id) ||
-              (currentUser?.customUserId && w.userId === currentUser.customUserId)
-          );
-          const hasUserClaimed = claims[item.id] || userWinnerRecord?.claimStatus === 'CLAIMED';
+      {endedGiveaways.length === 0 ? (
+        <div className="rounded-3xl bg-[#13131a] border border-white/8 p-12 text-center max-w-md mx-auto space-y-4">
+          <div className="w-16 h-16 rounded-2xl bg-purple-500/10 border border-purple-500/20 text-purple-400 flex items-center justify-center mx-auto">
+            <Trophy className="w-8 h-8" />
+          </div>
+          <h3 className="text-xl font-bold text-white">No Concluded Draws Yet</h3>
+          <p className="text-xs text-slate-400 leading-relaxed">
+            All current reward pools are actively running. Verified winner audits and on-chain allocations will appear here immediately after pool timers expire.
+          </p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 gap-6">
+          {endedGiveaways.map((item) => {
+            // Strict Winner Identity Check (Clause #26 & #34)
+            const userWinnerRecord = item.winners?.find(
+              (w) =>
+                (currentUser?.customUserId && w.customUserId === currentUser.customUserId) ||
+                (currentUser?.id && w.userId === currentUser.id) ||
+                (currentUser?.customUserId && w.userId === currentUser.customUserId)
+            );
+            const hasUserClaimed = claims[item.id] || userWinnerRecord?.claimStatus === 'CLAIMED';
 
-          return (
-            <div
-              key={item.id}
-              className="rounded-3xl bg-deep-card border border-slate-800 overflow-hidden shadow-2xl relative"
-            >
+            return (
+              <div
+                key={item.id}
+                className="rounded-3xl bg-[#13131a] border border-white/8 overflow-hidden shadow-2xl relative"
+              >
               {/* Exclusive Winner Claim Banner */}
               {userWinnerRecord ? (
                 <div className="bg-gradient-to-r from-accent-purple via-indigo-900 to-reward-gold/90 p-4 md:p-5 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-b border-purple-500/40">
@@ -191,7 +202,8 @@ export default function HistoryWinnersTab() {
             </div>
           );
         })}
-      </div>
+        </div>
+      )}
 
       {/* Claim Modals */}
       {selectedGiveaway && modalType === 'PHYSICAL' && (

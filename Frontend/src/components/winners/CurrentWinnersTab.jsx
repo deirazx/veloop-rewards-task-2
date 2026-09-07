@@ -11,8 +11,8 @@ export default function CurrentWinnersTab() {
 
   return (
     <div className="space-y-6">
-      <div className="p-4 rounded-2xl bg-deep-card/60 border border-slate-800 text-slate-300 text-sm flex items-center gap-3">
-        <Sparkles className="w-5 h-5 text-reward-gold shrink-0" />
+      <div className="p-4 rounded-2xl bg-[#13131a] border border-white/8 text-slate-300 text-sm flex items-center gap-3">
+        <Sparkles className="w-5 h-5 text-amber-400 shrink-0" />
         <span>
           <strong>Live Drawings Notice:</strong> All events in this tab are currently live. In accordance with platform integrity policies, winning tickets are selected via verified RNG strictly after the pool countdown reaches zero.
         </span>
@@ -26,7 +26,7 @@ export default function CurrentWinnersTab() {
           return (
             <div
               key={item.id}
-              className="rounded-3xl bg-deep-card border border-slate-800 overflow-hidden shadow-xl hover:border-slate-700 transition flex flex-col justify-between"
+              className="rounded-3xl bg-[#13131a] border border-white/8 overflow-hidden shadow-xl hover:border-purple-500/20 transition flex flex-col justify-between"
             >
               <div className="p-6">
                 {/* Header tags */}
@@ -81,7 +81,7 @@ export default function CurrentWinnersTab() {
               </div>
 
               {/* Action Bar */}
-              <div className="p-4 bg-obsidian/60 border-t border-slate-800 flex items-center justify-between">
+              <div className="p-4 bg-[#09090b]/80 border-t border-white/8 flex items-center justify-between">
                 {joined ? (
                   <span className="text-xs font-bold text-emerald-400 flex items-center gap-1">
                     ✓ Your Ticket is Active
@@ -93,8 +93,8 @@ export default function CurrentWinnersTab() {
                 )}
 
                 <Link
-                  to={`/giveaway/${item.slug}`}
-                  className="inline-flex items-center gap-1 text-xs font-semibold text-accent-purple hover:text-purple-300 transition"
+                  to={`/giveaway/${item.slug || item.id}`}
+                  className="inline-flex items-center gap-1 text-xs font-semibold text-purple-400 hover:text-purple-300 transition"
                 >
                   <span>{joined ? 'View Event Status' : 'Join Pool'}</span>
                   <ArrowRight className="w-3.5 h-3.5" />

@@ -19,6 +19,7 @@ import {
   UserPlus
 } from 'lucide-react';
 import { useGiveaway } from '../context/GiveawayContext';
+import { mockGiveaways } from '../data/mockGiveaways';
 import ConfirmationModal from '../components/modals/ConfirmationModal';
 import CustomLoader from '../components/common/CustomLoader';
 
@@ -26,7 +27,7 @@ export default function GiveawayDetailsPage() {
   const { id, slug } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
-  const { giveaways, balances, hasJoined, getBalanceCheck, addFunds, isAuthenticated, currentUser } = useGiveaway();
+  const { giveaways, balances, hasJoined, getBalanceCheck, addFunds, isAuthenticated, currentUser, isLoading } = useGiveaway();
 
   const [loading, setLoading] = useState(true);
   const [giveaway, setGiveaway] = useState(null);
@@ -38,15 +39,60 @@ export default function GiveawayDetailsPage() {
   const targetParam = slug || id;
 
   useEffect(() => {
+    // Wait if context is still loading initial data
+    if (isLoading && (!giveaways || giveaways.length === 0)) {
+      setLoading(true);
+      return;
+    }
+
     setLoading(true);
     const timer = setTimeout(() => {
-      const found = giveaways.find((g) => g.slug === targetParam || g.id === targetParam);
+      const normalize = (str) => (str || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+      const cleanTarget = normalize(targetParam);
+
+      // 1. Exact match by slug, id, _id, giveawayId
+      let found = (giveaways || []).find(
+        (g) =>
+          g.slug === targetParam ||
+          g.id === targetParam ||
+          g._id === targetParam ||
+          g.giveawayId === targetParam
+      );
+
+      // 2. Fuzzy match by normalized slug or title (e.g. 'iphone-15-pro' -> 'apple-iphone-15-pro-256gb')
+      if (!found && cleanTarget) {
+        found = (giveaways || []).find((g) => {
+          const gSlug = normalize(g.slug);
+          const gTitle = normalize(g.title);
+          return (
+            gSlug.includes(cleanTarget) ||
+            cleanTarget.includes(gSlug) ||
+            gTitle.includes(cleanTarget) ||
+            (cleanTarget.includes('iphone15') && gSlug.includes('iphone15')) ||
+            (cleanTarget.includes('watch') && gSlug.includes('watch')) ||
+            (cleanTarget.includes('airpods') && gSlug.includes('airpods')) ||
+            (cleanTarget.includes('amazon') && gSlug.includes('amazon'))
+          );
+        });
+      }
+
+      // 3. Fallback to mock data
+      if (!found) {
+        found = mockGiveaways.find(
+          (m) =>
+            m.slug === targetParam ||
+            m.id === targetParam ||
+            normalize(m.slug).includes(cleanTarget) ||
+            cleanTarget.includes(normalize(m.slug))
+        );
+      }
+
       setGiveaway(found || null);
       setLoading(false);
-    }, 600); // realistic smooth loading display with CustomLoader
+    }, 200);
 
     return () => clearTimeout(timer);
-  }, [targetParam, giveaways]);
+  }, [targetParam, giveaways, isLoading]);
 
   // Countdown clock simulation
   useEffect(() => {

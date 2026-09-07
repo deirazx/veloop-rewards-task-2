@@ -2,6 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Gift, ArrowRight, ShieldCheck, Trophy, Zap } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useGiveaway } from '../../context/GiveawayContext';
 
 const AVATARS = [
   'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=64&q=80&auto=format&fit=crop',
@@ -17,6 +18,14 @@ const TRUST_BADGES = [
 ];
 
 export default function HeroSection() {
+  const { giveaways } = useGiveaway();
+  const activeList = (giveaways || []).filter((g) => g.status === 'ACTIVE');
+  const featured =
+    activeList.find((g) => g.featured) ||
+    activeList.find((g) => g.slug?.includes('iphone') || g.title?.toLowerCase().includes('iphone')) ||
+    activeList[0];
+  const targetLink = featured ? `/giveaway/${featured.slug || featured.id}` : '/giveaway/apple-iphone-15-pro-256gb';
+
   return (
     <section className="relative rounded-3xl overflow-hidden
       bg-gradient-to-br from-[#14092b] via-[#0f0b1c] to-[#09090b]
@@ -73,7 +82,7 @@ export default function HeroSection() {
           {/* CTA row */}
           <div className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start">
             <Link
-              to="/giveaway/iphone-15-pro"
+              to={targetLink}
               className="inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-xl
                 text-base font-bold text-white
                 bg-gradient-to-r from-[#6366F1] to-[#8B5CF6]

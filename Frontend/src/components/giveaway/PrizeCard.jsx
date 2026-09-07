@@ -160,7 +160,7 @@ export default function PrizeCard({ giveaway }) {
     <motion.div
       whileHover={{ y: -7, scale: 1.01 }}
       transition={{ duration: 0.2, ease: 'easeOut' }}
-      onClick={() => navigate(`/giveaway/${giveaway.slug}`)}
+      onClick={() => navigate(`/giveaway/${giveaway.slug || giveaway.id || giveaway._id}`)}
       className={`group relative flex flex-col rounded-2xl bg-[#0f1117] border ${theme.outerBorder} ${theme.outerGlow} shadow-lg transition-all duration-300 overflow-hidden cursor-pointer`}
     >
       {/* ══════════════════════════════════════════════════════
@@ -301,7 +301,7 @@ export default function PrizeCard({ giveaway }) {
             <button
               onClick={(e) => {
                 e.stopPropagation();
-                navigate(`/giveaway/${giveaway.slug}`);
+                navigate(`/giveaway/${giveaway.slug || giveaway.id || giveaway._id}`);
               }}
               className="w-full flex items-center justify-center gap-2 py-3 rounded-xl
                 text-sm font-bold text-white tracking-wide

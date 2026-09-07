@@ -19,11 +19,13 @@ function App() {
           <main className="flex-grow">
             <Routes>
               <Route path="/" element={<HomePage />} />
+              <Route path="/giveaways" element={<HomePage />} />
               <Route path="/giveaway/:slug" element={<GiveawayDetailsPage />} />
               <Route path="/giveaway/:id" element={<GiveawayDetailsPage />} />
               <Route path="/winners" element={<WinnersPage />} />
               <Route path="/login" element={<LoginPage />} />
               <Route path="/register" element={<RegisterPage />} />
+              <Route path="*" element={<HomePage />} />
             </Routes>
           </main>
           {/* Footer hidden on mobile — BottomNav is used instead via HomePage */}
