@@ -6,6 +6,7 @@ import { useGiveaway } from '../../context/GiveawayContext';
 export default function Navbar() {
   const { balances, currentUser, logoutUser, isAuthenticated } = useGiveaway();
   const location = useLocation();
+  const [menuOpen, setMenuOpen] = useState(false);
   const [bellOpen, setBellOpen] = useState(false);
 
   const notifications = [
