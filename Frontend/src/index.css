@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Poppins:wght@400;500;600;700;800&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,10 +6,22 @@
 
 @layer base {
   body {
-    @apply bg-obsidian text-slate-100 font-sans antialiased selection:bg-accent-purple/40 selection:text-white;
-    background-color: #0B0E14;
+    @apply text-slate-100 font-sans antialiased selection:bg-[#a855f7]/40 selection:text-white;
+    background-color: #09090b;
   }
 }
+
+/* ── Hide scrollbar (used by horizontal card row) ── */
+@layer utilities {
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+}
+
 
 /* Custom subtle scrollbar */
 ::-webkit-scrollbar {
@@ -29,3 +41,16 @@
 ::-webkit-scrollbar-thumb:hover {
   background: #334155;
 }
+
+/* Shimmer animation for progress bar highlight */
+@keyframes shimmer {
+  0%   { transform: translateX(-100%); opacity: 0; }
+  40%  { opacity: 1; }
+  100% { transform: translateX(400%); opacity: 0; }
+}
+
+/* bg-white/8 utility (Tailwind doesn't generate this by default) */
+.bg-white\/8 {
+  background-color: rgba(255, 255, 255, 0.08);
+}
+

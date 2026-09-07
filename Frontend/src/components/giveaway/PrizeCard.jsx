@@ -1,125 +1,319 @@
-import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Clock, Users, ArrowRight, Sparkles, CheckCircle2, ShieldAlert } from 'lucide-react';
+import { Clock, CheckCircle2, Zap, ArrowRight, Users } from 'lucide-react';
 import { useGiveaway } from '../../context/GiveawayContext';
 
+/* ─────────────────────────────────────────────────────────────
+   PER-CARD THEME — all Tailwind classes as full literal strings
+   ───────────────────────────────────────────────────────────── */
+function getCardTheme(giveaway) {
+  const title = (giveaway.title || '').toLowerCase();
+  const category = (giveaway.category || '').toLowerCase();
+  const currency = (giveaway.currency || '').toLowerCase();
+  const accent = giveaway.accentColor || '';
+
+  /* Amazon / Gold voucher */
+  if (title.includes('amazon') || (title.includes('voucher') && accent === '#F59E0B')) {
+    return {
+      outerBorder: 'border-amber-500/30',
+      outerGlow: 'hover:shadow-[0_24px_60px_-12px_rgba(245,158,11,0.4)]',
+      imageBg: 'bg-[#100b01]',
+      radialGlow: 'bg-[radial-gradient(ellipse_90%_70%_at_50%_10%,rgba(200,110,0,0.45)_0%,rgba(130,60,0,0.18)_55%,transparent_100%)]',
+      imageBorder: 'border-amber-500/25',
+      badgeLabel: 'HOT',
+      badgeCls: 'bg-orange-500 text-white',
+      pillCls: 'bg-black/50 border border-amber-400/25 text-amber-200/90 backdrop-blur-md',
+      progressFill: 'from-amber-500 to-orange-500',
+      timerColor: 'text-amber-300',
+      accentText: 'text-amber-400',
+    };
+  }
+
+  /* iPhone / Flagship — cosmic violet */
+  if (title.includes('iphone') || category.includes('flagship') || accent === '#7C3AED') {
+    return {
+      outerBorder: 'border-purple-500/35',
+      outerGlow: 'hover:shadow-[0_24px_60px_-12px_rgba(124,58,237,0.5)]',
+      imageBg: 'bg-[#0d0318]',
+      radialGlow: 'bg-[radial-gradient(ellipse_90%_70%_at_50%_10%,rgba(130,30,240,0.5)_0%,rgba(70,10,140,0.22)_55%,transparent_100%)]',
+      imageBorder: 'border-purple-500/35',
+      badgeLabel: 'HOT',
+      badgeCls: 'bg-orange-500 text-white',
+      pillCls: 'bg-black/50 border border-purple-400/25 text-purple-200/90 backdrop-blur-md',
+      progressFill: 'from-violet-500 to-purple-600',
+      timerColor: 'text-purple-300',
+      accentText: 'text-purple-400',
+    };
+  }
+
+  /* Apple Watch / AirPods — sapphire cyan */
+  if (
+    title.includes('watch') || title.includes('airpods') ||
+    category.includes('wearable') || category.includes('audio') || accent === '#3B82F6'
+  ) {
+    return {
+      outerBorder: 'border-cyan-500/30',
+      outerGlow: 'hover:shadow-[0_24px_60px_-12px_rgba(6,182,212,0.4)]',
+      imageBg: 'bg-[#010d1f]',
+      radialGlow: 'bg-[radial-gradient(ellipse_90%_70%_at_50%_10%,rgba(0,110,220,0.45)_0%,rgba(0,55,130,0.2)_55%,transparent_100%)]',
+      imageBorder: 'border-cyan-500/25',
+      badgeLabel: 'TRENDING',
+      badgeCls: 'bg-fuchsia-600 text-white',
+      pillCls: 'bg-black/50 border border-cyan-400/25 text-cyan-200/90 backdrop-blur-md',
+      progressFill: 'from-cyan-500 to-blue-500',
+      timerColor: 'text-cyan-300',
+      accentText: 'text-cyan-400',
+    };
+  }
+
+  /* Paytm / Token / Teal */
+  if (
+    title.includes('recharge') || title.includes('paytm') ||
+    currency === 'tokens' || accent === '#10B981' || accent === '#06B6D4'
+  ) {
+    return {
+      outerBorder: 'border-teal-500/30',
+      outerGlow: 'hover:shadow-[0_24px_60px_-12px_rgba(20,184,166,0.4)]',
+      imageBg: 'bg-[#010e10]',
+      radialGlow: 'bg-[radial-gradient(ellipse_90%_70%_at_50%_10%,rgba(0,150,130,0.45)_0%,rgba(0,80,70,0.2)_55%,transparent_100%)]',
+      imageBorder: 'border-teal-500/25',
+      badgeLabel: 'NEW',
+      badgeCls: 'bg-red-500 text-white',
+      pillCls: 'bg-black/50 border border-teal-400/25 text-teal-200/90 backdrop-blur-md',
+      progressFill: 'from-teal-500 to-emerald-500',
+      timerColor: 'text-teal-300',
+      accentText: 'text-teal-400',
+    };
+  }
+
+  /* Fallback violet */
+  return {
+    outerBorder: 'border-violet-500/30',
+    outerGlow: 'hover:shadow-[0_24px_60px_-12px_rgba(124,58,237,0.4)]',
+    imageBg: 'bg-[#0c0520]',
+    radialGlow: 'bg-[radial-gradient(ellipse_90%_70%_at_50%_10%,rgba(110,30,210,0.45)_0%,rgba(60,10,140,0.2)_55%,transparent_100%)]',
+    imageBorder: 'border-violet-500/25',
+    badgeLabel: 'NEW',
+    badgeCls: 'bg-violet-600 text-white',
+    pillCls: 'bg-black/50 border border-violet-400/25 text-violet-200/90 backdrop-blur-md',
+    progressFill: 'from-violet-500 to-purple-600',
+    timerColor: 'text-violet-300',
+    accentText: 'text-violet-400',
+  };
+}
+
+/* ─────────────────────────────────────────────────────────────
+   COUNTDOWN HOOK — updates every second
+   ───────────────────────────────────────────────────────────── */
+function useCountdown(endsAt) {
+  const calc = () => {
+    const diff = new Date(endsAt) - Date.now();
+    if (diff <= 0) return { d: 0, h: 0, m: 0, s: 0, expired: true };
+    const s = Math.floor(diff / 1000);
+    return {
+      d: Math.floor(s / 86400),
+      h: Math.floor((s % 86400) / 3600),
+      m: Math.floor((s % 3600) / 60),
+      s: s % 60,
+      expired: false,
+    };
+  };
+  const [time, setTime] = useState(calc);
+  useEffect(() => {
+    const id = setInterval(() => setTime(calc()), 1000);
+    return () => clearInterval(id);
+  }, [endsAt]);
+  return time;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   ENTRY COUNT FORMATTER
+   ───────────────────────────────────────────────────────────── */
+function fmt(n) {
+  if (!n && n !== 0) return '0';
+  if (n >= 1000) {
+    const k = n / 1000;
+    return `${Number.isInteger(k) ? k : k.toFixed(1)}K`;
+  }
+  return n.toLocaleString();
+}
+
+/* ─────────────────────────────────────────────────────────────
+   PRIZE CARD COMPONENT
+   ───────────────────────────────────────────────────────────── */
 export default function PrizeCard({ giveaway }) {
   const navigate = useNavigate();
   const { hasJoined, getBalanceCheck } = useGiveaway();
 
   const isJoined = hasJoined(giveaway.id);
   const balanceCheck = getBalanceCheck(giveaway.cost, giveaway.currency);
-  const percentFilled = Math.round((giveaway.spotsTaken / giveaway.totalSpots) * 100);
+  const percentFilled = Math.min(100, Math.round((giveaway.spotsTaken / giveaway.totalSpots) * 100));
+  const theme = getCardTheme(giveaway);
+  const countdown = useCountdown(giveaway.endsAt);
+  const entryCount = giveaway.participantsCount ?? giveaway.spotsTaken ?? 0;
+  const totalSpots = giveaway.totalSpots ?? 1000;
 
-  const handleCardClick = () => {
-    navigate(`/giveaway/${giveaway.slug}`);
-  };
+  const pad = (n) => String(n).padStart(2, '0');
 
   return (
     <motion.div
-      whileHover={{ y: -4 }}
-      transition={{ duration: 0.2 }}
-      onClick={handleCardClick}
-      className="group relative flex flex-col justify-between rounded-3xl bg-deep-card border border-slate-800/90 hover:border-accent-purple/50 shadow-xl hover:shadow-[0_15px_30px_-10px_rgba(124,58,237,0.25)] transition-all duration-300 overflow-hidden cursor-pointer"
+      whileHover={{ y: -7, scale: 1.01 }}
+      transition={{ duration: 0.2, ease: 'easeOut' }}
+      onClick={() => navigate(`/giveaway/${giveaway.slug}`)}
+      className={`group relative flex flex-col rounded-2xl bg-[#0f1117] border ${theme.outerBorder} ${theme.outerGlow} shadow-lg transition-all duration-300 overflow-hidden cursor-pointer`}
     >
-      {/* Top Banner Tag */}
-      <div className="p-5 pb-0">
-        <div className="flex items-center justify-between gap-2 mb-3">
-          <span className="px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider bg-accent-purple/20 text-purple-300 border border-accent-purple/30">
-            {giveaway.category}
+      {/* ══════════════════════════════════════════════════════
+          IMAGE ZONE — themed radial glow backdrop
+          ══════════════════════════════════════════════════════ */}
+      <div className={`relative w-full h-44 overflow-hidden border-b ${theme.imageBorder}`}>
+        {/* Dark tinted base */}
+        <div className={`absolute inset-0 ${theme.imageBg}`} />
+
+        {/* Radial ambient bloom */}
+        <div className={`absolute inset-0 ${theme.radialGlow}`} />
+
+        {/* Prize photo — screen blend so glow shows through */}
+        <img
+          src={giveaway.image}
+          alt={giveaway.title}
+          onError={(e) => {
+            e.currentTarget.onerror = null;
+            const t = (giveaway.title || '').toLowerCase();
+            e.currentTarget.src =
+              t.includes('2000') || t.includes('2,000') ? '/amazon-2000.svg' : '/amazon-20.svg';
+          }}
+          className="absolute inset-0 w-full h-full object-cover mix-blend-screen opacity-85 group-hover:scale-105 transition-transform duration-500"
+        />
+
+        {/* Bottom fade into card body */}
+        <div className="absolute inset-0 bg-gradient-to-t from-[#0f1117] via-[#0f1117]/30 to-transparent" />
+
+        {/* ── Top row: Badge + Entry count pill ── */}
+        <div className="absolute top-3 left-3 right-3 flex items-center justify-between z-10">
+          <motion.span
+            initial={{ opacity: 0, x: -8 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.1 }}
+            className={`px-2.5 py-1 rounded-lg text-[10px] font-extrabold uppercase tracking-widest ${theme.badgeCls} shadow-md`}
+          >
+            {theme.badgeLabel}
+          </motion.span>
+
+          <span className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-semibold ${theme.pillCls}`}>
+            <Users className="w-2.5 h-2.5" />
+            {fmt(entryCount)} Entries
           </span>
-          <span className="text-xs font-mono font-bold text-slate-400">
+        </div>
+
+        {/* ── Retail price chip — bottom-right ── */}
+        <div className="absolute bottom-3 right-3 z-10">
+          <span className="px-2.5 py-1 rounded-lg bg-black/60 backdrop-blur-md border border-white/10 text-[10px] font-bold text-amber-300 font-mono tracking-wide">
+            {giveaway.retailPrice}
+          </span>
+        </div>
+      </div>
+
+      {/* ══════════════════════════════════════════════════════
+          CARD BODY
+          ══════════════════════════════════════════════════════ */}
+      <div className="flex flex-col flex-1 px-4 pt-3 pb-4 gap-3">
+
+        {/* Title + Retail Price chip (same row, like reference) */}
+        <div className="flex items-start justify-between gap-2">
+          <h3 className="text-sm font-bold text-white group-hover:text-purple-300 transition-colors line-clamp-2 leading-snug flex-1">
+            {giveaway.title}
+          </h3>
+          <span className={`shrink-0 px-2 py-0.5 rounded-md text-[10px] font-bold font-mono border border-white/10 bg-white/5 ${theme.accentText}`}>
             {giveaway.retailPrice}
           </span>
         </div>
 
-        {/* Prize Image */}
-        <div className="relative w-full h-48 rounded-2xl overflow-hidden bg-obsidian border border-slate-800/80">
-          <img
-            src={giveaway.image}
-            alt={giveaway.title}
-            onError={(e) => {
-              e.currentTarget.onerror = null;
-              const title = (giveaway.title || '').toLowerCase();
-              const is2000 = title.includes('2000') || title.includes('2,000') || title.includes('2k');
-              e.currentTarget.src = is2000 ? '/amazon-2000.svg' : '/amazon-20.svg';
-            }}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-90"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-deep-card via-transparent to-transparent opacity-80" />
-
-          <div className="absolute bottom-3 left-3">
-            <span className="px-2.5 py-1 rounded-lg bg-obsidian/85 backdrop-blur-md border border-slate-700/80 text-[10px] font-semibold text-slate-200">
-              {giveaway.type === 'PHYSICAL' ? '📦 Physical Prize' : '⚡ Digital E-Voucher'}
+        {/* Countdown timer — "Ends in 12d : 08h : 45m" */}
+        {!countdown.expired ? (
+          <div className={`flex items-center gap-1.5 text-[11px] font-medium ${theme.timerColor}`}>
+            <Clock className="w-3 h-3 shrink-0" />
+            <span className="font-mono tracking-wide">
+              {countdown.d > 0
+                ? `${countdown.d}d : ${pad(countdown.h)}h : ${pad(countdown.m)}m`
+                : `${pad(countdown.h)}h : ${pad(countdown.m)}m : ${pad(countdown.s)}s`}
             </span>
           </div>
-        </div>
+        ) : (
+          <span className="text-[11px] font-semibold text-red-400">Draw Completed</span>
+        )}
 
-        {/* Title & Subtitle */}
-        <div className="mt-4">
-          <h3 className="text-base font-bold text-white group-hover:text-purple-300 transition-colors line-clamp-1">
-            {giveaway.title}
-          </h3>
-          <p className="text-xs text-slate-400 mt-1 line-clamp-2 leading-relaxed">
-            {giveaway.subtitle}
-          </p>
-        </div>
-      </div>
-
-      {/* Progress & Entry Price Block */}
-      <div className="p-5 pt-4 space-y-4">
-        {/* Progress Bar */}
+        {/* Progress — "7.2K / 10K Entries   72%" like reference */}
         <div className="space-y-1.5">
-          <div className="flex justify-between text-[11px] text-slate-400">
-            <span>Spots: <strong className="text-slate-200">{giveaway.spotsTaken}</strong>/{giveaway.totalSpots}</span>
-            <span className="font-semibold text-purple-300">{percentFilled}% Full</span>
+          <div className="flex justify-between text-[11px]">
+            <span className="text-slate-400 font-medium">
+              <span className="text-slate-200 font-semibold">{fmt(giveaway.spotsTaken)}</span>
+              {' / '}
+              <span className="text-slate-500">{fmt(totalSpots)} Entries</span>
+            </span>
+            <span className={`font-bold ${theme.accentText}`}>{percentFilled}%</span>
           </div>
-          <div className="w-full h-2 rounded-full bg-obsidian border border-slate-800 overflow-hidden">
+          {/* Sleek progress bar */}
+          <div className="relative w-full h-1.5 rounded-full bg-white/8 overflow-hidden">
+            <motion.div
+              className={`h-full rounded-full bg-gradient-to-r ${theme.progressFill}`}
+              initial={{ width: 0 }}
+              animate={{ width: `${percentFilled}%` }}
+              transition={{ duration: 0.8, ease: 'easeOut' }}
+            />
+            {/* Shimmering highlight */}
             <div
-              className="h-full bg-gradient-to-r from-accent-purple to-reward-gold rounded-full"
-              style={{ width: `${percentFilled}%` }}
+              className="absolute top-0 h-full w-8 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-[shimmer_2.5s_infinite]"
+              style={{ left: `${Math.max(0, percentFilled - 8)}%` }}
             />
           </div>
         </div>
 
-        {/* Pricing Breakdown & Dynamic CTA */}
-        <div className="pt-3 border-t border-slate-800/90 flex items-center justify-between gap-3">
-          <div>
-            <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 block">
+        {/* ── Entry cost + Full-width Join Now button (like reference) ── */}
+        <div className="space-y-2.5 pt-0.5">
+          {/* Entry cost row */}
+          <div className="flex items-center justify-between">
+            <span className="text-[10px] font-semibold uppercase tracking-widest text-slate-500">
               Entry Cost
             </span>
-            <div className="flex items-baseline gap-1 mt-0.5">
-              <span className="text-xl font-extrabold text-reward-gold tracking-tight">
+            <div className="flex items-baseline gap-1">
+              <span className="text-base font-extrabold text-amber-400 tracking-tight">
                 {giveaway.cost.toLocaleString()}
               </span>
-              <span className="text-xs font-bold text-purple-300">
+              <span className="text-[11px] font-bold text-purple-400">
                 {giveaway.currency}
               </span>
             </div>
           </div>
 
-          {/* Action Button */}
+          {/* Full-width CTA button — unified across ALL cards */}
           {isJoined ? (
-            <span className="px-3.5 py-2 rounded-xl text-xs font-bold bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 flex items-center gap-1.5">
-              <CheckCircle2 className="w-3.5 h-3.5" />
-              <span>Joined</span>
-            </span>
+            <div className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-emerald-500/15 border border-emerald-500/40 text-emerald-300 text-sm font-semibold">
+              <CheckCircle2 className="w-4 h-4" />
+              You're In the Draw!
+            </div>
           ) : !balanceCheck.isSufficient ? (
-            <span className="px-3 py-2 rounded-xl text-xs font-bold bg-amber-500/20 border border-amber-500/40 text-amber-300 flex items-center gap-1">
-              <span>View Deficit</span>
-              <ArrowRight className="w-3 h-3" />
-            </span>
+            <div className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300 text-sm font-semibold">
+              Insufficient Balance
+              <ArrowRight className="w-3.5 h-3.5" />
+            </div>
           ) : (
             <button
               onClick={(e) => {
                 e.stopPropagation();
                 navigate(`/giveaway/${giveaway.slug}`);
               }}
-              className="px-4 py-2 rounded-xl text-xs font-bold text-white bg-accent-purple hover:bg-purple-600 transition shadow-lg shadow-purple-950/40 flex items-center gap-1.5 group-hover:scale-105"
+              className="w-full flex items-center justify-center gap-2 py-3 rounded-xl
+                text-sm font-bold text-white tracking-wide
+                bg-gradient-to-r from-[#6366F1] to-[#7C3AED]
+                hover:from-[#4F46E5] hover:to-[#6D28D9]
+                shadow-[0_0_20px_rgba(124,58,237,0.5)]
+                hover:shadow-[0_0_30px_rgba(124,58,237,0.8)]
+                active:scale-95
+                transition-all duration-200"
             >
-              <span>Join Now</span>
-              <ArrowRight className="w-3.5 h-3.5" />
+              <Zap className="w-4 h-4" />
+              Join Now
             </button>
           )}
         </div>

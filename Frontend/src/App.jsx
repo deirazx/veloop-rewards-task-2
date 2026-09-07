@@ -14,7 +14,7 @@ function App() {
   return (
     <GiveawayProvider>
       <Router>
-        <div className="min-h-screen flex flex-col bg-obsidian text-white">
+        <div className="min-h-screen flex flex-col bg-[#09090b] text-white">
           <Navbar />
           <main className="flex-grow">
             <Routes>
@@ -26,7 +26,7 @@ function App() {
               <Route path="/register" element={<RegisterPage />} />
             </Routes>
           </main>
-          <Footer />
+          {/* Footer hidden on mobile — BottomNav is used instead via HomePage */}
         </div>
       </Router>
     </GiveawayProvider>
