@@ -72,17 +72,17 @@ export default function HistoryWinnersTab() {
 
                   <div>
                     {hasUserClaimed ? (
-                      <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-500/20 border border-emerald-400/40 text-emerald-300 text-xs font-bold">
+                      <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-500/20 border border-blue-400/40 text-blue-300 text-xs font-bold">
                         <CheckCircle2 className="w-4 h-4" />
-                        <span>Claim Verified & Locked</span>
+                        <span>Claim Submitted</span>
                       </div>
                     ) : (
                       <button
                         onClick={() => handleOpenClaim(item, item.type)}
-                        className="px-5 py-2.5 rounded-xl font-bold text-obsidian bg-reward-gold hover:bg-amber-400 transition shadow-[0_4px_20px_rgba(245,158,11,0.5)] flex items-center gap-2 text-sm"
+                        className="px-5 py-2.5 rounded-xl font-bold text-obsidian bg-reward-gold hover:bg-amber-400 transition shadow-[0_4px_20px_rgba(245,158,11,0.5)] flex items-center gap-2 text-sm cursor-pointer"
                       >
                         <Gift className="w-4 h-4" />
-                        <span>Claim Your Prize Now</span>
+                        <span>Claim Prize</span>
                       </button>
                     )}
                   </div>
@@ -132,70 +132,74 @@ export default function HistoryWinnersTab() {
                       <ShieldCheck className="w-4 h-4 text-emerald-400" />
                       <span>Provably Fair RNG Winners ({item.winners?.length || 0})</span>
                     </div>
+                    <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider block mb-3">
+                      Official Audited Winners (Clause #25 & #63)
+                    </span>
 
-                    <div className="space-y-2">
+                    <div className="space-y-2.5">
                       {item.winners && item.winners.length > 0 ? (
                         item.winners.map((winner, idx) => {
-                          const isMe = Boolean(
-                            currentUser &&
-                              ((currentUser.id && winner.userId === currentUser.id) ||
-                                (currentUser.customUserId && (winner.customUserId === currentUser.customUserId || winner.userId === currentUser.customUserId)))
-                          );
+                          const isMe =
+                            (currentUser?.customUserId && winner.customUserId === currentUser.customUserId) ||
+                            (currentUser?.id && winner.userId === currentUser.id);
+
+                          const rawStatus = (winner.claimStatus || '').toUpperCase();
+                          const effectiveStatus = (isMe && hasUserClaimed)
+                            ? 'Claim Submitted'
+                            : (rawStatus === 'CLAIMED' || rawStatus === 'COMPLETED')
+                            ? 'Completed'
+                            : rawStatus === 'PROCESSING'
+                            ? 'Processing'
+                            : 'Claim Prize';
+
+                          const statusColors = {
+                            'Claim Prize': 'bg-amber-500/20 text-reward-gold border-amber-500/30',
+                            'Claim Submitted': 'bg-blue-500/20 text-blue-300 border-blue-500/30',
+                            'Processing': 'bg-purple-500/20 text-purple-300 border-purple-500/30',
+                            'Completed': 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30',
+                          }[effectiveStatus] || 'bg-slate-800 text-slate-300 border-slate-700';
+
+                          const maskedId = winner.maskedUserId || (winner.customUserId ? `${winner.customUserId.slice(0, 2)}****${winner.customUserId.slice(-2)}` : 'VE****00');
+
                           return (
                             <div
                               key={idx}
-                              className={`p-3.5 rounded-2xl flex flex-wrap items-center justify-between gap-3 text-xs border ${
+                              className={`p-3.5 rounded-2xl border flex items-center justify-between transition ${
                                 isMe
-                                  ? 'bg-purple-950/40 border-accent-purple/60 text-purple-200'
+                                  ? 'bg-purple-950/30 border-purple-500/40 text-white'
                                   : 'bg-obsidian/80 border-slate-800 text-slate-300'
                               }`}
                             >
                               <div className="flex items-center gap-3">
-                                {(() => {
-                                  const displayName = winner.maskedUserId || winner.name || 'VE****00';
-                                  return (
-                                    <>
-                                      <div
-                                        className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs ${
-                                          isMe
-                                            ? 'bg-reward-gold text-obsidian'
-                                            : 'bg-slate-800 text-slate-300'
-                                        }`}
-                                      >
-                                        {displayName.charAt(0)}
-                                      </div>
-                                      <div>
-                                        <div className="font-bold text-white flex items-center gap-1.5 font-mono">
-                                          <span>{displayName}</span>
-                                          {isMe && (
-                                            <span className="px-1.5 py-0.2 rounded bg-accent-purple text-[10px] text-white">
-                                              YOU
-                                            </span>
-                                          )}
-                                        </div>
-                                        <span className="text-slate-500 font-mono text-[11px]">
-                                          Ticket: {winner.ticketNumber} • {winner.drawTimestamp ? new Date(winner.drawTimestamp).toLocaleDateString() : 'Audited'}
-                                        </span>
-                                      </div>
-                                    </>
-                                  );
-                                })()}
+                                <div
+                                  className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs ${
+                                    isMe
+                                      ? 'bg-reward-gold text-obsidian'
+                                      : 'bg-slate-800 text-slate-300'
+                                  }`}
+                                >
+                                  {maskedId.charAt(0)}
+                                </div>
+                                <div>
+                                  <div className="font-bold text-white flex items-center gap-1.5 font-mono">
+                                    <span>{maskedId}</span>
+                                    {isMe && (
+                                      <span className="px-1.5 py-0.2 rounded bg-accent-purple text-[10px] text-white">
+                                        YOU
+                                      </span>
+                                    )}
+                                  </div>
+                                  <span className="text-slate-500 font-mono text-[11px]">
+                                    Ticket: {winner.ticketNumber} • {winner.drawTimestamp ? new Date(winner.drawTimestamp).toLocaleDateString() : 'Audited'}
+                                  </span>
+                                </div>
                               </div>
 
                               <div className="flex items-center gap-2">
-                                <span className="font-mono text-slate-400 text-[11px]">
-                                  {winner.email}
-                                </span>
                                 <span
-                                  className={`px-2.5 py-1 rounded-full text-[10px] font-bold ${
-                                    winner.claimStatus === 'CLAIMED' || (isMe && hasUserClaimed)
-                                      ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
-                                      : 'bg-amber-500/20 text-reward-gold border border-amber-500/30'
-                                  }`}
+                                  className={`px-2.5 py-1 rounded-full text-[10px] font-bold border ${statusColors}`}
                                 >
-                                  {winner.claimStatus === 'CLAIMED' || (isMe && hasUserClaimed)
-                                    ? 'Claim Dispatched'
-                                    : 'Awaiting Claim'}
+                                  {effectiveStatus}
                                 </span>
                               </div>
                             </div>

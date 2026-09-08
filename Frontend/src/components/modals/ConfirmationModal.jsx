@@ -153,7 +153,7 @@ export default function ConfirmationModal({ giveaway, isOpen, onClose, onSuccess
                   </div>
 
                   <div className="flex justify-between items-center text-sm">
-                    <span className="text-slate-400">Available Balance:</span>
+                    <span className="text-slate-400">Your Balance:</span>
                     <span className="font-semibold text-slate-200">
                       {balanceCheck.available.toLocaleString()} {giveaway.currency}
                     </span>
@@ -170,7 +170,7 @@ export default function ConfirmationModal({ giveaway, isOpen, onClose, onSuccess
                   </div>
 
                   <div className="pt-2 border-t border-slate-800 flex justify-between items-center text-sm">
-                    <span className="text-slate-300 font-medium">Balance After Join:</span>
+                    <span className="text-slate-300 font-medium">Balance After Joining:</span>
                     <span className={`font-bold ${balanceCheck.isSufficient ? 'text-emerald-400' : 'text-rose-400'}`}>
                       {balanceCheck.remaining.toLocaleString()} {giveaway.currency}
                     </span>
@@ -229,7 +229,7 @@ export default function ConfirmationModal({ giveaway, isOpen, onClose, onSuccess
                     {isSubmitting ? (
                       <>
                         <Loader2 className="w-5 h-5 animate-spin" />
-                        <span>Joining Giveaway...</span>
+                        <span>Joining...</span>
                       </>
                     ) : (
                       <>

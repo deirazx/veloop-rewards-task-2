@@ -12,11 +12,16 @@ import {
   Sparkles,
   ExternalLink,
   ChevronRight,
+  ChevronDown,
   PlusCircle,
   Coins,
   Lock,
   LogIn,
-  UserPlus
+  UserPlus,
+  Info,
+  Package,
+  FileText,
+  Gift
 } from 'lucide-react';
 import { useGiveaway } from '../context/GiveawayContext';
 import { mockGiveaways } from '../data/mockGiveaways';
@@ -33,6 +38,7 @@ export default function GiveawayDetailsPage() {
   const [giveaway, setGiveaway] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoginBarrierOpen, setIsLoginBarrierOpen] = useState(false);
+  const [isImportantInfoOpen, setIsImportantInfoOpen] = useState(false);
   const [timeLeft, setTimeLeft] = useState({ hours: 0, minutes: 0, seconds: 0 });
 
   // Match by slug or id
@@ -151,15 +157,15 @@ export default function GiveawayDetailsPage() {
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8 md:py-12">
-      {/* Back Navigation & Breadcrumb */}
+      {/* Back Navigation & Breadcrumb (Rule 82) */}
       <div className="flex items-center justify-between mb-6">
-        <button
-          onClick={() => navigate(-1)}
-          className="inline-flex items-center gap-2 text-sm font-medium text-slate-400 hover:text-white transition-colors group"
+        <Link
+          to="/"
+          className="inline-flex items-center gap-2 text-sm font-semibold text-slate-300 hover:text-white transition-colors group px-3.5 py-1.5 rounded-xl bg-white/5 border border-white/10 hover:border-purple-500/40"
         >
-          <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-          <span>Back to Giveaways</span>
-        </button>
+          <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform text-purple-400" />
+          <span>← Giveaway Home</span>
+        </Link>
 
         <div className="flex items-center gap-2 text-xs text-slate-500">
           <span>Giveaways</span>
@@ -265,6 +271,176 @@ export default function GiveawayDetailsPage() {
               </div>
             </div>
           )}
+
+          {/* ─── ABOUT THE PRIZE (Rule 93) ─── */}
+          <div className="p-6 rounded-2xl bg-deep-card border border-slate-800 space-y-4">
+            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+              <h3 className="text-sm font-bold uppercase tracking-wider text-white flex items-center gap-2">
+                <Gift className="w-4 h-4 text-reward-gold" />
+                About the Prize
+              </h3>
+              <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-purple-500/15 text-purple-300 border border-purple-500/30">
+                100% Genuine Reward
+              </span>
+            </div>
+
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+              <div className="p-3 rounded-xl bg-obsidian/60 border border-slate-800/80">
+                <span className="text-[11px] text-slate-500 block">Prize Value</span>
+                <span className="text-sm font-bold text-amber-300 font-mono">{giveaway.retailPrice}</span>
+              </div>
+              <div className="p-3 rounded-xl bg-obsidian/60 border border-slate-800/80">
+                <span className="text-[11px] text-slate-500 block">Winner Count</span>
+                <span className="text-sm font-bold text-white font-mono">
+                  {giveaway.prizes?.[0]?.winnerCount || (giveaway.slug?.includes('amazon-gift-voucher-500') ? 10 : giveaway.slug?.includes('2000') ? 5 : giveaway.slug?.includes('20') ? 50 : 1)} Winner(s)
+                </span>
+              </div>
+              <div className="p-3 rounded-xl bg-obsidian/60 border border-slate-800/80 col-span-2 sm:col-span-1">
+                <span className="text-[11px] text-slate-500 block">Fulfillment Type</span>
+                <span className="text-sm font-bold text-emerald-400">
+                  {giveaway.type === 'PHYSICAL' ? 'Insured Courier' : 'Instant Email PIN'}
+                </span>
+              </div>
+            </div>
+
+            <p className="text-xs text-slate-300 leading-relaxed bg-obsidian/40 p-3.5 rounded-xl border border-slate-800/60">
+              {giveaway.description || 'Authentic retail units dispatched in factory-sealed condition with standard manufacturer warranty. Digital vouchers are delivered immediately to registered email.'}
+            </p>
+          </div>
+
+          {/* ─── HOW THIS GIVEAWAY WORKS — Visual Step-by-Step Timeline (Rule 90) ─── */}
+          <div className="p-6 rounded-2xl bg-deep-card border border-slate-800 space-y-5">
+            <h3 className="text-sm font-bold uppercase tracking-wider text-white flex items-center gap-2 border-b border-slate-800 pb-3">
+              <Sparkles className="w-4 h-4 text-accent-purple" />
+              How This Giveaway Works
+            </h3>
+
+            <div className="relative pl-6 space-y-6 before:absolute before:left-2.5 before:top-2 before:bottom-2 before:w-0.5 before:bg-gradient-to-b before:from-purple-500 before:via-indigo-500 before:to-emerald-500">
+              {/* Step 1 */}
+              <div className="relative group">
+                <span className="absolute -left-6 top-0.5 flex items-center justify-center w-5 h-5 rounded-full bg-purple-600 text-[10px] font-extrabold text-white ring-4 ring-[#0f1117]">
+                  1
+                </span>
+                <h4 className="text-xs font-bold text-white">Reserve Your Entry Ticket</h4>
+                <p className="text-[11px] text-slate-400 mt-0.5 leading-relaxed">
+                  Lock your participation by deducting {(giveaway.cost).toLocaleString()} {giveaway.currency}. An individual cryptographic ticket number is recorded permanently in the pool.
+                </p>
+              </div>
+
+              {/* Step 2 */}
+              <div className="relative group">
+                <span className="absolute -left-6 top-0.5 flex items-center justify-center w-5 h-5 rounded-full bg-indigo-600 text-[10px] font-extrabold text-white ring-4 ring-[#0f1117]">
+                  2
+                </span>
+                <h4 className="text-xs font-bold text-white">Live Participation Tracking</h4>
+                <p className="text-[11px] text-slate-400 mt-0.5 leading-relaxed">
+                  Watch the pool fill in real-time. Entries automatically close as soon as the round countdown reaches 0 or all available tickets are claimed.
+                </p>
+              </div>
+
+              {/* Step 3 */}
+              <div className="relative group">
+                <span className="absolute -left-6 top-0.5 flex items-center justify-center w-5 h-5 rounded-full bg-amber-600 text-[10px] font-extrabold text-white ring-4 ring-[#0f1117]">
+                  3
+                </span>
+                <h4 className="text-xs font-bold text-white">Cryptographic Provably Fair Draw</h4>
+                <p className="text-[11px] text-slate-400 mt-0.5 leading-relaxed">
+                  An audited on-chain PRNG seed executes post-countdown to select winning tickets with complete algorithmic transparency.
+                </p>
+              </div>
+
+              {/* Step 4 */}
+              <div className="relative group">
+                <span className="absolute -left-6 top-0.5 flex items-center justify-center w-5 h-5 rounded-full bg-emerald-600 text-[10px] font-extrabold text-white ring-4 ring-[#0f1117]">
+                  4
+                </span>
+                <h4 className="text-xs font-bold text-white">Automated Claim & Delivery</h4>
+                <p className="text-[11px] text-slate-400 mt-0.5 leading-relaxed">
+                  Verified winners claim prizes directly in their dashboard. Digital codes are dispatched via secure email; physical prizes ship door-to-door.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* ─── TERMS & CONDITIONS: Eligibility, Duration, Claim Rules (Rule 91) ─── */}
+          <div className="p-6 rounded-2xl bg-deep-card border border-slate-800 space-y-4">
+            <h3 className="text-sm font-bold uppercase tracking-wider text-white flex items-center gap-2 border-b border-slate-800 pb-3">
+              <FileText className="w-4 h-4 text-cyan-400" />
+              Terms & Conditions
+            </h3>
+
+            <div className="space-y-3 text-xs text-slate-300">
+              <div className="p-3 rounded-xl bg-obsidian/60 border border-slate-800/80 space-y-1">
+                <span className="font-bold text-white flex items-center gap-1.5">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-purple-400" />
+                  Eligibility Rules
+                </span>
+                <p className="text-[11px] text-slate-400 leading-relaxed">
+                  Only KYC-verified and active VELOOP account holders may participate. Maximum 1 entry ticket is allowed per user per giveaway round.
+                </p>
+              </div>
+
+              <div className="p-3 rounded-xl bg-obsidian/60 border border-slate-800/80 space-y-1">
+                <span className="font-bold text-white flex items-center gap-1.5">
+                  <Clock className="w-3.5 h-3.5 text-cyan-400" />
+                  Duration & Draw Timelines
+                </span>
+                <p className="text-[11px] text-slate-400 leading-relaxed">
+                  The giveaway concludes exactly when the countdown timer hits 0 or all spots are reserved. Late submissions are strictly locked out.
+                </p>
+              </div>
+
+              <div className="p-3 rounded-xl bg-obsidian/60 border border-slate-800/80 space-y-1">
+                <span className="font-bold text-white flex items-center gap-1.5">
+                  <Award className="w-3.5 h-3.5 text-amber-400" />
+                  Claim Rules & Forfeiture
+                </span>
+                <p className="text-[11px] text-slate-400 leading-relaxed">
+                  Selected winners must confirm shipping addresses or email details within 7 calendar days. Unclaimed rewards will be re-pooled.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* ─── EXPANDABLE IMPORTANT INFORMATION ACCORDION (Rule 92) ─── */}
+          <div className="rounded-2xl bg-deep-card border border-slate-800 overflow-hidden">
+            <button
+              onClick={() => setIsImportantInfoOpen((prev) => !prev)}
+              className="w-full p-5 flex items-center justify-between text-left hover:bg-white/[0.02] transition-colors cursor-pointer"
+            >
+              <div className="flex items-center gap-2.5 text-sm font-bold text-white">
+                <Info className="w-4 h-4 text-amber-400" />
+                <span>Important Information & Fairness Disclosures</span>
+              </div>
+              <ChevronDown
+                className={`w-4 h-4 text-slate-400 transition-transform duration-300 ${
+                  isImportantInfoOpen ? 'rotate-180 text-purple-400' : ''
+                }`}
+              />
+            </button>
+
+            <AnimatePresence>
+              {isImportantInfoOpen && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.25, ease: 'easeInOut' }}
+                  className="px-5 pb-5 pt-1 text-xs text-slate-400 space-y-2.5 border-t border-slate-800/80 bg-obsidian/40"
+                >
+                  <p className="leading-relaxed">
+                    • <strong>Non-Refundable Entries:</strong> All entry fees ({giveaway.currency}) are finalized immediately upon ticket reservation and cannot be revoked.
+                  </p>
+                  <p className="leading-relaxed">
+                    • <strong>Hardware Anti-Collusion:</strong> Multi-accounting and automated bot bots are monitored via cryptographic hardware fingerprinting. Violating accounts face forfeiture.
+                  </p>
+                  <p className="leading-relaxed">
+                    • <strong>Audit Trail:</strong> All draw seed hashes and winner wallet signatures are made publicly readable in the Winners Hub post-event.
+                  </p>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
         </div>
 
         {/* Right Column: Dynamic Action & Balance Verification Box */}
@@ -361,7 +537,10 @@ export default function GiveawayDetailsPage() {
                   <div className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-emerald-500/20 text-emerald-400">
                     <CheckCircle2 className="w-6 h-6" />
                   </div>
-                  <h4 className="text-base font-bold text-white">You're Already Participating!</h4>
+                  <h4 className="text-base font-bold text-white flex items-center justify-center gap-1">
+                    <span>You're Already Participating</span>
+                    <span className="text-emerald-400">✓</span>
+                  </h4>
                   <p className="text-xs text-slate-300">
                     Your ticket is locked in this draw pool. Check the Winners Hub once the round timer concludes.
                   </p>

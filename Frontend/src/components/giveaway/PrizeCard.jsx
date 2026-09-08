@@ -299,7 +299,7 @@ export default function PrizeCard({ giveaway }) {
           ) : isJoined ? (
             <div className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-emerald-500/15 border border-emerald-500/40 text-emerald-300 text-sm font-semibold">
               <CheckCircle2 className="w-4 h-4" />
-              You're In the Draw!
+              You're Already Participating ✓
             </div>
           ) : !balanceCheck.isSufficient ? (
             <div className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300 text-sm font-semibold">
