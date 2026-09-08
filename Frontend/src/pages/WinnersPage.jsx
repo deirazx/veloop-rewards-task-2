@@ -18,7 +18,7 @@ export default function WinnersPage() {
       <div className="text-center max-w-2xl mx-auto mb-10 space-y-3">
         <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-bold uppercase tracking-wider">
           <Trophy className="w-4 h-4" />
-          <span>Provably Fair Verification Hub</span>
+          <span>Official Verification Hub</span>
         </div>
 
         <h1 className="text-3xl md:text-4xl font-extrabold text-white tracking-tight">
@@ -26,7 +26,7 @@ export default function WinnersPage() {
         </h1>
 
         <p className="text-sm text-slate-400">
-          Transparent cryptographic draws. Inspect live countdowns, verify past winner allocations, and securely claim won rewards.
+          Transparent reward selection. Verify past winners and securely claim your rewards.
         </p>
       </div>
 
@@ -42,7 +42,7 @@ export default function WinnersPage() {
             }`}
           >
             <Trophy className="w-4 h-4 text-amber-400" />
-            <span>Audited Concluded Draws</span>
+            <span>Concluded Giveaways</span>
             <span className="text-[11px] px-2 py-0.5 rounded-full bg-white/10 font-mono">
               {concludedCount}
             </span>
@@ -57,7 +57,7 @@ export default function WinnersPage() {
             }`}
           >
             <Clock className="w-4 h-4 text-cyan-400" />
-            <span>Live Drawings In Progress</span>
+            <span>Active Giveaways</span>
             <span className="text-[11px] px-2 py-0.5 rounded-full bg-white/10 font-mono">
               {liveCount}
             </span>

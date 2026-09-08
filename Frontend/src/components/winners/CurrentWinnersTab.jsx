@@ -14,7 +14,7 @@ export default function CurrentWinnersTab() {
       <div className="p-4 rounded-2xl bg-[#13131a] border border-white/8 text-slate-300 text-sm flex items-center gap-3">
         <Sparkles className="w-5 h-5 text-amber-400 shrink-0" />
         <span>
-          <strong>Live Drawings Notice:</strong> All events in this tab are currently live. In accordance with platform integrity policies, winning tickets are selected via verified RNG strictly after the pool countdown reaches zero.
+          <strong>Active Giveaways Notice:</strong> All events in this tab are currently active. In accordance with platform transparency policies, winners will be announced after the giveaway ends.
         </span>
       </div>
 
@@ -34,9 +34,9 @@ export default function CurrentWinnersTab() {
                   <span className="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-accent-purple/20 text-purple-300 border border-accent-purple/30">
                     {item.category}
                   </span>
-                  <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold">
-                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-                    <span>Live Drawing Active</span>
+                  <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-300 text-xs font-semibold">
+                    <span className="w-1.5 h-1.5 rounded-full bg-purple-400" />
+                    <span>Active Giveaway</span>
                   </div>
                 </div>
 

@@ -128,13 +128,10 @@ export default function HistoryWinnersTab() {
 
                   {/* Right: Confirmed Winners Roster */}
                   <div className="md:col-span-8 space-y-3">
-                    <div className="text-xs uppercase font-semibold text-slate-400 flex items-center gap-2">
+                    <div className="text-xs uppercase font-semibold text-slate-400 flex items-center gap-2 mb-2">
                       <ShieldCheck className="w-4 h-4 text-emerald-400" />
-                      <span>Provably Fair RNG Winners ({item.winners?.length || 0})</span>
+                      <span>Official Verified Winners ({item.winners?.length || 0})</span>
                     </div>
-                    <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider block mb-3">
-                      Official Audited Winners (Clause #25 & #63)
-                    </span>
 
                     <div className="space-y-2.5">
                       {item.winners && item.winners.length > 0 ? (
