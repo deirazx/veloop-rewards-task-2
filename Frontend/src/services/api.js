@@ -130,6 +130,16 @@ export async function fetchPreviousWinners() {
   return res.data || [];
 }
 
+export async function fetchAllWinners() {
+  const res = await request('/winners');
+  return res.data || [];
+}
+
+export async function fetchLeaderboard(filter = 'ALL_TIME') {
+  const res = await request(`/leaderboard?filter=${filter}`);
+  return res.data || [];
+}
+
 export async function fetchMyStatus(giveawayId) {
   const res = await request(`/participation/${giveawayId}/my-status`);
   return res.data || { hasJoined: false };
@@ -163,8 +173,11 @@ export default {
   fetchCurrentGiveaway,
   fetchWinners,
   fetchPreviousWinners,
+  fetchAllWinners,
+  fetchLeaderboard,
   fetchMyStatus,
   joinGiveaway,
   submitClaim,
   getDeviceHash
 };
+

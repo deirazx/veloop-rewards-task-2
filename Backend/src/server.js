@@ -88,6 +88,12 @@ app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/giveaways', require('./routes/giveawayRoutes'));
 app.use('/api/participation', require('./routes/participationRoutes'));
 app.use('/api/claim', require('./routes/claimRoutes'));
+app.use('/api/leaderboard', require('./routes/leaderboardRoutes'));
+app.use('/api/winners', (req, res, next) => {
+  const giveawayController = require('./controllers/giveawayController');
+  return giveawayController.getAllWinners(req, res, next);
+});
+
 
 // 404 Route Handler
 app.use((req, res) => {

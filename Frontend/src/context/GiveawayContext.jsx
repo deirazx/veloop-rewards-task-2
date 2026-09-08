@@ -127,20 +127,30 @@ const normalizeGiveaway = (backendItem) => {
   const primaryPrize = backendItem.prizes?.[0] || {};
   const meta = resolveAuthoritativeFee(backendItem, primaryPrize);
 
+  const entryCost = Number(backendItem.entryFee ?? primaryPrize.entryFee ?? backendItem.cost ?? meta.cost);
+  const rawCurr = backendItem.currency ?? primaryPrize.currency ?? meta.currency ?? 'VEs';
+  const currencyDisplay = rawCurr.toUpperCase() === 'SVES' ? 'SVEs'
+                        : rawCurr.toUpperCase() === 'VES' ? 'VEs'
+                        : rawCurr;
+
   return {
     ...backendItem,
-    id: backendItem.giveawayId || backendItem._id,
-    slug: backendItem.slug,
+    id: backendItem.id || backendItem.giveawayId || backendItem._id,
+    slug: backendItem.slug || backendItem.id || backendItem.giveawayId,
     title: backendItem.title,
     subtitle: backendItem.subtitle || primaryPrize.name || 'Provably Fair Community Giveaway',
-    cost: meta.cost,
-    currency: meta.currency,
-    type: meta.type,
-    category: meta.category,
-    retailPrice: meta.retailPrice,
-    image: resolvePrizeImage(backendItem),
-    totalSpots: backendItem.totalSpots || 1000,
-    spotsTaken: backendItem.spotsTaken || 0,
+    entryFee: entryCost,
+    cost: entryCost,
+    currency: currencyDisplay,
+    type: backendItem.type || primaryPrize.type || meta.type || 'PHYSICAL',
+    category: backendItem.category || meta.category || 'Premium Rewards',
+    retailPrice: backendItem.retailPrice || primaryPrize.retailPrice || meta.retailPrice,
+    image: backendItem.image || primaryPrize.image || resolvePrizeImage(backendItem),
+    totalSpots: Number(backendItem.maxEntries ?? backendItem.totalSpots ?? 1000),
+    maxEntries: Number(backendItem.maxEntries ?? backendItem.totalSpots ?? 1000),
+    spotsTaken: Number(backendItem.currentEntries ?? backendItem.spotsTaken ?? 0),
+    currentEntries: Number(backendItem.currentEntries ?? backendItem.spotsTaken ?? 0),
+    participantsCount: Number(backendItem.participantsCount ?? (backendItem.spotsTaken || 0)),
     endsAt: backendItem.endAt || backendItem.endsAt || new Date(Date.now() + 86400000).toISOString(),
     status: backendItem.status || 'ACTIVE',
     terms: backendItem.terms || [
@@ -225,13 +235,12 @@ export const GiveawayProvider = ({ children }) => {
           ? currentList.map(normalizeGiveaway)
           : mockGiveaways.filter((m) => m.status === 'ACTIVE');
 
-        // Authoritative concluded draws with verified winners (MacBook Pro & Steam Code)
-        const endedMock = mockGiveaways.filter((m) => m.status === 'ENDED');
-        const endedFromApi = Array.isArray(previousList) && previousList.length > 0 && previousList.some((p) => p.winners?.length > 0)
+        // Strict Rule 21 & 63: Use authoritative backend concluded draws without injecting fake mock winners
+        const endedFromApi = Array.isArray(previousList) && previousList.length > 0
           ? previousList.map(normalizeGiveaway)
           : [];
 
-        const endedNormalized = endedFromApi.length > 0 ? endedFromApi : endedMock;
+        const endedNormalized = endedFromApi;
         const combined = [...activeNormalized, ...endedNormalized];
 
         setGiveaways(combined);
@@ -380,10 +389,20 @@ export const GiveawayProvider = ({ children }) => {
 
         setJoinedGiveaways((prev) => [...prev, giveawayId]);
 
+        const updatedEntries = response.data?.currentEntries;
+        const updatedSpots = response.data?.spotsTaken;
+        const updatedParticipants = response.data?.participantsCount;
         setGiveaways((prev) =>
           prev.map((item) =>
             item.id === giveawayId
-              ? { ...item, spotsTaken: Math.min(item.totalSpots, item.spotsTaken + 1) }
+              ? {
+                  ...item,
+                  spotsTaken: typeof updatedSpots === 'number' ? updatedSpots : Math.min(item.totalSpots, item.spotsTaken + 1),
+                  currentEntries: typeof updatedEntries === 'number' ? updatedEntries : (item.currentEntries || item.spotsTaken || 0) + 1,
+                  participantsCount: typeof updatedParticipants === 'number'
+                    ? updatedParticipants
+                    : (item.participantsCount || 0) + 1
+                }
               : item
           )
         );

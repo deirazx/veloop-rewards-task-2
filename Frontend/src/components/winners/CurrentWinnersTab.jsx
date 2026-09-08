@@ -64,7 +64,7 @@ export default function CurrentWinnersTab() {
                 <div className="p-3.5 rounded-xl bg-obsidian/80 border border-slate-800 text-xs space-y-2">
                   <div className="flex items-center gap-2 text-slate-300 font-medium">
                     <Clock className="w-4 h-4 text-reward-gold shrink-0" />
-                    <span>Giveaway is still live. Winners announced post-countdown.</span>
+                    <span>Giveaway is still live. Winners will be announced after the giveaway ends.</span>
                   </div>
                   
                   <div className="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">

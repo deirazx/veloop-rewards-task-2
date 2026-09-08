@@ -233,11 +233,11 @@ exports.joinGiveaway = async (req, res) => {
       opts
     );
 
-    // D. Increment spots taken on Giveaway
-    await Giveaway.findByIdAndUpdate(
+    // D. Increment spots taken, currentEntries, and participantsCount on Giveaway
+    const updatedGiveaway = await Giveaway.findByIdAndUpdate(
       giveaway._id,
-      { $inc: { spotsTaken: 1 } },
-      opts
+      { $inc: { spotsTaken: 1, currentEntries: 1, participantsCount: 1 } },
+      { new: true, ...opts }
     );
 
     // Commit Transaction safely
@@ -272,6 +272,10 @@ exports.joinGiveaway = async (req, res) => {
         deducted: entryFee,
         currency,
         remainingBalance: balanceAfter,
+        spotsTaken: updatedGiveaway ? updatedGiveaway.spotsTaken : (giveaway.spotsTaken || 0) + 1,
+        currentEntries: updatedGiveaway ? updatedGiveaway.currentEntries : (giveaway.currentEntries || 0) + 1,
+        maxEntries: updatedGiveaway ? updatedGiveaway.maxEntries : giveaway.maxEntries || 1000,
+        participantsCount: updatedGiveaway ? updatedGiveaway.participantsCount : (giveaway.participantsCount || 0) + 1,
         confirmedAt: participation.createdAt
       }
     });

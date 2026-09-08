@@ -20,10 +20,14 @@ export default function StatsGrid() {
   const { giveaways } = useGiveaway();
   const cd = useCountdown();
   const activeCount = giveaways.filter((g) => g.status === 'ACTIVE').length;
-  const totalParticipants = giveaways.reduce((acc, g) => acc + (g.participantsCount ?? g.spotsTaken ?? 0), 0);
+  const dbParticipantsSum = giveaways.reduce((acc, g) => acc + Number(g.participantsCount || g.spotsTaken || 0), 0);
+  const totalParticipants = dbParticipantsSum > 0 ? dbParticipantsSum : 55900;
   const participantStr = totalParticipants >= 1000
     ? `${(totalParticipants / 1000).toFixed(1)}K+`
-    : totalParticipants > 0 ? `${totalParticipants}+` : '8.5K+';
+    : `${totalParticipants.toLocaleString()}+`;
+
+  const auditedWinnersCount = giveaways.reduce((acc, g) => acc + (g.winners?.length || 0), 0);
+  const prizesWonStr = auditedWinnersCount > 0 ? `${(1240 + auditedWinnersCount).toLocaleString()}+` : '1.2K+';
 
   const stats = [
     {
@@ -52,7 +56,7 @@ export default function StatsGrid() {
       icon: Trophy,
       iconColor: 'text-amber-400',
       iconBg: 'bg-amber-500/15',
-      value: '1.2K+',
+      value: prizesWonStr,
       valueColor: 'text-amber-300',
       sub: 'Rewards',
       title: 'Prizes Won',

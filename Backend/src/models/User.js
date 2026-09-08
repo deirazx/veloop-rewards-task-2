@@ -62,6 +62,14 @@ const userSchema = new mongoose.Schema(
     isSuspended: {
       type: Boolean,
       default: false
+    },
+    stats: {
+      points: { type: Number, default: 0 },
+      weeklyPoints: { type: Number, default: 0 },
+      entries: { type: Number, default: 0 },
+      wins: { type: Number, default: 0 },
+      badge: { type: String, default: 'Challenger' },
+      avatar: { type: String, default: '' }
     }
   },
   {

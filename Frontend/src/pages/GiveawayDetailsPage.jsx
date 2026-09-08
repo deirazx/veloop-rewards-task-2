@@ -144,7 +144,9 @@ export default function GiveawayDetailsPage() {
 
   const alreadyJoined = hasJoined(giveaway.id);
   const balanceCheck = getBalanceCheck(giveaway.cost, giveaway.currency);
-  const progressPercent = Math.round((giveaway.spotsTaken / giveaway.totalSpots) * 100);
+  const currentEntries = Number(giveaway.currentEntries ?? giveaway.spotsTaken ?? 0);
+  const maxEntries = Number(giveaway.maxEntries ?? giveaway.totalSpots ?? 1000);
+  const progressPercent = maxEntries > 0 ? Math.min(100, Math.round((currentEntries / maxEntries) * 100)) : 0;
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8 md:py-12">
@@ -320,7 +322,7 @@ export default function GiveawayDetailsPage() {
               <div className="flex justify-between text-xs text-slate-400">
                 <span className="flex items-center gap-1.5">
                   <Users className="w-3.5 h-3.5 text-accent-purple" />
-                  Spots Reserved: <strong className="text-white">{giveaway.spotsTaken}</strong> / {giveaway.totalSpots}
+                  Spots Reserved: <strong className="text-white">{currentEntries.toLocaleString()}</strong> / {maxEntries.toLocaleString()}
                 </span>
                 <span className="font-semibold text-purple-400">{progressPercent}% Filled</span>
               </div>

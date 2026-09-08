@@ -22,13 +22,13 @@ export default function HistoryWinnersTab() {
   return (
     <div className="space-y-6">
       {endedGiveaways.length === 0 ? (
-        <div className="rounded-3xl bg-[#13131a] border border-white/8 p-12 text-center max-w-md mx-auto space-y-4">
-          <div className="w-16 h-16 rounded-2xl bg-purple-500/10 border border-purple-500/20 text-purple-400 flex items-center justify-center mx-auto">
-            <Trophy className="w-8 h-8" />
+        <div className="rounded-3xl bg-[#13131a] border border-white/5 p-10 sm:p-14 text-center max-w-md mx-auto space-y-3 shadow-[0_0_24px_rgba(0,0,0,0.4)] relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-b from-purple-500/5 via-transparent to-transparent pointer-events-none" />
+          <div className="w-14 h-14 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-slate-500 shadow-inner mx-auto mb-1">
+            <Trophy className="w-7 h-7 text-slate-500/70" />
           </div>
-          <h3 className="text-xl font-bold text-white">No Concluded Draws Yet</h3>
-          <p className="text-xs text-slate-400 leading-relaxed">
-            All current reward pools are actively running. Verified winner audits and on-chain allocations will appear here immediately after pool timers expire.
+          <p className="text-sm text-gray-400 font-medium">
+            Previous winners will appear here after a giveaway is completed.
           </p>
         </div>
       ) : (
@@ -151,28 +151,35 @@ export default function HistoryWinnersTab() {
                               }`}
                             >
                               <div className="flex items-center gap-3">
-                                <div
-                                  className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs ${
-                                    isMe
-                                      ? 'bg-reward-gold text-obsidian'
-                                      : 'bg-slate-800 text-slate-300'
-                                  }`}
-                                >
-                                  {winner.name.charAt(0)}
-                                </div>
-                                <div>
-                                  <div className="font-bold text-white flex items-center gap-1.5">
-                                    <span>{winner.name}</span>
-                                    {isMe && (
-                                      <span className="px-1.5 py-0.2 rounded bg-accent-purple text-[10px] text-white">
-                                        YOU
-                                      </span>
-                                    )}
-                                  </div>
-                                  <span className="text-slate-500 font-mono text-[11px]">
-                                    Ticket: {winner.ticketNumber} • {winner.drawTimestamp}
-                                  </span>
-                                </div>
+                                {(() => {
+                                  const displayName = winner.maskedUserId || winner.name || 'VE****00';
+                                  return (
+                                    <>
+                                      <div
+                                        className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs ${
+                                          isMe
+                                            ? 'bg-reward-gold text-obsidian'
+                                            : 'bg-slate-800 text-slate-300'
+                                        }`}
+                                      >
+                                        {displayName.charAt(0)}
+                                      </div>
+                                      <div>
+                                        <div className="font-bold text-white flex items-center gap-1.5 font-mono">
+                                          <span>{displayName}</span>
+                                          {isMe && (
+                                            <span className="px-1.5 py-0.2 rounded bg-accent-purple text-[10px] text-white">
+                                              YOU
+                                            </span>
+                                          )}
+                                        </div>
+                                        <span className="text-slate-500 font-mono text-[11px]">
+                                          Ticket: {winner.ticketNumber} • {winner.drawTimestamp ? new Date(winner.drawTimestamp).toLocaleDateString() : 'Audited'}
+                                        </span>
+                                      </div>
+                                    </>
+                                  );
+                                })()}
                               </div>
 
                               <div className="flex items-center gap-2">

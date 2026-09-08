@@ -9,7 +9,7 @@ exports.getCurrentGiveaways = async (req, res) => {
   try {
     const giveaways = await Giveaway.find({
       status: { $in: ['ACTIVE', 'UPCOMING'] }
-    }).sort({ endAt: 1 });
+    }).sort({ giveawayId: 1 });
 
     return res.json({
       success: true,
@@ -121,3 +121,43 @@ exports.getPreviousWinners = async (req, res) => {
     });
   }
 };
+
+/**
+ * Get all audited winners across all giveaways
+ * Endpoint: GET /api/winners or GET /api/giveaways/winners
+ */
+exports.getAllWinners = async (req, res) => {
+  try {
+    const winners = await Winner.find({})
+      .select('maskedUserId ticketNumber prizeName prizeType drawTimestamp claimStatus customUserId giveawayId')
+      .sort({ drawTimestamp: -1 });
+
+    const formatted = winners.map((w) => ({
+      id: w._id,
+      _id: w._id,
+      giveawayId: w.giveawayId,
+      customUserId: w.customUserId,
+      maskedUserId: w.maskedUserId,
+      name: w.maskedUserId,
+      ticketNumber: w.ticketNumber,
+      prize: w.prizeName,
+      prizeName: w.prizeName,
+      prizeType: w.prizeType,
+      drawTimestamp: w.drawTimestamp,
+      claimStatus: w.claimStatus
+    }));
+
+    return res.json({
+      success: true,
+      count: formatted.length,
+      data: formatted
+    });
+  } catch (error) {
+    console.error('[Get All Winners Error]', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to retrieve winners list.'
+    });
+  }
+};
+

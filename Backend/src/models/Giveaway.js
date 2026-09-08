@@ -19,7 +19,7 @@ const prizeSchema = new mongoose.Schema(
     },
     currency: {
       type: String,
-      enum: ['VES', 'SVES', 'Tokens'],
+      enum: ['VES', 'SVES', 'Tokens', 'VEs', 'SVEs'],
       required: true
     },
     entryFee: {
@@ -86,11 +86,39 @@ const giveawaySchema = new mongoose.Schema(
       required: true,
       validate: [val => val.length > 0, 'At least one prize must be configured']
     },
+    entryFee: {
+      type: Number,
+      default: 0
+    },
+    currency: {
+      type: String,
+      default: 'VEs'
+    },
+    retailPrice: {
+      type: String,
+      default: ''
+    },
+    image: {
+      type: String,
+      default: ''
+    },
+    spotsTaken: {
+      type: Number,
+      default: 0
+    },
+    currentEntries: {
+      type: Number,
+      default: 0
+    },
     totalSpots: {
       type: Number,
       default: 1000
     },
-    spotsTaken: {
+    maxEntries: {
+      type: Number,
+      default: 1000
+    },
+    participantsCount: {
       type: Number,
       default: 0
     },

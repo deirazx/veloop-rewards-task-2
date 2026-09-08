@@ -148,11 +148,13 @@ export default function PrizeCard({ giveaway }) {
 
   const isJoined = hasJoined(giveaway.id);
   const balanceCheck = getBalanceCheck(giveaway.cost, giveaway.currency);
-  const percentFilled = Math.min(100, Math.round((giveaway.spotsTaken / giveaway.totalSpots) * 100));
   const theme = getCardTheme(giveaway);
   const countdown = useCountdown(giveaway.endsAt);
-  const entryCount = giveaway.participantsCount ?? giveaway.spotsTaken ?? 0;
-  const totalSpots = giveaway.totalSpots ?? 1000;
+  
+  // Real API / MongoDB single source of truth for participation
+  const currentEntries = Number(giveaway.currentEntries ?? giveaway.spotsTaken ?? 0);
+  const maxEntries = Number(giveaway.maxEntries ?? giveaway.totalSpots ?? 1000);
+  const percentFilled = maxEntries > 0 ? Math.min(100, Math.round((currentEntries / maxEntries) * 100)) : 0;
 
   const pad = (n) => String(n).padStart(2, '0');
 
@@ -202,7 +204,7 @@ export default function PrizeCard({ giveaway }) {
 
           <span className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-semibold ${theme.pillCls}`}>
             <Users className="w-2.5 h-2.5" />
-            {fmt(entryCount)} Entries
+            {fmt(currentEntries)} Entries
           </span>
         </div>
 
@@ -243,17 +245,15 @@ export default function PrizeCard({ giveaway }) {
           <span className="text-[11px] font-semibold text-red-400">Draw Completed</span>
         )}
 
-        {/* Progress — "7.2K / 10K Entries   72%" like reference */}
+        {/* Progress — dynamically calculated: Math.round((currentEntries / maxEntries) * 100) */}
         <div className="space-y-1.5">
-          <div className="flex justify-between text-[11px]">
+          <div className="flex justify-between items-center text-[11px]">
             <span className="text-slate-400 font-medium">
-              <span className="text-slate-200 font-semibold">{fmt(giveaway.spotsTaken)}</span>
-              {' / '}
-              <span className="text-slate-500">{fmt(totalSpots)} Entries</span>
+              {currentEntries} / {maxEntries} Entries
             </span>
             <span className={`font-bold ${theme.accentText}`}>{percentFilled}%</span>
           </div>
-          {/* Sleek progress bar */}
+          {/* Sleek progress bar with animated dynamic width */}
           <div className="relative w-full h-1.5 rounded-full bg-white/8 overflow-hidden">
             <motion.div
               className={`h-full rounded-full bg-gradient-to-r ${theme.progressFill}`}
@@ -269,7 +269,7 @@ export default function PrizeCard({ giveaway }) {
           </div>
         </div>
 
-        {/* ── Entry cost + Full-width Join Now button (like reference) ── */}
+        {/* ── Entry cost + Full-width Join Now button ── */}
         <div className="space-y-2.5 pt-0.5">
           {/* Entry cost row */}
           <div className="flex items-center justify-between">
@@ -278,7 +278,7 @@ export default function PrizeCard({ giveaway }) {
             </span>
             <div className="flex items-baseline gap-1">
               <span className="text-base font-extrabold text-amber-400 tracking-tight">
-                {giveaway.cost.toLocaleString()}
+                {(giveaway.entryFee ?? giveaway.cost ?? 0).toLocaleString()}
               </span>
               <span className="text-[11px] font-bold text-purple-400">
                 {giveaway.currency}

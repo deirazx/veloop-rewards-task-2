@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Megaphone, Trophy, Radio, Pause, Play, Sparkles } from 'lucide-react';
+import { ArrowRight, Megaphone, Trophy, Pause, Play, Sparkles } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useGiveaway } from '../../context/GiveawayContext';
+import api from '../../services/api';
 
 const AVATAR_GRADIENTS = [
   'from-purple-500 to-violet-700',
@@ -13,48 +14,117 @@ const AVATAR_GRADIENTS = [
   'from-fuchsia-500 to-purple-700',
 ];
 
-const POOL_WINNERS = [
-  { id: 1, name: 'Rohit Sharma', prize: 'Amazon Gift Card ₹5,000', time: 'Just now', initials: 'RS', prize_icon: '🎁', avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&auto=format&fit=crop&q=80', isFresh: true },
-  { id: 2, name: 'Neha Patel', prize: 'Paytm Gift Card ₹1,000', time: '14s ago', initials: 'NP', prize_icon: '💸', avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&auto=format&fit=crop&q=80' },
-  { id: 3, name: 'Arjun Singh', prize: 'iPhone 15 Pro', time: '38s ago', initials: 'AS', prize_icon: '📱', avatar: 'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=100&auto=format&fit=crop&q=80' },
-  { id: 4, name: 'Priya Mehta', prize: 'AirPods Pro Gen 2', time: '2m ago', initials: 'PM', prize_icon: '🎧', avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&auto=format&fit=crop&q=80' },
-  { id: 5, name: 'Rahul Gupta', prize: 'Apple Watch S9', time: '4m ago', initials: 'RG', prize_icon: '⌚', avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&auto=format&fit=crop&q=80' },
-  { id: 6, name: 'Ananya Roy', prize: 'Sony WH-1000XM5', time: '7m ago', initials: 'AR', prize_icon: '🎵', avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80' },
-  { id: 7, name: 'Vikram Malhotra', prize: 'OnePlus 12 5G', time: '12m ago', initials: 'VM', prize_icon: '⚡', avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&auto=format&fit=crop&q=80' },
-  { id: 8, name: 'Sneha Reddy', prize: 'Flipkart Gift Card ₹2,500', time: '18m ago', initials: 'SR', prize_icon: '🛍️', avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&auto=format&fit=crop&q=80' },
-];
+function formatTimeAgo(timestamp) {
+  if (!timestamp) return 'Recently';
+  try {
+    const past = new Date(timestamp).getTime();
+    if (isNaN(past)) return String(timestamp);
+    const now = Date.now();
+    const diffSec = Math.floor((now - past) / 1000);
 
-function relativeTime(ts) {
-  if (!ts) return 'Recently';
-  if (typeof ts === 'string' && (ts.includes('ago') || ts.includes('Just'))) return ts;
-  return ts;
+    if (diffSec < 60) return 'Just now';
+    const diffMin = Math.floor(diffSec / 60);
+    if (diffMin < 60) return `${diffMin}m ago`;
+    const diffHr = Math.floor(diffMin / 60);
+    if (diffHr < 24) return `${diffHr}h ago`;
+    const diffDay = Math.floor(diffHr / 24);
+    return `${diffDay}d ago`;
+  } catch {
+    return 'Recently';
+  }
+}
+
+function resolvePrizeIcon(prizeName = '') {
+  const p = prizeName.toLowerCase();
+  if (p.includes('macbook') || p.includes('laptop')) return '💻';
+  if (p.includes('playstation') || p.includes('ps5') || p.includes('console')) return '🎮';
+  if (p.includes('iphone') || p.includes('phone')) return '📱';
+  if (p.includes('watch')) return '⌚';
+  if (p.includes('airpods') || p.includes('audio')) return '🎧';
+  if (p.includes('voucher') || p.includes('gift card') || p.includes('psn')) return '🎁';
+  return '🏆';
 }
 
 export default function WinnersList() {
   const { giveaways } = useGiveaway();
+  const [dbWinners, setDbWinners] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
 
-  // Dynamic winner pool: API winners if available, combined with fallback pool
-  const apiWinners = (giveaways || [])
-    .filter((g) => g.status === 'ENDED' && g.winners?.length > 0)
-    .flatMap((g) =>
-      g.winners.map((w, idx) => ({
-        id: w._id || w.id || `api-${idx}`,
-        name: w.name,
-        prize: w.prizeTitle || g.title,
-        avatar: w.avatar || w.profileImage || null,
-        time: relativeTime(w.drawTimestamp),
-        initials: (w.name || 'U').split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2),
-        prize_icon: '🏆',
-      }))
-    );
-
-  const pool = apiWinners.length > 0 ? [...apiWinners, ...POOL_WINNERS] : POOL_WINNERS;
-
-  // Auto-refreshing mechanism every 3.5 seconds
+  // Fetch real winners strictly from MongoDB backend API
   useEffect(() => {
-    if (isPaused) return;
+    let isMounted = true;
+    async function loadRealWinners() {
+      setIsLoading(true);
+      try {
+        const res = await api.fetchAllWinners();
+        if (isMounted) {
+          if (Array.isArray(res) && res.length > 0) {
+            setDbWinners(res);
+          } else {
+            // Fallback check from giveaways context concluded items
+            const fromContext = (giveaways || [])
+              .filter((g) => g.status === 'ENDED' && g.winners?.length > 0)
+              .flatMap((g) =>
+                g.winners.map((w, idx) => ({
+                  id: w._id || w.id || `ctx-${idx}`,
+                  maskedUserId: w.maskedUserId || w.customUserId || 'VE****25',
+                  name: w.maskedUserId || w.name || 'VE****25',
+                  prize: w.prizeName || w.prizeTitle || g.title,
+                  prizeName: w.prizeName || g.title,
+                  prizeType: w.prizeType || 'PHYSICAL',
+                  drawTimestamp: w.drawTimestamp,
+                  ticketNumber: w.ticketNumber
+                }))
+              );
+            setDbWinners(fromContext);
+          }
+        }
+      } catch (err) {
+        console.warn('[WinnersList] Error fetching backend winners:', err.message);
+        // Fallback check from giveaways context
+        const fromContext = (giveaways || [])
+          .filter((g) => g.status === 'ENDED' && g.winners?.length > 0)
+          .flatMap((g) =>
+            g.winners.map((w, idx) => ({
+              id: w._id || w.id || `ctx-${idx}`,
+              maskedUserId: w.maskedUserId || w.customUserId || 'VE****25',
+              name: w.maskedUserId || w.name || 'VE****25',
+              prize: w.prizeName || w.prizeTitle || g.title,
+              prizeName: w.prizeName || g.title,
+              prizeType: w.prizeType || 'PHYSICAL',
+              drawTimestamp: w.drawTimestamp,
+              ticketNumber: w.ticketNumber
+            }))
+          );
+        if (isMounted) setDbWinners(fromContext);
+      } finally {
+        if (isMounted) setIsLoading(false);
+      }
+    }
+    loadRealWinners();
+    return () => { isMounted = false; };
+  }, [giveaways]);
+
+  // Transform real winners adhering strictly to PDF Rule 25 (e.g. VE****42)
+  // ZERO fake rotation if database returns empty array!
+  const pool = dbWinners.map((w, idx) => {
+    const masked = w.maskedUserId || w.name || 'VE****00';
+    return {
+      id: w.id || w._id || `winner-${idx}`,
+      name: masked,
+      prize: w.prize || w.prizeName || 'Verified Reward',
+      time: formatTimeAgo(w.drawTimestamp),
+      initials: masked.startsWith('VE') ? 'VE' : masked.slice(0, 2).toUpperCase(),
+      prize_icon: resolvePrizeIcon(w.prize || w.prizeName),
+      ticketNumber: w.ticketNumber
+    };
+  });
+
+  // Auto-refreshing cycling mechanism every 3.5 seconds when winners exist
+  useEffect(() => {
+    if (isPaused || pool.length <= 1) return;
 
     const interval = setInterval(() => {
       setCurrentIndex((prev) => (prev + 1) % pool.length);
@@ -63,16 +133,18 @@ export default function WinnersList() {
     return () => clearInterval(interval);
   }, [isPaused, pool.length]);
 
-  // Window of 4 visible winners
-  const visibleCount = 4;
+  // Window of visible winners (up to 4)
+  const visibleCount = Math.min(pool.length, 4);
   const visibleWinners = [];
-  for (let i = 0; i < visibleCount; i++) {
-    const item = pool[(currentIndex + i) % pool.length];
-    visibleWinners.push({
-      ...item,
-      displayKey: `${item.id}-${currentIndex + i}`,
-      isRecentAddition: i === 0,
-    });
+  if (pool.length > 0) {
+    for (let i = 0; i < visibleCount; i++) {
+      const item = pool[(currentIndex + i) % pool.length];
+      visibleWinners.push({
+        ...item,
+        displayKey: `${item.id}-${currentIndex + i}`,
+        isRecentAddition: i === 0,
+      });
+    }
   }
 
   return (
@@ -87,41 +159,44 @@ export default function WinnersList() {
             <div className="flex items-center gap-2.5">
               <h2 className="text-xl font-bold text-white leading-none">Winner Announcements</h2>
               
-              {/* Live Ticker Indicator */}
-              <div
-                className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-semibold border transition-all ${
-                  isPaused
-                    ? 'bg-amber-500/10 text-amber-400 border-amber-500/20'
-                    : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
-                }`}
-                title={isPaused ? 'Auto-cycle paused' : 'Cycling every 3.5s'}
-              >
-                {isPaused ? (
-                  <>
-                    <Pause className="w-2.5 h-2.5" />
-                    <span>Paused</span>
-                  </>
-                ) : (
-                  <>
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
-                    <span>Live Feed</span>
-                  </>
-                )}
-              </div>
+              {/* Live Ticker Indicator (Active only when real winners exist) */}
+              {pool.length > 0 && (
+                <div
+                  className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-semibold border transition-all ${
+                    isPaused
+                      ? 'bg-amber-500/10 text-amber-400 border-amber-500/20'
+                      : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+                  }`}
+                  title={isPaused ? 'Auto-cycle paused' : 'Cycling every 3.5s'}
+                >
+                  {isPaused ? (
+                    <>
+                      <Pause className="w-2.5 h-2.5" />
+                      <span>Paused</span>
+                    </>
+                  ) : (
+                    <>
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
+                      <span>Live Feed</span>
+                    </>
+                  )}
+                </div>
+              )}
             </div>
             <p className="text-xs text-slate-500 mt-1">Real-time provably fair verified winner feed</p>
           </div>
         </div>
 
         <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end">
-          {/* Pause/Play Controls */}
-          <button
-            onClick={() => setIsPaused((prev) => !prev)}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium text-slate-400 hover:text-white bg-[#13131a] border border-white/5 hover:border-white/10 transition-colors"
-          >
-            {isPaused ? <Play className="w-3 h-3 text-emerald-400" /> : <Pause className="w-3 h-3 text-amber-400" />}
-            <span>{isPaused ? 'Resume' : 'Pause'}</span>
-          </button>
+          {pool.length > 1 && (
+            <button
+              onClick={() => setIsPaused((prev) => !prev)}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium text-slate-400 hover:text-white bg-[#13131a] border border-white/5 hover:border-white/10 transition-colors cursor-pointer"
+            >
+              {isPaused ? <Play className="w-3 h-3 text-emerald-400" /> : <Pause className="w-3 h-3 text-amber-400" />}
+              <span>{isPaused ? 'Resume' : 'Pause'}</span>
+            </button>
+          )}
 
           <Link
             to="/winners"
@@ -134,82 +209,94 @@ export default function WinnersList() {
         </div>
       </div>
 
-      {/* ── Auto-Refreshing Winner Grid with Framer Motion ── */}
-      <div
-        className="grid grid-cols-1 lg:grid-cols-2 gap-3"
-        onMouseEnter={() => setIsPaused(true)}
-        onMouseLeave={() => setIsPaused(false)}
-      >
-        <AnimatePresence mode="popLayout">
-          {visibleWinners.map((w, i) => (
-            <motion.div
-              key={w.displayKey}
-              layout
-              initial={{ opacity: 0, y: -16, scale: 0.98 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: 16, scale: 0.96 }}
-              transition={{ duration: 0.45, ease: 'easeOut' }}
-              className={`group flex items-center gap-4 bg-[#13131a] rounded-2xl px-5 py-4
-                border transition-all duration-200 relative overflow-hidden ${
-                  w.isRecentAddition
-                    ? 'border-purple-500/40 shadow-[0_0_24px_rgba(168,85,247,0.15)] bg-gradient-to-r from-purple-500/8 via-[#13131a] to-[#13131a]'
-                    : 'border-white/5 hover:border-purple-500/20 hover:shadow-[0_0_24px_rgba(168,85,247,0.08)]'
-                }`}
-            >
-              {/* Subtle hover glow */}
-              <div className="absolute inset-0 bg-gradient-to-r from-purple-500/0 via-purple-500/4 to-purple-500/0
-                opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+      {/* ── Conditional Rendering: Empty State vs Data-Driven Cycling Ticker ── */}
+      {pool.length === 0 ? (
+        /* PDF Rule 64 & 21: Premium Centered Empty State Card when no previous winners exist in DB */
+        <div className="w-full rounded-2xl bg-[#13131a] border border-white/5 p-10 sm:p-14 text-center flex flex-col items-center justify-center space-y-3 shadow-[0_0_24px_rgba(0,0,0,0.4)] relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-b from-purple-500/5 via-transparent to-transparent pointer-events-none" />
+          
+          <div className="w-14 h-14 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-slate-500 shadow-inner mb-1">
+            <Trophy className="w-7 h-7 text-slate-500/70" />
+          </div>
 
-              {/* Avatar */}
-              <div
-                className={`relative w-11 h-11 rounded-full bg-gradient-to-br ${AVATAR_GRADIENTS[(currentIndex + i) % AVATAR_GRADIENTS.length]}
-                  flex items-center justify-center shrink-0 text-white text-sm font-bold shadow-lg overflow-visible`}
+          <p className="text-sm text-gray-400 font-medium max-w-md">
+            Previous winners will appear here after a giveaway is completed.
+          </p>
+        </div>
+      ) : (
+        /* Real Data-Driven Winners Grid with Framer Motion */
+        <div
+          className="grid grid-cols-1 lg:grid-cols-2 gap-3"
+          onMouseEnter={() => setIsPaused(true)}
+          onMouseLeave={() => setIsPaused(false)}
+        >
+          <AnimatePresence mode="popLayout">
+            {visibleWinners.map((w, i) => (
+              <motion.div
+                key={w.displayKey}
+                layout
+                initial={{ opacity: 0, y: -16, scale: 0.98 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: 16, scale: 0.96 }}
+                transition={{ duration: 0.45, ease: 'easeOut' }}
+                className={`group flex items-center gap-4 bg-[#13131a] rounded-2xl px-5 py-4
+                  border transition-all duration-200 relative overflow-hidden ${
+                    w.isRecentAddition
+                      ? 'border-purple-500/40 shadow-[0_0_24px_rgba(168,85,247,0.15)] bg-gradient-to-r from-purple-500/8 via-[#13131a] to-[#13131a]'
+                      : 'border-white/5 hover:border-purple-500/20 hover:shadow-[0_0_24px_rgba(168,85,247,0.08)]'
+                  }`}
               >
-                {w.avatar ? (
-                  <img
-                    src={w.avatar}
-                    alt={w.name}
-                    className="w-full h-full rounded-full object-cover border border-white/10"
-                    onError={(e) => { e.currentTarget.style.display = 'none'; }}
-                  />
-                ) : (
-                  w.initials
-                )}
-                {/* Trophy/Prize badge */}
-                <span className="absolute -bottom-1 -right-1 text-base leading-none select-none drop-shadow-md">
-                  {w.prize_icon || '🏆'}
-                </span>
-              </div>
+                {/* Subtle hover glow */}
+                <div className="absolute inset-0 bg-gradient-to-r from-purple-500/0 via-purple-500/4 to-purple-500/0
+                  opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
 
-              {/* Info */}
-              <div className="flex-1 min-w-0 relative">
-                <div className="flex items-center gap-2">
-                  <p className="text-sm font-bold text-white leading-snug truncate group-hover:text-purple-300 transition-colors">
-                    {w.name}
+                {/* Avatar */}
+                <div
+                  className={`relative w-11 h-11 rounded-full bg-gradient-to-br ${AVATAR_GRADIENTS[(currentIndex + i) % AVATAR_GRADIENTS.length]}
+                    flex items-center justify-center shrink-0 text-white text-xs font-bold font-mono shadow-lg overflow-visible`}
+                >
+                  {w.initials}
+                  {/* Trophy/Prize badge */}
+                  <span className="absolute -bottom-1 -right-1 text-base leading-none select-none drop-shadow-md">
+                    {w.prize_icon || '🏆'}
+                  </span>
+                </div>
+
+                {/* Info */}
+                <div className="flex-1 min-w-0 relative">
+                  <div className="flex items-center gap-2">
+                    <p className="text-sm font-bold text-white font-mono leading-snug truncate group-hover:text-purple-300 transition-colors">
+                      {w.name}
+                    </p>
+                    {w.isRecentAddition && (
+                      <span className="inline-flex items-center gap-0.5 px-1.5 py-0.2 rounded text-[9px] font-extrabold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 animate-pulse">
+                        <Sparkles className="w-2.5 h-2.5" /> VERIFIED
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-xs text-slate-400 truncate mt-0.5">
+                    Won <span className="text-slate-200 font-medium">{w.prize}</span>
                   </p>
-                  {w.isRecentAddition && (
-                    <span className="inline-flex items-center gap-0.5 px-1.5 py-0.2 rounded text-[9px] font-extrabold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 animate-pulse">
-                      <Sparkles className="w-2.5 h-2.5" /> NEW
-                    </span>
+                  {w.ticketNumber && (
+                    <p className="text-[10px] text-slate-500 font-mono mt-0.5 truncate">
+                      Ticket: {w.ticketNumber}
+                    </p>
                   )}
                 </div>
-                <p className="text-xs text-slate-400 truncate mt-0.5">
-                  Won <span className="text-slate-200 font-medium">{w.prize}</span>
-                </p>
-              </div>
 
-              {/* Time + trophy badge */}
-              <div className="relative flex flex-col items-end gap-1 shrink-0">
-                <div className="flex items-center gap-1 text-[10px] bg-amber-500/10 border border-amber-500/20 text-amber-400 px-2 py-0.5 rounded-full font-medium">
-                  <Trophy className="w-2.5 h-2.5" />
-                  Winner
+                {/* Time + trophy badge */}
+                <div className="relative flex flex-col items-end gap-1 shrink-0">
+                  <div className="flex items-center gap-1 text-[10px] bg-amber-500/10 border border-amber-500/20 text-amber-400 px-2 py-0.5 rounded-full font-medium">
+                    <Trophy className="w-2.5 h-2.5" />
+                    Winner
+                  </div>
+                  <span className="text-xs text-slate-500 font-mono">{w.time}</span>
                 </div>
-                <span className="text-xs text-slate-500 font-mono">{w.time}</span>
-              </div>
-            </motion.div>
-          ))}
-        </AnimatePresence>
-      </div>
+              </motion.div>
+            ))}
+          </AnimatePresence>
+        </div>
+      )}
     </section>
   );
 }
