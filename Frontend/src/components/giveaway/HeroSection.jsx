@@ -147,19 +147,30 @@ export default function HeroSection() {
           transition={{ duration: 0.7, delay: 0.15 }}
           className="flex-1 flex items-center justify-center w-full max-w-sm lg:max-w-md xl:max-w-lg"
         >
-          {/* Try to load hero graphic */}
-          <img
-            src="/assets/hero-graphic.png"
-            alt="Giveaway rewards graphic"
-            className="w-full object-contain drop-shadow-2xl"
-            onError={(e) => {
-              e.currentTarget.style.display = 'none';
-              e.currentTarget.nextSibling.style.display = 'flex';
+          {/* Hero graphic with subtle floating & hover animations */}
+          <motion.div
+            animate={{ y: [-8, 8, -8] }}
+            whileHover={{ scale: 1.04, rotate: 1 }}
+            transition={{
+              y: { repeat: Infinity, duration: 4, ease: 'easeInOut' },
+              scale: { duration: 0.25 }
             }}
-          />
+            className="w-full flex items-center justify-center cursor-pointer"
+          >
+            <img
+              src="/assets/hero-graphic.png"
+              alt="Exclusive Giveaway rewards showcase"
+              className="w-full object-contain drop-shadow-[0_20px_50px_rgba(124,58,237,0.35)] rounded-2xl"
+              onError={(e) => {
+                e.currentTarget.parentElement.style.display = 'none';
+                const fallback = document.getElementById('hero-fallback-cards');
+                if (fallback) fallback.style.display = 'flex';
+              }}
+            />
+          </motion.div>
 
           {/* Decorative fallback card stack when image is missing */}
-          <div className="hidden w-full aspect-square max-w-sm items-center justify-center relative">
+          <div id="hero-fallback-cards" className="hidden w-full aspect-square max-w-sm items-center justify-center relative">
             {/* Back card */}
             <div className="absolute w-52 h-52 rounded-3xl bg-gradient-to-br from-purple-900/60 to-[#09090b]
               border border-purple-500/20 rotate-12 translate-x-6 translate-y-4 shadow-2xl" />

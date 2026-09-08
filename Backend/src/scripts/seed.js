@@ -356,13 +356,16 @@ const seedData = async () => {
     // 3. Seed Exactly 2 Concluded Giveaways with Past Dates for Audited Winners Hub
     console.log('[Seed] Seeding 2 completed giveaways with past dates...');
     const endedGiveaway1 = await Giveaway.create({
-      giveawayId: 'giveaway-ended-macbook-pro',
-      title: 'MacBook Pro 14" M3 Pro (Completed)',
-      slug: 'macbook-pro-m3-ended',
+      giveawayId: 'giveaway-ended-ipad-air',
+      title: 'Apple iPad Air M2 11" (Completed)',
+      slug: 'apple-ipad-air-ended',
       status: 'ENDED',
       startAt: new Date(now.getTime() - 1000 * 60 * 60 * 96),
       endAt: new Date(now.getTime() - 1000 * 60 * 60 * 12),
-      category: 'Pro Hardware',
+      category: 'Tablets',
+      entryFee: 350,
+      currency: 'VEs',
+      retailPrice: '₹59,900',
       totalSpots: 500,
       spotsTaken: 500,
       currentEntries: 500,
@@ -370,14 +373,14 @@ const seedData = async () => {
       participantsCount: 9400,
       prizes: [
         {
-          prizeId: 'prize-macbook-pro',
-          name: 'MacBook Pro 14" M3 Pro',
+          prizeId: 'prize-ipad-air',
+          name: 'Apple iPad Air M2 11"',
           type: 'PHYSICAL',
-          currency: 'VES',
-          entryFee: 800,
-          retailPrice: '₹1,99,900',
+          currency: 'VEs',
+          entryFee: 350,
+          retailPrice: '₹59,900',
           winnerCount: 1,
-          image: 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=1000&q=80'
+          image: 'https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?auto=format&fit=crop&w=1000&q=80'
         }
       ]
     });
@@ -390,6 +393,9 @@ const seedData = async () => {
       startAt: new Date(now.getTime() - 1000 * 60 * 60 * 144),
       endAt: new Date(now.getTime() - 1000 * 60 * 60 * 24),
       category: 'Gaming Console',
+      entryFee: 650,
+      currency: 'VEs',
+      retailPrice: '₹54,990',
       totalSpots: 600,
       spotsTaken: 600,
       currentEntries: 600,
@@ -400,7 +406,7 @@ const seedData = async () => {
           prizeId: 'prize-ps5-console',
           name: 'Sony PlayStation 5 Disc Edition',
           type: 'PHYSICAL',
-          currency: 'VES',
+          currency: 'VEs',
           entryFee: 650,
           retailPrice: '₹54,990',
           winnerCount: 2,
@@ -410,7 +416,7 @@ const seedData = async () => {
           prizeId: 'prize-psn-5k',
           name: '₹5,000 PlayStation Network Voucher',
           type: 'GIFT_CARD',
-          currency: 'VES',
+          currency: 'VEs',
           entryFee: 300,
           retailPrice: '₹5,000',
           winnerCount: 2,
@@ -429,8 +435,8 @@ const seedData = async () => {
         customUserId: users[0].customUserId,
         maskedUserId: 'VE****25',
         ticketNumber: 'TK-889412',
-        prizeId: 'prize-macbook-pro',
-        prizeName: 'MacBook Pro 14" M3 Pro',
+        prizeId: 'prize-ipad-air',
+        prizeName: 'Apple iPad Air M2 11"',
         prizeType: 'PHYSICAL',
         drawTimestamp: new Date(now.getTime() - 1000 * 60 * 60 * 10),
         claimStatus: 'UNCLAIMED'

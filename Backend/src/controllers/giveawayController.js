@@ -101,8 +101,10 @@ exports.getPreviousWinners = async (req, res) => {
         giveawayId: g.giveawayId,
         title: g.title,
         slug: g.slug,
+        status: g.status || 'ENDED',
         category: g.category,
         endedAt: g.endAt,
+        endAt: g.endAt,
         prizes: g.prizes,
         winners: gWinners
       };

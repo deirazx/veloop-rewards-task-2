@@ -12,8 +12,7 @@ const PRIZE_IMAGES = {
   'apple-watch-series-9': 'https://images.unsplash.com/photo-1508685096489-7aacd43bd3b1?auto=format&fit=crop&w=1000&q=80',
   'airpods-pro-2nd-gen': 'https://images.unsplash.com/photo-1600294037681-c80b4cb5b434?auto=format&fit=crop&w=1000&q=80',
   'amazon-voucher-2000': '/amazon-2000.svg',
-  'micro-voucher-20': '/amazon-20.svg',
-  'macbook-pro-m3-ended': 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=1000&q=80'
+  'micro-voucher-20': '/amazon-20.svg'
 };
 
 const resolvePrizeImage = (item) => {
@@ -43,11 +42,6 @@ const resolvePrizeImage = (item) => {
   // 5. iPhone 15 Pro
   if (titleLower.includes('iphone') || slugLower.includes('iphone')) {
     return PRIZE_IMAGES['iphone-15-pro'];
-  }
-
-  // 6. MacBook Pro
-  if (titleLower.includes('macbook') || slugLower.includes('macbook')) {
-    return PRIZE_IMAGES['macbook-pro-m3-ended'];
   }
 
   return PRIZE_IMAGES['iphone-15-pro'];
@@ -152,7 +146,7 @@ const normalizeGiveaway = (backendItem) => {
     currentEntries: Number(backendItem.currentEntries ?? backendItem.spotsTaken ?? 0),
     participantsCount: Number(backendItem.participantsCount ?? (backendItem.spotsTaken || 0)),
     endsAt: backendItem.endAt || backendItem.endsAt || new Date(Date.now() + 86400000).toISOString(),
-    status: backendItem.status || 'ACTIVE',
+    status: backendItem.status || (backendItem.endedAt || (backendItem.endAt && new Date(backendItem.endAt) <= new Date()) ? 'ENDED' : 'ACTIVE'),
     terms: backendItem.terms || [
       '1 entry permitted per verified account.',
       'Cryptographic provably fair draw upon countdown completion.',
@@ -237,7 +231,7 @@ export const GiveawayProvider = ({ children }) => {
 
         // Strict Rule 21 & 63: Use authoritative backend concluded draws without injecting fake mock winners
         const endedFromApi = Array.isArray(previousList) && previousList.length > 0
-          ? previousList.map(normalizeGiveaway)
+          ? previousList.map((item) => ({ ...normalizeGiveaway(item), status: 'ENDED' }))
           : [];
 
         const endedNormalized = endedFromApi;

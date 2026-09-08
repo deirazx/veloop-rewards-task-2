@@ -150,6 +150,7 @@ export default function PrizeCard({ giveaway }) {
   const balanceCheck = getBalanceCheck(giveaway.cost, giveaway.currency);
   const theme = getCardTheme(giveaway);
   const countdown = useCountdown(giveaway.endsAt);
+  const isEnded = giveaway.status === 'ENDED' || countdown.expired;
   
   // Real API / MongoDB single source of truth for participation
   const currentEntries = Number(giveaway.currentEntries ?? giveaway.spotsTaken ?? 0);
@@ -197,9 +198,9 @@ export default function PrizeCard({ giveaway }) {
             initial={{ opacity: 0, x: -8 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.1 }}
-            className={`px-2.5 py-1 rounded-lg text-[10px] font-extrabold uppercase tracking-widest ${theme.badgeCls} shadow-md`}
+            className={`px-2.5 py-1 rounded-lg text-[10px] font-extrabold uppercase tracking-widest ${isEnded ? 'bg-slate-700 text-slate-300 border border-slate-600' : theme.badgeCls} shadow-md`}
           >
-            {theme.badgeLabel}
+            {isEnded ? 'ENDED' : theme.badgeLabel}
           </motion.span>
 
           <span className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-semibold ${theme.pillCls}`}>
@@ -231,8 +232,8 @@ export default function PrizeCard({ giveaway }) {
           </span>
         </div>
 
-        {/* Countdown timer — "Ends in 12d : 08h : 45m" */}
-        {!countdown.expired ? (
+        {/* Countdown timer — "Ends in 12d : 08h : 45m" or "ENDED" */}
+        {!isEnded ? (
           <div className={`flex items-center gap-1.5 text-[11px] font-medium ${theme.timerColor}`}>
             <Clock className="w-3 h-3 shrink-0" />
             <span className="font-mono tracking-wide">
@@ -242,7 +243,10 @@ export default function PrizeCard({ giveaway }) {
             </span>
           </div>
         ) : (
-          <span className="text-[11px] font-semibold text-red-400">Draw Completed</span>
+          <div className="flex items-center gap-1.5 text-[11px] font-bold text-rose-400 font-mono">
+            <span className="w-2 h-2 rounded-full bg-rose-500 animate-pulse" />
+            <span>ENDED — Draw Concluded</span>
+          </div>
         )}
 
         {/* Progress — dynamically calculated: Math.round((currentEntries / maxEntries) * 100) */}
@@ -287,7 +291,12 @@ export default function PrizeCard({ giveaway }) {
           </div>
 
           {/* Full-width CTA button — unified across ALL cards */}
-          {isJoined ? (
+          {isEnded ? (
+            <div className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-white/5 border border-white/10 text-slate-400 text-sm font-semibold cursor-not-allowed">
+              <Clock className="w-4 h-4" />
+              Event Concluded
+            </div>
+          ) : isJoined ? (
             <div className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-emerald-500/15 border border-emerald-500/40 text-emerald-300 text-sm font-semibold">
               <CheckCircle2 className="w-4 h-4" />
               You're In the Draw!
