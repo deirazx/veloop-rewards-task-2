@@ -343,14 +343,15 @@ export const GiveawayProvider = ({ children }) => {
   // Automated balance checking against required currency
   const getBalanceCheck = (cost, rawCurrency) => {
     const currency = rawCurrency === 'VEs' ? 'VES' : rawCurrency === 'SVEs' ? 'SVES' : rawCurrency;
-    const available = balances[currency] ?? balances[rawCurrency] ?? 0;
-    const isSufficient = available >= cost;
-    const deficit = Math.max(0, cost - available);
-    const remaining = isSufficient ? available - cost : available;
+    const safeCost = Number(cost ?? 0);
+    const available = Number(balances?.[currency] ?? balances?.[rawCurrency] ?? 0);
+    const isSufficient = available >= safeCost;
+    const deficit = Math.max(0, safeCost - available);
+    const remaining = isSufficient ? available - safeCost : available;
 
     return {
       available,
-      required: cost,
+      required: safeCost,
       isSufficient,
       deficit,
       remaining

@@ -148,12 +148,14 @@ export default function GiveawayDetailsPage() {
     );
   }
 
+  const entryCost = Number(giveaway.cost ?? giveaway.entryFee ?? 0);
   const alreadyJoined = hasJoined(giveaway.id);
-  const balanceCheck = getBalanceCheck(giveaway.cost, giveaway.currency);
+  const balanceCheck = getBalanceCheck(entryCost, giveaway.currency);
   const currentEntries = Number(giveaway.currentEntries ?? giveaway.spotsTaken ?? 0);
   const maxEntries = Number(giveaway.maxEntries ?? giveaway.totalSpots ?? 1000);
   const progressPercent = maxEntries > 0 ? Math.min(100, Math.round((currentEntries / maxEntries) * 100)) : 0;
-  const isEnded = giveaway.status === 'ENDED' || (new Date(giveaway.endsAt).getTime() - Date.now() <= 0);
+  const isTimerZero = timeLeft.hours === 0 && timeLeft.minutes === 0 && timeLeft.seconds === 0 && (new Date(giveaway.endsAt).getTime() - Date.now() <= 0);
+  const isEnded = giveaway.status === 'ENDED' || isTimerZero || (new Date(giveaway.endsAt).getTime() - Date.now() <= 0);
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8 md:py-12">
@@ -565,7 +567,7 @@ export default function GiveawayDetailsPage() {
                 >
                   <Sparkles className="w-5 h-5 text-reward-gold group-hover:rotate-12 transition-transform" />
                   <span>Join Giveaway Now</span>
-                  <span className="text-xs opacity-80 font-normal">({giveaway.cost} {giveaway.currency})</span>
+                  <span className="text-xs opacity-80 font-normal">({entryCost} {giveaway.currency})</span>
                 </button>
               ) : (
                 /* Insufficient Balance: Transform CTA to 'Earn More [Currency]' with exact deficit calculation */
@@ -595,11 +597,11 @@ export default function GiveawayDetailsPage() {
                   {/* Dev / Tester Quick Top-Up Utility */}
                   <div className="pt-2 text-center">
                     <button
-                      onClick={() => addFunds(giveaway.currency, giveaway.cost)}
+                      onClick={() => addFunds(giveaway.currency, entryCost)}
                       className="inline-flex items-center gap-1.5 text-xs text-purple-400 hover:text-purple-300 hover:underline cursor-pointer"
                     >
                       <PlusCircle className="w-3.5 h-3.5" />
-                      <span>[Demo Test] Top up +{giveaway.cost} {giveaway.currency}</span>
+                      <span>[Demo Test] Top up +{entryCost} {giveaway.currency}</span>
                     </button>
                   </div>
                 </div>

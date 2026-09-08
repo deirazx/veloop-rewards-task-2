@@ -14,8 +14,9 @@ export default function ConfirmationModal({ giveaway, isOpen, onClose, onSuccess
 
   if (!isOpen || !giveaway) return null;
 
+  const fee = Number(giveaway.cost ?? giveaway.entryFee ?? 0);
   const alreadyJoined = hasJoined(giveaway.id);
-  const balanceCheck = getBalanceCheck(giveaway.cost, giveaway.currency);
+  const balanceCheck = getBalanceCheck(fee, giveaway.currency);
 
   const triggerConfetti = () => {
     confetti({
@@ -47,7 +48,7 @@ export default function ConfirmationModal({ giveaway, isOpen, onClose, onSuccess
 
     try {
       const prizeId = giveaway.prizes?.[0]?.prizeId || giveaway.prizeId || 'default';
-      const result = await joinGiveaway(giveaway.id, giveaway.cost, giveaway.currency, prizeId);
+      const result = await joinGiveaway(giveaway.id, fee, giveaway.currency, prizeId);
       
       if (result?.ticketNumber) {
         setConfirmedTicket(result.ticketNumber);
@@ -88,7 +89,22 @@ export default function ConfirmationModal({ giveaway, isOpen, onClose, onSuccess
           <div className="p-6 md:p-8">
             {/* Modal Title & Prize Header */}
             <div className="flex items-center gap-3 mb-6">
-              <div className="w-12 h-12 rounded-xl bg-accent-purple/20 border border-accent-purple/30 flex items-center justify-center shrink-0">
+              {giveaway.image ? (
+                <img
+                  src={giveaway.image}
+                  alt={giveaway.title}
+                  onError={(e) => {
+                    e.currentTarget.style.display = 'none';
+                    const fallback = e.currentTarget.nextElementSibling;
+                    if (fallback) fallback.style.display = 'flex';
+                  }}
+                  className="w-12 h-12 rounded-xl object-cover border border-purple-500/30 shrink-0 bg-obsidian"
+                />
+              ) : null}
+              <div
+                className="w-12 h-12 rounded-xl bg-accent-purple/20 border border-accent-purple/30 items-center justify-center shrink-0"
+                style={{ display: giveaway.image ? 'none' : 'flex' }}
+              >
                 <Coins className="w-6 h-6 text-reward-gold" />
               </div>
               <div>
@@ -165,7 +181,7 @@ export default function ConfirmationModal({ giveaway, isOpen, onClose, onSuccess
                       Entry Deduction:
                     </span>
                     <span className="font-bold text-rose-400">
-                      - {giveaway.cost.toLocaleString()} {giveaway.currency}
+                      - {fee.toLocaleString()} {giveaway.currency}
                     </span>
                   </div>
 
