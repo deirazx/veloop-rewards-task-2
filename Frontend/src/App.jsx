@@ -11,6 +11,7 @@ import MyEntriesPage from './pages/MyEntriesPage';
 import ProfilePage from './pages/ProfilePage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
+import BottomNav from './components/common/BottomNav';
 
 function App() {
   return (
@@ -18,7 +19,7 @@ function App() {
       <Router>
         <div className="min-h-screen flex flex-col bg-[#09090b] text-white">
           <Navbar />
-          <main className="flex-grow">
+          <main className="flex-grow pb-24 md:pb-0">
             <Routes>
               <Route path="/" element={<HomePage />} />
               <Route path="/giveaways" element={<HomePage />} />
@@ -32,7 +33,10 @@ function App() {
               <Route path="*" element={<HomePage />} />
             </Routes>
           </main>
-          {/* Footer hidden on mobile — BottomNav is used instead via HomePage */}
+          {/* Mobile-only persistent bottom navigation bar */}
+          <div className="md:hidden">
+            <BottomNav />
+          </div>
         </div>
       </Router>
     </GiveawayProvider>

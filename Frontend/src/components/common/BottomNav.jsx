@@ -1,72 +1,129 @@
 import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Home, Gift, Plus, BookOpen, User } from 'lucide-react';
-
-const NAV_ITEMS = [
-  { label: 'Home',       icon: Home,     path: '/' },
-  { label: 'Giveaways',  icon: Gift,     path: '/giveaways' },
-  { label: null,         icon: null,     path: null },          /* Center + button */
-  { label: 'My Entries', icon: BookOpen, path: '/entries' },
-  { label: 'Profile',    icon: User,     path: '/profile' },
-];
+import { Home, Gift, Sparkles, BookOpen, User } from 'lucide-react';
 
 export default function BottomNav() {
   const { pathname } = useLocation();
   const navigate = useNavigate();
 
+  const scrollToGiveaways = () => {
+    const target = document.getElementById('active-giveaways') || document.getElementById('active-giveaways-grid');
+    if (target) {
+      target.scrollIntoView({ behavior: 'smooth' });
+    } else {
+      window.scrollTo({ top: 450, behavior: 'smooth' });
+    }
+  };
+
+  const handleGiveawaysClick = (e) => {
+    if (e) e.preventDefault();
+    if (pathname === '/' || pathname === '/giveaways') {
+      scrollToGiveaways();
+    } else {
+      navigate('/');
+      setTimeout(() => {
+        scrollToGiveaways();
+      }, 150);
+    }
+  };
+
+  const handleHomeClick = (e) => {
+    if (pathname === '/') {
+      e.preventDefault();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
+  const isHomeActive = pathname === '/';
+  const isGiveawaysActive = pathname === '/giveaways';
+  const isEntriesActive = pathname === '/entries';
+  const isProfileActive = pathname === '/profile';
+
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-[#13131a] border-t border-white/10 safe-area-inset-bottom">
-      <div className="flex items-end justify-around px-2 py-2 max-w-md mx-auto relative">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-[#0c0817]/95 backdrop-blur-2xl border-t border-purple-500/20 shadow-[0_-10px_35px_rgba(0,0,0,0.8)] safe-area-inset-bottom">
+      <div className="flex items-center justify-around px-3 py-2 max-w-lg mx-auto relative h-16">
 
-        {NAV_ITEMS.map((item, i) => {
-          /* ── Centre floating + button ── */
-          if (item.path === null) {
-            return (
-              <div key="center" className="flex flex-col items-center relative" style={{ marginBottom: '8px' }}>
-                <button
-                  onClick={() => {
-                    navigate('/');
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                  }}
-                  className="w-14 h-14 rounded-full bg-gradient-to-r from-[#6366F1] to-[#a855f7]
-                    shadow-[0_0_24px_rgba(168,85,247,0.6)]
-                    flex items-center justify-center
-                    -translate-y-4
-                    active:scale-90 transition-transform duration-150 cursor-pointer"
-                  aria-label="Explore Giveaways"
-                  title="Explore Giveaways"
-                >
-                  <Plus className="w-7 h-7 text-white" strokeWidth={2.5} />
-                </button>
-              </div>
-            );
-          }
+        {/* 1. Home Tab */}
+        <Link
+          to="/"
+          onClick={handleHomeClick}
+          className={`flex flex-col items-center justify-center gap-1 py-1 px-3 rounded-2xl min-w-[56px] transition-all duration-200 active:scale-95 ${
+            isHomeActive
+              ? 'text-[#c084fc]'
+              : 'text-slate-400 hover:text-slate-200'
+          }`}
+        >
+          <div className={`p-1 rounded-xl transition-all ${isHomeActive ? 'bg-purple-500/20 text-[#c084fc] shadow-[0_0_12px_rgba(168,85,247,0.4)]' : ''}`}>
+            <Home className="w-5 h-5" strokeWidth={isHomeActive ? 2.3 : 1.7} />
+          </div>
+          <span className="text-[10px] font-semibold tracking-tight leading-none">Home</span>
+        </Link>
 
-          const Icon    = item.icon;
-          const isActive = pathname === item.path || (item.path === '/' && pathname === '/');
+        {/* 2. Giveaways Tab (Direct Smooth Scroll & Navigation) */}
+        <button
+          type="button"
+          onClick={handleGiveawaysClick}
+          className={`flex flex-col items-center justify-center gap-1 py-1 px-3 rounded-2xl min-w-[56px] transition-all duration-200 active:scale-95 cursor-pointer ${
+            isGiveawaysActive
+              ? 'text-[#c084fc]'
+              : 'text-slate-400 hover:text-slate-200'
+          }`}
+        >
+          <div className={`p-1 rounded-xl transition-all ${isGiveawaysActive ? 'bg-purple-500/20 text-[#c084fc] shadow-[0_0_12px_rgba(168,85,247,0.4)]' : ''}`}>
+            <Gift className="w-5 h-5" strokeWidth={isGiveawaysActive ? 2.3 : 1.7} />
+          </div>
+          <span className="text-[10px] font-semibold tracking-tight leading-none">Giveaways</span>
+        </button>
 
-          return (
-            <Link
-              key={item.path}
-              to={item.path}
-              className="flex flex-col items-center gap-1 px-3 py-1 min-w-[52px]"
-            >
-              <Icon
-                className={`w-5 h-5 transition-colors ${
-                  isActive ? 'text-[#a855f7]' : 'text-slate-500'
-                }`}
-                strokeWidth={isActive ? 2 : 1.5}
-              />
-              <span
-                className={`text-[10px] font-medium transition-colors ${
-                  isActive ? 'text-[#a855f7]' : 'text-slate-500'
-                }`}
-              >
-                {item.label}
-              </span>
-            </Link>
-          );
-        })}
+        {/* 3. Center Floating Luxury CTA */}
+        <div className="relative -top-5 flex flex-col items-center">
+          <button
+            type="button"
+            onClick={handleGiveawaysClick}
+            className="w-13 h-13 rounded-full bg-gradient-to-tr from-[#6366F1] via-[#8B5CF6] to-[#ec4899]
+              p-[2px] shadow-[0_0_25px_rgba(147,51,234,0.65)]
+              hover:shadow-[0_0_35px_rgba(147,51,234,0.9)]
+              active:scale-90 transition-all duration-150 cursor-pointer group"
+            aria-label="Join Active Giveaways"
+            title="Join Active Giveaways"
+          >
+            <div className="w-full h-full rounded-full bg-[#0e0a1c] flex items-center justify-center group-hover:bg-opacity-80 transition-colors">
+              <Sparkles className="w-6 h-6 text-white group-hover:rotate-12 transition-transform drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]" />
+            </div>
+          </button>
+          <span className="text-[9px] font-extrabold tracking-wider text-purple-300 mt-1 uppercase">Win</span>
+        </div>
+
+        {/* 4. My Entries Tab */}
+        <Link
+          to="/entries"
+          className={`flex flex-col items-center justify-center gap-1 py-1 px-3 rounded-2xl min-w-[56px] transition-all duration-200 active:scale-95 ${
+            isEntriesActive
+              ? 'text-[#c084fc]'
+              : 'text-slate-400 hover:text-slate-200'
+          }`}
+        >
+          <div className={`p-1 rounded-xl transition-all ${isEntriesActive ? 'bg-purple-500/20 text-[#c084fc] shadow-[0_0_12px_rgba(168,85,247,0.4)]' : ''}`}>
+            <BookOpen className="w-5 h-5" strokeWidth={isEntriesActive ? 2.3 : 1.7} />
+          </div>
+          <span className="text-[10px] font-semibold tracking-tight leading-none">My Entries</span>
+        </Link>
+
+        {/* 5. Profile Tab */}
+        <Link
+          to="/profile"
+          className={`flex flex-col items-center justify-center gap-1 py-1 px-3 rounded-2xl min-w-[56px] transition-all duration-200 active:scale-95 ${
+            isProfileActive
+              ? 'text-[#c084fc]'
+              : 'text-slate-400 hover:text-slate-200'
+          }`}
+        >
+          <div className={`p-1 rounded-xl transition-all ${isProfileActive ? 'bg-purple-500/20 text-[#c084fc] shadow-[0_0_12px_rgba(168,85,247,0.4)]' : ''}`}>
+            <User className="w-5 h-5" strokeWidth={isProfileActive ? 2.3 : 1.7} />
+          </div>
+          <span className="text-[10px] font-semibold tracking-tight leading-none">Profile</span>
+        </Link>
+
       </div>
     </nav>
   );

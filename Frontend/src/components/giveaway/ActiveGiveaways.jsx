@@ -23,7 +23,7 @@ export default function ActiveGiveaways() {
   ];
 
   return (
-    <section className="w-full">
+    <section id="active-giveaways" className="w-full scroll-mt-20">
       {/* ── Section header + filter pills ── */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-7">
         <div className="flex items-center gap-2.5">

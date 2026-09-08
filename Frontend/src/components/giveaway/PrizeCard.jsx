@@ -159,12 +159,16 @@ export default function PrizeCard({ giveaway }) {
 
   const pad = (n) => String(n).padStart(2, '0');
 
+  const handleCardClick = () => {
+    navigate(`/giveaway/${giveaway.slug || giveaway.id || giveaway._id}`);
+  };
+
   return (
     <motion.div
-      whileHover={{ y: -7, scale: 1.01 }}
-      transition={{ duration: 0.2, ease: 'easeOut' }}
-      onClick={() => navigate(`/giveaway/${giveaway.slug || giveaway.id || giveaway._id}`)}
-      className={`group relative flex flex-col rounded-2xl bg-[#0f1117] border ${theme.outerBorder} ${theme.outerGlow} shadow-lg transition-all duration-300 overflow-hidden cursor-pointer`}
+      whileTap={{ scale: 0.98 }}
+      transition={{ duration: 0.15 }}
+      onClick={handleCardClick}
+      className={`group relative flex flex-col rounded-2xl bg-[#0f1117] border ${theme.outerBorder} ${theme.outerGlow} shadow-lg sm:hover:-translate-y-1.5 sm:hover:shadow-2xl transition-all duration-300 overflow-hidden cursor-pointer touch-manipulation select-none`}
     >
       {/* ══════════════════════════════════════════════════════
           IMAGE ZONE — themed radial glow backdrop
@@ -296,39 +300,49 @@ export default function PrizeCard({ giveaway }) {
             </div>
           </div>
 
-          {/* Full-width CTA button — unified across ALL cards */}
+          {/* Full-width CTA button — responsive and interactive across ALL devices */}
           {isEnded ? (
-            <div className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-white/5 border border-white/10 text-slate-400 text-sm font-semibold cursor-not-allowed">
-              <Clock className="w-4 h-4" />
-              Event Concluded
-            </div>
+            <button
+              type="button"
+              onClick={handleCardClick}
+              className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-white/5 border border-white/10 text-slate-400 text-sm font-semibold hover:bg-white/10 active:scale-95 transition-all cursor-pointer"
+            >
+              <Clock className="w-4 h-4 text-slate-500" />
+              <span>Event Concluded</span>
+            </button>
           ) : isJoined ? (
-            <div className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-emerald-500/15 border border-emerald-500/40 text-emerald-300 text-sm font-semibold">
-              <CheckCircle2 className="w-4 h-4" />
-              You're Already Participating ✓
-            </div>
+            <button
+              type="button"
+              onClick={handleCardClick}
+              className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-emerald-500/15 border border-emerald-500/40 text-emerald-300 text-sm font-semibold hover:bg-emerald-500/25 active:scale-95 transition-all cursor-pointer"
+            >
+              <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+              <span>Participating — View Ticket</span>
+            </button>
           ) : !balanceCheck.isSufficient ? (
-            <div className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300 text-sm font-semibold">
-              Insufficient Balance
+            <button
+              type="button"
+              onClick={handleCardClick}
+              className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-300 text-sm font-semibold hover:bg-amber-500/25 active:scale-95 transition-all cursor-pointer"
+            >
+              <span>Insufficient Balance — Details</span>
               <ArrowRight className="w-3.5 h-3.5" />
-            </div>
+            </button>
           ) : (
             <button
-              onClick={(e) => {
-                e.stopPropagation();
-                navigate(`/giveaway/${giveaway.slug || giveaway.id || giveaway._id}`);
-              }}
+              type="button"
+              onClick={handleCardClick}
               className="w-full flex items-center justify-center gap-2 py-3 rounded-xl
                 text-sm font-bold text-white tracking-wide
-                bg-gradient-to-r from-[#6366F1] to-[#7C3AED]
+                bg-gradient-to-r from-[#6366F1] via-[#7C3AED] to-[#a855f7]
                 hover:from-[#4F46E5] hover:to-[#6D28D9]
                 shadow-[0_0_20px_rgba(124,58,237,0.5)]
                 hover:shadow-[0_0_30px_rgba(124,58,237,0.8)]
                 active:scale-95
-                transition-all duration-200"
+                transition-all duration-200 cursor-pointer"
             >
-              <Zap className="w-4 h-4" />
-              Join Now
+              <Zap className="w-4 h-4 text-amber-300" />
+              <span>Join Giveaway</span>
             </button>
           )}
         </div>

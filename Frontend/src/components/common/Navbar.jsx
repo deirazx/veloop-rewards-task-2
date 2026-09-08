@@ -373,7 +373,7 @@ export default function Navbar() {
                           Audited
                         </span>
                       </div>
-                      <div className="text-[10px] text-slate-400">Verified winners and live leaderboard</div>
+                      <div className="text-[10px] text-slate-400">Verified winners and audited draws</div>
                     </div>
                   </div>
                   <ChevronRight className="w-4 h-4 text-slate-500" />

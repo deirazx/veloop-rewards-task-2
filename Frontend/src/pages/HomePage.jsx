@@ -3,9 +3,7 @@ import HeroSection from '../components/giveaway/HeroSection';
 import StatsGrid from '../components/giveaway/StatsGrid';
 import LiveWinnersTicker from '../components/giveaway/WinnerMarquee';
 import ActiveGiveaways from '../components/giveaway/ActiveGiveaways';
-import Leaderboard from '../components/common/Leaderboard';
 import WinnersList from '../components/common/WinnersList';
-import BottomNav from '../components/common/BottomNav';
 
 export default function HomePage() {
   return (
@@ -25,17 +23,9 @@ export default function HomePage() {
         {/* 3. Active Giveaways (full grid on desktop) */}
         <ActiveGiveaways />
 
-        {/* 4. Top Leaderboard */}
-        <Leaderboard />
-
-        {/* 5. Winner Announcements (Auto-refreshing) */}
+        {/* 4. Winner Announcements (Auto-refreshing) */}
         <WinnersList />
       </main>
-
-      {/* ── Mobile-only bottom nav ── */}
-      <div className="md:hidden">
-        <BottomNav />
-      </div>
     </>
   );
 }

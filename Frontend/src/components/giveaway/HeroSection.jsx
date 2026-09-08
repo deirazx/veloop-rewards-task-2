@@ -151,37 +151,40 @@ export default function HeroSection() {
           <div className="absolute inset-0 bg-gradient-to-tr from-purple-600/20 via-transparent to-indigo-500/10 rounded-3xl blur-2xl pointer-events-none" />
 
           {/* Floating 3D Showcase Container */}
-          <motion.div
-            animate={{ y: [-7, 7, -7] }}
-            whileHover={{ scale: 1.02 }}
-            transition={{
-              y: { repeat: Infinity, duration: 4.5, ease: 'easeInOut' },
-              scale: { duration: 0.25 }
-            }}
-            className="relative w-full rounded-3xl overflow-hidden bg-[#100c1e]/80 border border-purple-500/20 p-3 sm:p-4 shadow-[0_20px_60px_-15px_rgba(124,58,237,0.3)] backdrop-blur-sm"
-          >
-            <div className="relative rounded-2xl overflow-hidden aspect-square bg-[#0b0816] flex items-center justify-center border border-white/5">
-              <img
-                src="/assets/hero-iphone.jpg"
-                alt="Apple iPhone 15 Pro Titanium Giveaway Showcase"
-                className="w-full h-full object-cover rounded-2xl"
-                onError={(e) => {
-                  e.currentTarget.src = '/assets/iphone-prize.jpg';
-                  e.currentTarget.className = 'w-3/4 object-contain drop-shadow-[0_15px_35px_rgba(124,58,237,0.4)]';
-                }}
-              />
+          <Link to={targetLink} className="block w-full cursor-pointer">
+            <motion.div
+              animate={{ y: [-7, 7, -7] }}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              transition={{
+                y: { repeat: Infinity, duration: 4.5, ease: 'easeInOut' },
+                scale: { duration: 0.25 }
+              }}
+              className="relative w-full rounded-3xl overflow-hidden bg-[#100c1e]/80 border border-purple-500/20 p-3 sm:p-4 shadow-[0_20px_60px_-15px_rgba(124,58,237,0.3)] backdrop-blur-sm group"
+            >
+              <div className="relative rounded-2xl overflow-hidden aspect-square bg-[#0b0816] flex items-center justify-center border border-white/5">
+                <img
+                  src="/assets/hero-iphone.jpg"
+                  alt="Apple iPhone 15 Pro Titanium Giveaway Showcase"
+                  className="w-full h-full object-cover rounded-2xl group-hover:scale-105 transition-transform duration-500"
+                  onError={(e) => {
+                    e.currentTarget.src = '/assets/iphone-prize.jpg';
+                    e.currentTarget.className = 'w-3/4 object-contain drop-shadow-[0_15px_35px_rgba(124,58,237,0.4)]';
+                  }}
+                />
 
-              {/* Floating Fintech Info Badges */}
-              <div className="absolute top-3 left-3 px-3 py-1 rounded-xl bg-black/60 backdrop-blur-md border border-white/10 text-[11px] font-semibold text-white flex items-center gap-1.5 shadow-lg">
-                <span className="w-2 h-2 rounded-full bg-purple-400 animate-pulse" />
-                Apple iPhone 15 Pro
-              </div>
+                {/* Floating Fintech Info Badges */}
+                <div className="absolute top-3 left-3 px-3 py-1 rounded-xl bg-black/60 backdrop-blur-md border border-white/10 text-[11px] font-semibold text-white flex items-center gap-1.5 shadow-lg">
+                  <span className="w-2 h-2 rounded-full bg-purple-400 animate-pulse" />
+                  Apple iPhone 15 Pro
+                </div>
 
-              <div className="absolute bottom-3 right-3 px-3 py-1 rounded-xl bg-black/60 backdrop-blur-md border border-purple-500/30 text-[11px] font-bold text-purple-300 shadow-lg">
-                Natural Titanium
+                <div className="absolute bottom-3 right-3 px-3 py-1 rounded-xl bg-black/60 backdrop-blur-md border border-purple-500/30 text-[11px] font-bold text-purple-300 shadow-lg">
+                  Natural Titanium
+                </div>
               </div>
-            </div>
-          </motion.div>
+            </motion.div>
+          </Link>
         </motion.div>
       </div>
     </section>
