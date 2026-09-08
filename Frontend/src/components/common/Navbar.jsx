@@ -48,14 +48,19 @@ export default function Navbar() {
 
         {/* ── Logo ── */}
         <Link to="/" className="flex items-center gap-2.5 shrink-0 group">
-          <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-[#7C3AED] to-[#a855f7] p-[2px] shadow-[0_0_16px_rgba(168,85,247,0.45)] group-hover:shadow-[0_0_24px_rgba(168,85,247,0.65)] transition-shadow">
-            <div className="w-full h-full bg-[#09090b] rounded-full flex items-center justify-center">
-              <Gift className="w-4 h-4 text-[#a855f7]" />
-            </div>
+          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full overflow-hidden bg-black flex items-center justify-center border border-white/10 shadow-[0_0_16px_rgba(168,85,247,0.35)] group-hover:shadow-[0_0_24px_rgba(168,85,247,0.65)] transition-all">
+            <img
+              src="/logo.jpeg"
+              alt="VELOOP Logo"
+              onError={(e) => {
+                e.currentTarget.src = '/assets/logo.jpeg';
+              }}
+              className="w-full h-full object-contain rounded-full"
+            />
           </div>
           <div className="flex flex-col leading-none">
-            <span className="text-sm font-bold tracking-wide text-white">VELOOP</span>
-            <span className="text-[10px] font-bold tracking-[0.2em] text-[#a855f7]">REWARDS</span>
+            <span className="text-sm sm:text-base font-extrabold tracking-wide text-white">VELOOP</span>
+            <span className="text-[9px] sm:text-[10px] font-extrabold tracking-[0.22em] text-[#a855f7] mt-0.5">REWARDS</span>
           </div>
         </Link>
 

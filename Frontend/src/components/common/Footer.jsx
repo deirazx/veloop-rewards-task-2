@@ -8,8 +8,8 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex flex-col md:flex-row items-center justify-between gap-6 pb-8 border-b border-slate-800/80">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl bg-deep-card border border-slate-700 flex items-center justify-center">
-              <Gift className="w-4 h-4 text-reward-gold" />
+            <div className="w-8 h-8 rounded-full overflow-hidden bg-black border border-white/10 flex items-center justify-center shadow-md">
+              <img src="/logo.jpeg" alt="VELOOP Logo" className="w-full h-full object-contain rounded-full" onError={(e) => { e.currentTarget.src = '/assets/logo.jpeg'; }} />
             </div>
             <span className="font-bold text-white text-sm">VELOOP REWARDS PROTOCOL</span>
           </div>
