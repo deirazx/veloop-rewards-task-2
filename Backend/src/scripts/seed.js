@@ -353,80 +353,80 @@ const seedData = async () => {
       }
     ]);
 
-    // 3. Seed Exactly 2 Concluded Giveaways with Past Dates for Audited Winners Hub
-    console.log('[Seed] Seeding 2 completed giveaways with past dates...');
+    // 3. Seed Exactly 2 Concluded Giveaways with Past Dates for Audited Winners Hub (Rule 62)
+    console.log('[Seed] Seeding 2 completed giveaways with approved platform prizes...');
     const endedGiveaway1 = await Giveaway.create({
-      giveawayId: 'giveaway-ended-ipad-air',
-      title: 'Apple iPad Air M2 11" (Completed)',
-      slug: 'apple-ipad-air-ended',
+      giveawayId: 'giveaway-ended-watch',
+      title: 'Apple Watch Series 9 GPS (Round 1 Completed)',
+      slug: 'apple-watch-series-9-ended',
       status: 'ENDED',
       startAt: new Date(now.getTime() - 1000 * 60 * 60 * 96),
       endAt: new Date(now.getTime() - 1000 * 60 * 60 * 12),
-      category: 'Tablets',
-      entryFee: 350,
+      category: 'Wearables',
+      entryFee: 200,
       currency: 'VEs',
-      retailPrice: '₹59,900',
-      totalSpots: 500,
-      spotsTaken: 500,
-      currentEntries: 500,
-      maxEntries: 500,
-      participantsCount: 9400,
+      retailPrice: '₹44,900',
+      totalSpots: 350,
+      spotsTaken: 350,
+      currentEntries: 350,
+      maxEntries: 350,
+      participantsCount: 4320,
       prizes: [
         {
-          prizeId: 'prize-ipad-air',
-          name: 'Apple iPad Air M2 11"',
+          prizeId: 'prize-watch-ended',
+          name: 'Apple Watch Series 9 GPS',
           type: 'PHYSICAL',
           currency: 'VEs',
-          entryFee: 350,
-          retailPrice: '₹59,900',
+          entryFee: 200,
+          retailPrice: '₹44,900',
           winnerCount: 1,
-          image: 'https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?auto=format&fit=crop&w=1000&q=80'
+          image: '/assets/apple-watch.png'
         }
       ]
     });
 
     const endedGiveaway2 = await Giveaway.create({
-      giveawayId: 'giveaway-ended-ps5',
-      title: 'Sony PlayStation 5 Disc Edition (Completed)',
-      slug: 'sony-ps5-disc-ended',
+      giveawayId: 'giveaway-ended-amazon',
+      title: '₹2,000 Amazon Gift Voucher (Round 1 Completed)',
+      slug: 'amazon-gift-voucher-2000-ended',
       status: 'ENDED',
       startAt: new Date(now.getTime() - 1000 * 60 * 60 * 144),
       endAt: new Date(now.getTime() - 1000 * 60 * 60 * 24),
-      category: 'Gaming Console',
-      entryFee: 650,
+      category: 'Digital Voucher',
+      entryFee: 500,
       currency: 'VEs',
-      retailPrice: '₹54,990',
-      totalSpots: 600,
-      spotsTaken: 600,
-      currentEntries: 600,
-      maxEntries: 600,
-      participantsCount: 11250,
+      retailPrice: '₹2,000',
+      totalSpots: 1000,
+      spotsTaken: 1000,
+      currentEntries: 1000,
+      maxEntries: 1000,
+      participantsCount: 8450,
       prizes: [
         {
-          prizeId: 'prize-ps5-console',
-          name: 'Sony PlayStation 5 Disc Edition',
-          type: 'PHYSICAL',
+          prizeId: 'prize-amazon-2000-ended',
+          name: '₹2,000 Amazon Gift Voucher',
+          type: 'GIFT_CARD',
           currency: 'VEs',
-          entryFee: 650,
-          retailPrice: '₹54,990',
+          entryFee: 500,
+          retailPrice: '₹2,000',
           winnerCount: 2,
-          image: 'https://images.unsplash.com/photo-1606813907291-d86efa9b94db?auto=format&fit=crop&w=1000&q=80'
+          image: '/assets/amazon-prize.png'
         },
         {
-          prizeId: 'prize-psn-5k',
-          name: '₹5,000 PlayStation Network Voucher',
+          prizeId: 'prize-amazon-500-ended',
+          name: '₹500 Amazon Gift Voucher',
           type: 'GIFT_CARD',
           currency: 'VEs',
           entryFee: 300,
-          retailPrice: '₹5,000',
+          retailPrice: '₹500',
           winnerCount: 2,
-          image: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=1000&q=80'
+          image: '/assets/amazon-prize.png'
         }
       ]
     });
 
-    // 4. Seed 5 Audited Winners linked to the 2 ended giveaways adhering to PDF Rule 25
-    console.log('[Seed] Seeding 5 audited Winner records adhering to PDF Rule 25...');
+    // 4. Seed 5 Audited Winners linked strictly to Approved Platform Prizes (Rule 25 & 62)
+    console.log('[Seed] Seeding 5 audited Winner records with approved platform prizes...');
     const winners = await Winner.create([
       {
         giveawayId: endedGiveaway1.giveawayId,
@@ -435,8 +435,8 @@ const seedData = async () => {
         customUserId: users[0].customUserId,
         maskedUserId: 'VE****25',
         ticketNumber: 'TK-889412',
-        prizeId: 'prize-ipad-air',
-        prizeName: 'Apple iPad Air M2 11"',
+        prizeId: 'prize-watch-ended',
+        prizeName: 'Apple Watch Series 9 GPS',
         prizeType: 'PHYSICAL',
         drawTimestamp: new Date(now.getTime() - 1000 * 60 * 60 * 10),
         claimStatus: 'UNCLAIMED'
@@ -448,9 +448,9 @@ const seedData = async () => {
         customUserId: users[1].customUserId,
         maskedUserId: 'VE****42',
         ticketNumber: 'TK-774042',
-        prizeId: 'prize-ps5-console',
-        prizeName: 'Sony PlayStation 5 Disc Edition',
-        prizeType: 'PHYSICAL',
+        prizeId: 'prize-amazon-2000-ended',
+        prizeName: '₹2,000 Amazon Gift Voucher',
+        prizeType: 'GIFT_CARD',
         drawTimestamp: new Date(now.getTime() - 1000 * 60 * 60 * 22),
         claimStatus: 'CLAIMED'
       },
@@ -461,9 +461,9 @@ const seedData = async () => {
         customUserId: users[2].customUserId,
         maskedUserId: 'VE****91',
         ticketNumber: 'TK-118491',
-        prizeId: 'prize-ps5-console',
-        prizeName: 'Sony PlayStation 5 Disc Edition',
-        prizeType: 'PHYSICAL',
+        prizeId: 'prize-amazon-2000-ended',
+        prizeName: '₹2,000 Amazon Gift Voucher',
+        prizeType: 'GIFT_CARD',
         drawTimestamp: new Date(now.getTime() - 1000 * 60 * 60 * 20),
         claimStatus: 'CLAIMED'
       },
@@ -474,8 +474,8 @@ const seedData = async () => {
         customUserId: users[3].customUserId,
         maskedUserId: 'VE****78',
         ticketNumber: 'TK-552178',
-        prizeId: 'prize-psn-5k',
-        prizeName: '₹5,000 PlayStation Network Voucher',
+        prizeId: 'prize-amazon-500-ended',
+        prizeName: '₹500 Amazon Gift Voucher',
         prizeType: 'GIFT_CARD',
         drawTimestamp: new Date(now.getTime() - 1000 * 60 * 60 * 18),
         claimStatus: 'CLAIMED'
@@ -487,8 +487,8 @@ const seedData = async () => {
         customUserId: users[4].customUserId,
         maskedUserId: 'VE****63',
         ticketNumber: 'TK-339063',
-        prizeId: 'prize-psn-5k',
-        prizeName: '₹5,000 PlayStation Network Voucher',
+        prizeId: 'prize-amazon-500-ended',
+        prizeName: '₹500 Amazon Gift Voucher',
         prizeType: 'GIFT_CARD',
         drawTimestamp: new Date(now.getTime() - 1000 * 60 * 60 * 16),
         claimStatus: 'CLAIMED'
