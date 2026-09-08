@@ -12,7 +12,7 @@ const AVATARS = [
 ];
 
 const TRUST_BADGES = [
-  { icon: ShieldCheck, label: 'Provably Fair' },
+  { icon: ShieldCheck, label: 'Transparent Selection' },
   { icon: Trophy,      label: '1,420+ Winners' },
   { icon: Zap,         label: 'Instant Dispatch' },
 ];
@@ -24,7 +24,7 @@ export default function HeroSection() {
     activeList.find((g) => g.featured) ||
     activeList.find((g) => g.slug?.includes('iphone') || g.title?.toLowerCase().includes('iphone')) ||
     activeList[0];
-  const targetLink = featured ? `/giveaway/${featured.slug || featured.id}` : '/giveaway/apple-iphone-15-pro-256gb';
+  const targetLink = featured ? `/giveaway/${featured.slug || featured.id}` : '/giveaway/iphone-15-pro';
 
   return (
     <section className="relative rounded-3xl overflow-hidden
@@ -33,7 +33,7 @@ export default function HeroSection() {
 
       {/* Ambient glows */}
       <div className="absolute -top-32 -right-32 w-[500px] h-[500px] rounded-full bg-purple-700/20 blur-[100px] pointer-events-none" />
-      <div className="absolute -bottom-24 -left-24 w-80 h-80 rounded-full bg-amber-500/8 blur-[80px] pointer-events-none" />
+      <div className="absolute -bottom-24 -left-24 w-80 h-80 rounded-full bg-purple-500/10 blur-[80px] pointer-events-none" />
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 rounded-full bg-purple-600/10 blur-[80px] pointer-events-none" />
 
       {/* Subtle grid pattern overlay */}
@@ -73,10 +73,10 @@ export default function HeroSection() {
             </h1>
           </div>
 
-          {/* Subtitle */}
+          {/* Subtitle (Fintech style, no gambling words) */}
           <p className="text-base md:text-lg text-gray-400 leading-relaxed max-w-lg mx-auto lg:mx-0">
             Complete activities, collect entries &amp; get a chance to win exciting rewards.
-            Provably fair — every winner verified on-chain.
+            Transparent reward selection — audited platform allocations.
           </p>
 
           {/* CTA row */}
@@ -128,7 +128,7 @@ export default function HeroSection() {
 
             <div className="hidden sm:block w-px h-8 bg-white/10" />
 
-            {/* Trust badges */}
+            {/* Trust badges (Transparent Selection) */}
             <div className="flex items-center gap-4">
               {TRUST_BADGES.map(({ icon: Icon, label }) => (
                 <div key={label} className="flex items-center gap-1.5 text-xs text-slate-400">
@@ -140,75 +140,48 @@ export default function HeroSection() {
           </div>
         </motion.div>
 
-        {/* ─── RIGHT COLUMN — hero graphic / prize showcase ─────────── */}
+        {/* ─── RIGHT COLUMN — Sleek 3D Floating Apple iPhone 15 Pro Showcase ─── */}
         <motion.div
           initial={{ opacity: 0, x: 30, scale: 0.95 }}
           animate={{ opacity: 1, x: 0, scale: 1 }}
           transition={{ duration: 0.7, delay: 0.15 }}
-          className="flex-1 flex items-center justify-center w-full max-w-sm lg:max-w-md xl:max-w-lg"
+          className="flex-1 flex items-center justify-center w-full max-w-sm lg:max-w-md xl:max-w-lg relative"
         >
-          {/* Hero graphic with subtle floating & hover animations */}
+          {/* Subtle Ambient Radial Glow */}
+          <div className="absolute inset-0 bg-gradient-to-tr from-purple-600/20 via-transparent to-indigo-500/10 rounded-3xl blur-2xl pointer-events-none" />
+
+          {/* Floating 3D Showcase Container */}
           <motion.div
-            animate={{ y: [-8, 8, -8] }}
-            whileHover={{ scale: 1.04, rotate: 1 }}
+            animate={{ y: [-7, 7, -7] }}
+            whileHover={{ scale: 1.02 }}
             transition={{
-              y: { repeat: Infinity, duration: 4, ease: 'easeInOut' },
+              y: { repeat: Infinity, duration: 4.5, ease: 'easeInOut' },
               scale: { duration: 0.25 }
             }}
-            className="w-full flex items-center justify-center cursor-pointer"
+            className="relative w-full rounded-3xl overflow-hidden bg-[#100c1e]/80 border border-purple-500/20 p-3 sm:p-4 shadow-[0_20px_60px_-15px_rgba(124,58,237,0.3)] backdrop-blur-sm"
           >
-            <img
-              src="/assets/hero-graphic.png"
-              alt="Exclusive Giveaway rewards showcase"
-              className="w-full object-contain drop-shadow-[0_20px_50px_rgba(124,58,237,0.35)] rounded-2xl"
-              onError={(e) => {
-                e.currentTarget.parentElement.style.display = 'none';
-                const fallback = document.getElementById('hero-fallback-cards');
-                if (fallback) fallback.style.display = 'flex';
-              }}
-            />
-          </motion.div>
-
-          {/* Decorative fallback card stack when image is missing */}
-          <div id="hero-fallback-cards" className="hidden w-full aspect-square max-w-sm items-center justify-center relative">
-            {/* Back card */}
-            <div className="absolute w-52 h-52 rounded-3xl bg-gradient-to-br from-purple-900/60 to-[#09090b]
-              border border-purple-500/20 rotate-12 translate-x-6 translate-y-4 shadow-2xl" />
-            {/* Middle card */}
-            <div className="absolute w-52 h-52 rounded-3xl bg-gradient-to-br from-amber-900/40 to-[#09090b]
-              border border-amber-500/20 -rotate-6 -translate-x-4 translate-y-2 shadow-2xl" />
-            {/* Front card */}
-            <div className="relative w-56 h-56 rounded-3xl bg-gradient-to-br from-[#1a0a3e] to-[#0d0318]
-              border border-purple-500/40 shadow-2xl shadow-purple-900/30
-              flex flex-col items-center justify-center gap-4 p-6">
-              <div className="w-20 h-20 rounded-2xl bg-gradient-to-tr from-[#7C3AED] to-[#a855f7]
-                flex items-center justify-center shadow-[0_0_40px_rgba(168,85,247,0.5)]">
-                <Gift className="w-10 h-10 text-white" />
-              </div>
-              <div className="text-center">
-                <div className="text-white font-bold text-lg">Win Prizes</div>
-                <div className="text-purple-300 text-sm">Fair &amp; Transparent</div>
-              </div>
-              {/* Glow ring */}
-              <div className="absolute inset-0 rounded-3xl border border-purple-400/20 shadow-[inset_0_0_40px_rgba(168,85,247,0.1)]" />
-            </div>
-            {/* Floating coins decorations */}
-            {[...Array(3)].map((_, i) => (
-              <motion.div
-                key={i}
-                animate={{ y: [0, -12, 0] }}
-                transition={{ repeat: Infinity, duration: 2.5 + i * 0.5, delay: i * 0.4, ease: 'easeInOut' }}
-                className="absolute w-10 h-10 rounded-full bg-gradient-to-br from-amber-400 to-orange-500
-                  shadow-[0_0_20px_rgba(251,191,36,0.5)] flex items-center justify-center text-white font-bold text-sm"
-                style={{
-                  top:  `${20 + i * 25}%`,
-                  right: `${5 + i * 8}%`,
+            <div className="relative rounded-2xl overflow-hidden aspect-square bg-[#0b0816] flex items-center justify-center border border-white/5">
+              <img
+                src="/assets/hero-iphone.jpg"
+                alt="Apple iPhone 15 Pro Titanium Giveaway Showcase"
+                className="w-full h-full object-cover rounded-2xl"
+                onError={(e) => {
+                  e.currentTarget.src = '/assets/iphone-prize.jpg';
+                  e.currentTarget.className = 'w-3/4 object-contain drop-shadow-[0_15px_35px_rgba(124,58,237,0.4)]';
                 }}
-              >
-                ₹
-              </motion.div>
-            ))}
-          </div>
+              />
+
+              {/* Floating Fintech Info Badges */}
+              <div className="absolute top-3 left-3 px-3 py-1 rounded-xl bg-black/60 backdrop-blur-md border border-white/10 text-[11px] font-semibold text-white flex items-center gap-1.5 shadow-lg">
+                <span className="w-2 h-2 rounded-full bg-purple-400 animate-pulse" />
+                Apple iPhone 15 Pro
+              </div>
+
+              <div className="absolute bottom-3 right-3 px-3 py-1 rounded-xl bg-black/60 backdrop-blur-md border border-purple-500/30 text-[11px] font-bold text-purple-300 shadow-lg">
+                Natural Titanium
+              </div>
+            </div>
+          </motion.div>
         </motion.div>
       </div>
     </section>

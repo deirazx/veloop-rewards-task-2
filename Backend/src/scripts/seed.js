@@ -16,33 +16,6 @@ const Claim = require('../models/Claim');
 
 dotenv.config();
 
-// Ensure public assets exist for local static serving
-try {
-  const srcDir = path.resolve(__dirname, '../../../Frontend/src/assets');
-  const targetDir = path.resolve(__dirname, '../../../Frontend/public/assets');
-  if (!fs.existsSync(targetDir)) {
-    fs.mkdirSync(targetDir, { recursive: true });
-  }
-
-  const assetMap = {
-    'iphone-prize.jpg': 'iphone-prize.png',
-    'apple-watch.jpg': 'apple-watch.png',
-    'airpods.jpg': 'airpods.png',
-    'amazon.jpg': 'amazon-prize.png',
-    'digital-coin-token.jpg': 'token.png'
-  };
-
-  for (const [srcFile, targetFile] of Object.entries(assetMap)) {
-    const srcPath = path.join(srcDir, srcFile);
-    const targetPath = path.join(targetDir, targetFile);
-    if (fs.existsSync(srcPath) && !fs.existsSync(targetPath)) {
-      fs.copyFileSync(srcPath, targetPath);
-    }
-  }
-} catch (e) {
-  console.warn('[Asset Copy Note]', e.message);
-}
-
 const seedData = async () => {
   try {
     await connectDB();
@@ -176,7 +149,7 @@ const seedData = async () => {
         currentEntries: 413,
         maxEntries: 500,
         participantsCount: 8500,
-        image: '/assets/iphone-prize.png',
+        image: '/assets/iphone-prize.jpg',
         description: 'Titanium craftsmanship with A17 Pro chip. 100% genuine insured delivery.',
         prizes: [
           {
@@ -187,7 +160,7 @@ const seedData = async () => {
             entryFee: 250,
             retailPrice: '₹1,34,900',
             winnerCount: 1,
-            image: '/assets/iphone-prize.png'
+            image: '/assets/iphone-prize.jpg'
           }
         ]
       },
@@ -208,7 +181,7 @@ const seedData = async () => {
         currentEntries: 278,
         maxEntries: 350,
         participantsCount: 4320,
-        image: '/assets/apple-watch.png',
+        image: '/assets/apple-watch.jpg',
         description: 'Advanced health metrics, ECG, and S9 SiP processor.',
         prizes: [
           {
@@ -219,7 +192,7 @@ const seedData = async () => {
             entryFee: 200,
             retailPrice: '₹44,900',
             winnerCount: 1,
-            image: '/assets/apple-watch.png'
+            image: '/assets/apple-watch.jpg'
           }
         ]
       },
@@ -240,7 +213,7 @@ const seedData = async () => {
         currentEntries: 184,
         maxEntries: 200,
         participantsCount: 3180,
-        image: '/assets/airpods.png',
+        image: '/assets/airpods.jpg',
         description: 'Pro Active Noise Cancellation and USB-C MagSafe case.',
         prizes: [
           {
@@ -251,7 +224,7 @@ const seedData = async () => {
             entryFee: 500,
             retailPrice: '₹24,900',
             winnerCount: 1,
-            image: '/assets/airpods.png'
+            image: '/assets/airpods.jpg'
           }
         ]
       },
@@ -272,7 +245,7 @@ const seedData = async () => {
         currentEntries: 650,
         maxEntries: 1000,
         participantsCount: 6450,
-        image: '/assets/amazon-prize.png',
+        image: '/assets/amazon-2000.jpg',
         description: 'Direct digital voucher pin dispatched instantly to verified email.',
         prizes: [
           {
@@ -283,7 +256,7 @@ const seedData = async () => {
             entryFee: 500,
             retailPrice: '₹2,000',
             winnerCount: 5,
-            image: '/assets/amazon-prize.png'
+            image: '/assets/amazon-2000.jpg'
           }
         ]
       },
@@ -304,7 +277,7 @@ const seedData = async () => {
         currentEntries: 2150,
         maxEntries: 3000,
         participantsCount: 4200,
-        image: '/assets/amazon-prize.png',
+        image: '/assets/amazon-500.png',
         description: 'Quick shopping boost. Instant digital gift card voucher for Amazon Pay.',
         prizes: [
           {
@@ -315,7 +288,7 @@ const seedData = async () => {
             entryFee: 300,
             retailPrice: '₹500',
             winnerCount: 10,
-            image: '/assets/amazon-prize.png'
+            image: '/assets/amazon-500.png'
           }
         ]
       },
@@ -336,7 +309,7 @@ const seedData = async () => {
         currentEntries: 3400,
         maxEntries: 5000,
         participantsCount: 12800,
-        image: '/assets/token.png',
+        image: '/assets/recharge-voucher.png',
         description: 'Exchange platform tokens for quick liquid recharge vouchers.',
         prizes: [
           {
@@ -347,7 +320,7 @@ const seedData = async () => {
             entryFee: 2000,
             retailPrice: '₹20',
             winnerCount: 50,
-            image: '/assets/token.png'
+            image: '/assets/recharge-voucher.png'
           }
         ]
       }
@@ -380,7 +353,7 @@ const seedData = async () => {
           entryFee: 200,
           retailPrice: '₹44,900',
           winnerCount: 1,
-          image: '/assets/apple-watch.png'
+          image: '/assets/apple-watch.jpg'
         }
       ]
     });
@@ -410,7 +383,7 @@ const seedData = async () => {
           entryFee: 500,
           retailPrice: '₹2,000',
           winnerCount: 2,
-          image: '/assets/amazon-prize.png'
+          image: '/assets/amazon-2000.jpg'
         },
         {
           prizeId: 'prize-amazon-500-ended',
@@ -420,7 +393,7 @@ const seedData = async () => {
           entryFee: 300,
           retailPrice: '₹500',
           winnerCount: 2,
-          image: '/assets/amazon-prize.png'
+          image: '/assets/amazon-500.png'
         }
       ]
     });

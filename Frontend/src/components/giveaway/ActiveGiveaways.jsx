@@ -30,7 +30,7 @@ export default function ActiveGiveaways() {
           <Star className="w-5 h-5 text-amber-400 fill-amber-400" />
           <div>
             <h2 className="text-xl font-bold text-white leading-none">Active Giveaways</h2>
-            <p className="text-xs text-slate-500 mt-0.5">Live reward pools — provably fair draws</p>
+            <p className="text-xs text-slate-400 mt-0.5">Explore our active premium reward pools</p>
           </div>
           {/* Live dot */}
           <span className="flex items-center gap-1 ml-1">

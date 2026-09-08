@@ -176,17 +176,23 @@ export default function PrizeCard({ giveaway }) {
         {/* Radial ambient bloom */}
         <div className={`absolute inset-0 ${theme.radialGlow}`} />
 
-        {/* Prize photo — screen blend so glow shows through */}
+        {/* Prize photo */}
         <img
           src={giveaway.image}
           alt={giveaway.title}
           onError={(e) => {
             e.currentTarget.onerror = null;
             const t = (giveaway.title || '').toLowerCase();
-            e.currentTarget.src =
-              t.includes('2000') || t.includes('2,000') ? '/amazon-2000.svg' : '/amazon-20.svg';
+            if (t.includes('iphone')) e.currentTarget.src = '/assets/iphone-prize.jpg';
+            else if (t.includes('watch')) e.currentTarget.src = '/assets/apple-watch.jpg';
+            else if (t.includes('airpods')) e.currentTarget.src = '/assets/airpods.jpg';
+            else if (t.includes('2000') || t.includes('2,000')) e.currentTarget.src = '/assets/amazon-2000.jpg';
+            else if (t.includes('500')) e.currentTarget.src = '/assets/amazon-500.png';
+            else if (t.includes('20') || t.includes('recharge')) e.currentTarget.src = '/assets/recharge-voucher.png';
+            else if (t.includes('token') || t.includes('coin')) e.currentTarget.src = '/assets/digital-coin-token.jpg';
+            else e.currentTarget.src = '/assets/recharge-voucher.png';
           }}
-          className="absolute inset-0 w-full h-full object-cover mix-blend-screen opacity-85 group-hover:scale-105 transition-transform duration-500"
+          className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
         />
 
         {/* Bottom fade into card body */}

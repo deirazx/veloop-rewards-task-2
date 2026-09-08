@@ -208,8 +208,14 @@ export default function GiveawayDetailsPage() {
                 onError={(e) => {
                   e.currentTarget.onerror = null;
                   const title = (giveaway.title || '').toLowerCase();
-                  const is2000 = title.includes('2000') || title.includes('2,000') || title.includes('2k');
-                  e.currentTarget.src = is2000 ? '/amazon-2000.svg' : '/amazon-20.svg';
+                  if (title.includes('iphone')) e.currentTarget.src = '/assets/iphone-prize.jpg';
+                  else if (title.includes('watch')) e.currentTarget.src = '/assets/apple-watch.jpg';
+                  else if (title.includes('airpods')) e.currentTarget.src = '/assets/airpods.jpg';
+                  else if (title.includes('2000') || title.includes('2,000')) e.currentTarget.src = '/assets/amazon-2000.jpg';
+                  else if (title.includes('500')) e.currentTarget.src = '/assets/amazon-500.png';
+                  else if (title.includes('20') || title.includes('recharge')) e.currentTarget.src = '/assets/recharge-voucher.png';
+                  else if (title.includes('token') || title.includes('coin')) e.currentTarget.src = '/assets/digital-coin-token.jpg';
+                  else e.currentTarget.src = '/assets/recharge-voucher.png';
                 }}
                 className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500 opacity-90"
               />

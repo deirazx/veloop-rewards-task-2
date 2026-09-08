@@ -45,6 +45,18 @@ export default function CurrentWinnersTab() {
                   <img
                     src={item.image}
                     alt={item.title}
+                    onError={(e) => {
+                      e.currentTarget.onerror = null;
+                      const t = (item.title || '').toLowerCase();
+                      if (t.includes('iphone')) e.currentTarget.src = '/assets/iphone-prize.jpg';
+                      else if (t.includes('watch')) e.currentTarget.src = '/assets/apple-watch.jpg';
+                      else if (t.includes('airpods')) e.currentTarget.src = '/assets/airpods.jpg';
+                      else if (t.includes('2000') || t.includes('2,000')) e.currentTarget.src = '/assets/amazon-2000.jpg';
+                      else if (t.includes('500')) e.currentTarget.src = '/assets/amazon-500.png';
+                      else if (t.includes('20') || t.includes('recharge')) e.currentTarget.src = '/assets/recharge-voucher.png';
+                      else if (t.includes('token') || t.includes('coin')) e.currentTarget.src = '/assets/digital-coin-token.jpg';
+                      else e.currentTarget.src = '/assets/recharge-voucher.png';
+                    }}
                     className="w-20 h-20 rounded-2xl object-cover border border-slate-800 shrink-0"
                   />
                   <div>

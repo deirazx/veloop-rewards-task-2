@@ -36,7 +36,6 @@ export default function StatsGrid() {
       iconBg: 'bg-purple-500/15',
       value: String(activeCount || 24),
       valueColor: 'text-white',
-      sub: 'Active',
       title: 'Total Giveaways',
       border: 'border-purple-500/10',
       glow: 'hover:shadow-[0_0_30px_rgba(168,85,247,0.12)]',
@@ -47,7 +46,6 @@ export default function StatsGrid() {
       iconBg: 'bg-blue-500/15',
       value: participantStr,
       valueColor: 'text-white',
-      sub: 'Users',
       title: 'Total Participants',
       border: 'border-blue-500/10',
       glow: 'hover:shadow-[0_0_30px_rgba(59,130,246,0.12)]',
@@ -58,7 +56,6 @@ export default function StatsGrid() {
       iconBg: 'bg-amber-500/15',
       value: prizesWonStr,
       valueColor: 'text-amber-300',
-      sub: 'Rewards',
       title: 'Prizes Won',
       border: 'border-amber-500/10',
       glow: 'hover:shadow-[0_0_30px_rgba(245,158,11,0.12)]',
@@ -69,7 +66,6 @@ export default function StatsGrid() {
       iconBg: 'bg-cyan-500/15',
       value: `${cd.d}d : ${pad(cd.h)}h : ${pad(cd.m)}m`,
       valueColor: 'text-cyan-300',
-      sub: 'Remaining',
       title: 'Ends In',
       border: 'border-cyan-500/10',
       glow: 'hover:shadow-[0_0_30px_rgba(6,182,212,0.12)]',
@@ -78,7 +74,7 @@ export default function StatsGrid() {
 
   return (
     <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
-      {stats.map(({ icon: Icon, iconColor, iconBg, value, valueColor, sub, title, border, glow }) => (
+      {stats.map(({ icon: Icon, iconColor, iconBg, value, valueColor, title, border, glow }) => (
         <div
           key={title}
           className={`relative bg-[#13131a] rounded-2xl p-5 lg:p-6 flex flex-col items-center justify-center gap-3
@@ -99,10 +95,9 @@ export default function StatsGrid() {
             {value}
           </div>
 
-          {/* Labels */}
-          <div className="relative space-y-0.5">
-            <div className="text-xs font-semibold text-white">{title}</div>
-            <div className="text-[11px] text-slate-500">{sub}</div>
+          {/* Title Label without redundant sub-labels */}
+          <div className="relative">
+            <div className="text-xs font-semibold text-slate-300">{title}</div>
           </div>
         </div>
       ))}

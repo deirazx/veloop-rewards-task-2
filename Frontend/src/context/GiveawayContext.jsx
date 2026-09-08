@@ -8,43 +8,55 @@ const GiveawayContext = createContext();
 
 // Distinct curated product imagery mapped by slug and category
 const PRIZE_IMAGES = {
-  'iphone-15-pro': 'https://images.unsplash.com/photo-1695048133142-1a20484d2569?auto=format&fit=crop&w=1000&q=80',
-  'apple-watch-series-9': 'https://images.unsplash.com/photo-1508685096489-7aacd43bd3b1?auto=format&fit=crop&w=1000&q=80',
-  'airpods-pro-2nd-gen': 'https://images.unsplash.com/photo-1600294037681-c80b4cb5b434?auto=format&fit=crop&w=1000&q=80',
-  'amazon-voucher-2000': '/amazon-2000.svg',
-  'micro-voucher-20': '/amazon-20.svg'
+  'iphone-15-pro': '/assets/iphone-prize.jpg',
+  'apple-watch-series-9': '/assets/apple-watch.jpg',
+  'airpods-pro-2nd-gen': '/assets/airpods.jpg',
+  'amazon-voucher-2000': '/assets/amazon-2000.jpg',
+  'amazon-voucher-500': '/assets/amazon-500.png',
+  'micro-voucher-20': '/assets/recharge-voucher.png',
+  'community-token': '/assets/digital-coin-token.jpg'
 };
 
 const resolvePrizeImage = (item) => {
   const titleLower = (item?.title || '').toLowerCase();
   const slugLower = (item?.slug || '').toLowerCase();
 
-  // 1. ₹2,000 Amazon Shopping Gift Voucher (Checked FIRST so 2000 is not caught by 20)
+  // 1. ₹2,000 Amazon Shopping Gift Voucher
   if (titleLower.includes('2000') || slugLower.includes('2000') || titleLower.includes('2,000') || slugLower.includes('2k')) {
-    return '/amazon-2000.svg';
+    return '/assets/amazon-2000.jpg';
   }
 
-  // 2. ₹20 Micro-Reward (Only ₹20, not ₹2000)
-  if (titleLower.includes('₹20') || titleLower.includes(' 20') || slugLower.includes('20-voucher') || slugLower.includes('micro-voucher') || titleLower.includes('micro') || titleLower.includes('recharge')) {
-    return '/amazon-20.svg';
+  // 2. ₹500 Amazon Gift Voucher
+  if (titleLower.includes('500') || slugLower.includes('500')) {
+    return '/assets/amazon-500.png';
   }
 
-  // 3. Apple AirPods Pro
+  // 3. ₹20 Instant Recharge Voucher (strictly recharge-voucher.png)
+  if (titleLower.includes('₹20') || titleLower.includes(' 20') || slugLower.includes('20-voucher') || slugLower.includes('micro') || titleLower.includes('recharge')) {
+    return '/assets/recharge-voucher.png';
+  }
+
+  // 4. Token / Community Tokens (strictly digital-coin-token.jpg)
+  if (titleLower.includes('token') || slugLower.includes('token') || titleLower.includes('coin')) {
+    return '/assets/digital-coin-token.jpg';
+  }
+
+  // 4. Apple AirPods Pro
   if (titleLower.includes('airpods') || slugLower.includes('airpods')) {
-    return PRIZE_IMAGES['airpods-pro-2nd-gen'];
+    return '/assets/airpods.jpg';
   }
 
-  // 4. Apple Watch
+  // 5. Apple Watch
   if (titleLower.includes('watch') || slugLower.includes('watch')) {
-    return PRIZE_IMAGES['apple-watch-series-9'];
+    return '/assets/apple-watch.jpg';
   }
 
-  // 5. iPhone 15 Pro
+  // 6. iPhone 15 Pro
   if (titleLower.includes('iphone') || slugLower.includes('iphone')) {
-    return PRIZE_IMAGES['iphone-15-pro'];
+    return '/assets/iphone-prize.jpg';
   }
 
-  return PRIZE_IMAGES['iphone-15-pro'];
+  return '/assets/iphone-prize.jpg';
 };
 
 // Authoritative mapping of fees and currencies strictly according to assignment specifications
