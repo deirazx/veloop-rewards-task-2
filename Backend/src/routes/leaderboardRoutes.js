@@ -47,21 +47,16 @@ router.get('/', async (req, res) => {
       .select('customUserId name tier stats balances avatar')
       .lean();
 
-    // Calculate dynamic period points and attributes for each user from real MongoDB data
+    // Calculate authentic points (matching user's actual VES coins) and dynamic initials
     const computedUsers = users.map((u, i) => {
       const stats = u.stats || {};
       const balances = u.balances || {};
 
-      let points = 0;
-      if (filterKey.includes('DAILY')) {
-        points = stats.weeklyPoints ? Math.round(stats.weeklyPoints * 0.25) : (stats.points ? Math.round(stats.points * 0.1) : 0);
-      } else if (filterKey.includes('MONTHLY')) {
-        points = stats.points || 0;
-      } else if (filterKey.includes('ALL')) {
-        points = (stats.points || 0) + (balances.Tokens || 0);
-      } else {
-        // Default: WEEKLY
-        points = stats.weeklyPoints || Math.round((stats.points || 0) * 0.4) || 0;
+      // Authoritative points matching actual VES coins
+      const vesBalance = Number(balances.VES ?? balances.VEs ?? stats.points ?? 0);
+      let points = vesBalance;
+      if (filterKey.includes('ALL')) {
+        points = vesBalance + Number(balances.Tokens || 0);
       }
 
       const rawId = u.customUserId || String(u._id);
@@ -70,15 +65,35 @@ router.get('/', async (req, res) => {
         ? `@${clean.slice(0, 2).toLowerCase()}****${clean.slice(-2).toLowerCase()}`
         : '@ve****99';
 
+      // Authentic Name Initials:
+      // If space present: first letter of first name + first letter of second name
+      // Otherwise: starting 2 letters of name
+      let initial = 'VE';
+      const actualName = (u.name || '').trim();
+      if (actualName) {
+        const parts = actualName.split(/\s+/).filter(Boolean);
+        if (parts.length >= 2) {
+          initial = (parts[0][0] + parts[1][0]).toUpperCase();
+        } else if (actualName.length >= 2) {
+          initial = actualName.slice(0, 2).toUpperCase();
+        } else {
+          initial = actualName.toUpperCase();
+        }
+      } else if (u.customUserId) {
+        initial = u.customUserId.slice(0, 2).toUpperCase();
+      }
+
       const streak = (stats.wins && stats.wins > 0) ? `⚡ ${stats.wins} Win Streak` : 'Active Hunter';
 
       return {
         id: u._id,
         customUserId: masked,
         name: masked,
+        actualName: u.name,
         masked,
-        avatar: null, // Rule 25: Never expose real user photos
-        initial: 'VE', // Rule 25: Generic stylized cyber badge
+        avatar: null,
+        initial,
+        initials: initial,
         points: Number(points) || 0,
         pointsRaw: Number(points) || 0,
         wins: Number(stats.wins) || 0,

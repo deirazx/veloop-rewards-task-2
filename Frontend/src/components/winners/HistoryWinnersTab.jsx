@@ -4,6 +4,20 @@ import { useGiveaway } from '../../context/GiveawayContext';
 import PhysicalClaimModal from '../modals/PhysicalClaimModal';
 import GiftCardClaimModal from '../modals/GiftCardClaimModal';
 
+function getInitials(name, fallback = 'VE') {
+  if (!name || typeof name !== 'string') return fallback;
+  const trimmed = name.trim();
+  if (!trimmed) return fallback;
+  const parts = trimmed.split(/\s+/).filter(Boolean);
+  if (parts.length >= 2) {
+    return (parts[0][0] + parts[1][0]).toUpperCase();
+  }
+  if (trimmed.length >= 2) {
+    return trimmed.slice(0, 2).toUpperCase();
+  }
+  return trimmed.toUpperCase();
+}
+
 export default function HistoryWinnersTab() {
   const { giveaways, currentUser, claims } = useGiveaway();
 
@@ -204,7 +218,7 @@ export default function HistoryWinnersTab() {
                                       : 'bg-slate-800 text-slate-300'
                                   }`}
                                 >
-                                  {maskedId.charAt(0)}
+                                  {getInitials(winner.actualName || winner.userName || winner.name || winner.customUserId || maskedId, 'VE')}
                                 </div>
                                 <div>
                                   <div className="font-bold text-white flex items-center gap-1.5 font-mono">

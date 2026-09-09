@@ -179,11 +179,17 @@ export default function Navbar() {
                 <span className="text-xs font-bold text-white font-mono">
                   {(balances.VES ?? balances.VEs ?? 0).toLocaleString()}
                 </span>
-                <div className="w-px h-4 bg-white/10 mx-1" />
+                <div className="w-px h-4 bg-white/10 mx-0.5" />
                 <Coins className="w-3 h-3 text-amber-400" />
                 <span className="text-[11px] font-mono text-slate-400">SVEs:</span>
                 <span className="text-xs font-bold text-amber-300 font-mono">
                   {(balances.SVES ?? balances.SVEs ?? 0).toLocaleString()}
+                </span>
+                <div className="w-px h-4 bg-white/10 mx-0.5" />
+                <Zap className="w-3 h-3 text-cyan-400" />
+                <span className="text-[11px] font-mono text-slate-400">Tokens:</span>
+                <span className="text-xs font-bold text-cyan-300 font-mono">
+                  {(balances.Tokens ?? 0).toLocaleString()}
                 </span>
               </div>
 
@@ -310,27 +316,38 @@ export default function Navbar() {
                     </Link>
                   </div>
 
-                  {/* 2-Column Balance Hub */}
-                  <div className="grid grid-cols-2 gap-2.5 pt-1">
+                  {/* 3-Column Balance Hub */}
+                  <div className="grid grid-cols-3 gap-2 pt-1">
                     {/* VEs Pill */}
-                    <div className="p-2.5 rounded-xl bg-[#09090f] border border-purple-500/30 flex flex-col justify-between">
-                      <div className="flex items-center gap-1.5 mb-1 text-slate-400">
-                        <Sparkles className="w-3.5 h-3.5 text-purple-400" />
-                        <span className="text-[10px] font-mono uppercase tracking-wider text-slate-400">VEs Points</span>
+                    <div className="p-2 rounded-xl bg-[#09090f] border border-purple-500/30 flex flex-col justify-between">
+                      <div className="flex items-center gap-1 mb-1 text-slate-400">
+                        <Sparkles className="w-3 h-3 text-purple-400 shrink-0" />
+                        <span className="text-[9px] font-mono uppercase tracking-wider text-slate-400 truncate">VEs</span>
                       </div>
-                      <span className="text-base font-bold text-white font-mono tracking-tight">
+                      <span className="text-sm font-bold text-white font-mono tracking-tight truncate">
                         {(balances.VES ?? balances.VEs ?? 0).toLocaleString()}
                       </span>
                     </div>
 
                     {/* SVEs Pill */}
-                    <div className="p-2.5 rounded-xl bg-[#09090f] border border-amber-500/30 flex flex-col justify-between">
-                      <div className="flex items-center gap-1.5 mb-1 text-slate-400">
-                        <Coins className="w-3.5 h-3.5 text-amber-400" />
-                        <span className="text-[10px] font-mono uppercase tracking-wider text-slate-400">SVEs Coins</span>
+                    <div className="p-2 rounded-xl bg-[#09090f] border border-amber-500/30 flex flex-col justify-between">
+                      <div className="flex items-center gap-1 mb-1 text-slate-400">
+                        <Coins className="w-3 h-3 text-amber-400 shrink-0" />
+                        <span className="text-[9px] font-mono uppercase tracking-wider text-slate-400 truncate">SVEs</span>
                       </div>
-                      <span className="text-base font-bold text-amber-300 font-mono tracking-tight">
+                      <span className="text-sm font-bold text-amber-300 font-mono tracking-tight truncate">
                         {(balances.SVES ?? balances.SVEs ?? 0).toLocaleString()}
+                      </span>
+                    </div>
+
+                    {/* Tokens Pill */}
+                    <div className="p-2 rounded-xl bg-[#09090f] border border-cyan-500/30 flex flex-col justify-between">
+                      <div className="flex items-center gap-1 mb-1 text-slate-400">
+                        <Zap className="w-3 h-3 text-cyan-400 shrink-0" />
+                        <span className="text-[9px] font-mono uppercase tracking-wider text-slate-400 truncate">Tokens</span>
+                      </div>
+                      <span className="text-sm font-bold text-cyan-300 font-mono tracking-tight truncate">
+                        {(balances.Tokens ?? 0).toLocaleString()}
                       </span>
                     </div>
                   </div>

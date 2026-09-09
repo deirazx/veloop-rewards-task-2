@@ -24,8 +24,23 @@ function formatMaskedHandle(user) {
   return '@ve****25';
 }
 
-/* ─── Avatar circle with subtle shine — Rule 25 Compliant (Stylized Cyber Badge, Zero Real Photos) ─── */
-function Avatar({ gradientStyle, size = 'md' }) {
+/* ─── Dynamic Name Initials Generator ─── */
+function getInitials(name, fallback = 'VE') {
+  if (!name || typeof name !== 'string') return fallback;
+  const trimmed = name.trim();
+  if (!trimmed) return fallback;
+  const parts = trimmed.split(/\s+/).filter(Boolean);
+  if (parts.length >= 2) {
+    return (parts[0][0] + parts[1][0]).toUpperCase();
+  }
+  if (trimmed.length >= 2) {
+    return trimmed.slice(0, 2).toUpperCase();
+  }
+  return trimmed.toUpperCase();
+}
+
+/* ─── Avatar circle with dynamic initials ─── */
+function Avatar({ gradientStyle, size = 'md', initials, name, user }) {
   const sz = size === 'xl'
     ? 'w-16 h-16 sm:w-20 sm:h-20 text-xl sm:text-2xl ring-4'
     : size === 'lg'
@@ -34,13 +49,15 @@ function Avatar({ gradientStyle, size = 'md' }) {
         ? 'w-8 h-8 text-xs ring-1'
         : 'w-10 h-10 text-sm ring-2';
 
+  const textInitials = initials || user?.initial || user?.initials || getInitials(user?.actualName || user?.name || name, 'VE');
+
   return (
     <div
       style={{ background: gradientStyle || 'linear-gradient(135deg, #6366f1 0%, #a855f7 100%)' }}
       className={`${sz} rounded-2xl flex items-center justify-center font-black text-white shrink-0 shadow-lg ring-white/20 select-none relative overflow-hidden`}
     >
       <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-white/20 pointer-events-none" />
-      <span className="relative z-10 drop-shadow-md">VE</span>
+      <span className="relative z-10 drop-shadow-md">{textInitials}</span>
     </div>
   );
 }
@@ -221,10 +238,10 @@ function PodiumCard({ user, position, onCelebrate }) {
         )}
       </div>
 
-      {/* Avatar with Metallic Halo & Glow — Rule 25 Compliant Generic Cyber Insignia */}
+      {/* Avatar with Metallic Halo & Glow — Dynamic Name Initials */}
       <div className="relative mb-3">
         <div className={`rounded-2xl transition-transform duration-300 group-hover:scale-105 ${c.glowColor}`}>
-          <Avatar gradientStyle={user.gradientStyle} size={c.avatarSize} />
+          <Avatar gradientStyle={user.gradientStyle} size={c.avatarSize} user={user} initials={user.initial || user.initials} />
         </div>
 
         {/* Position rank badge anchored to bottom right */}
@@ -402,7 +419,7 @@ export default function Leaderboard() {
       }
 
       const masked = u.masked || u.username || (u.customUserId ? `@${u.customUserId}` : '@hunter');
-      const initial = u.initial || u.initials || (u.name ? u.name.slice(0, 2).toUpperCase() : 'VE');
+      const initial = u.initial || u.initials || getInitials(u.actualName || u.name, 'VE');
 
       return {
         ...u,
@@ -772,9 +789,9 @@ export default function Leaderboard() {
                       </div>
                     </div>
 
-                    {/* User & Avatar Info — Rule 25 Compliant */}
+                    {/* User & Avatar Info — Dynamic Initials */}
                     <div className="flex items-center gap-3 min-w-0 w-full">
-                      <Avatar gradientStyle={user.gradientStyle} size="sm" />
+                      <Avatar gradientStyle={user.gradientStyle} size="sm" user={user} initials={user.initial || user.initials} />
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-2">
                           <p className="text-xs sm:text-sm font-bold text-white truncate group-hover:text-purple-300 transition-colors font-mono">

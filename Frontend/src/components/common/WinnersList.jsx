@@ -34,6 +34,21 @@ function formatTimeAgo(timestamp) {
   }
 }
 
+// Dynamic Name Initials Generator
+function getInitials(name, fallback = 'VE') {
+  if (!name || typeof name !== 'string') return fallback;
+  const trimmed = name.trim();
+  if (!trimmed) return fallback;
+  const parts = trimmed.split(/\s+/).filter(Boolean);
+  if (parts.length >= 2) {
+    return (parts[0][0] + parts[1][0]).toUpperCase();
+  }
+  if (trimmed.length >= 2) {
+    return trimmed.slice(0, 2).toUpperCase();
+  }
+  return trimmed.toUpperCase();
+}
+
 // Strictly resolve icons ONLY for approved platform prizes
 function resolvePrizeIcon(prizeName = '') {
   const p = (prizeName || '').toLowerCase();
@@ -122,7 +137,7 @@ export default function WinnersList() {
       name: masked,
       prize: w.prize || w.prizeName || 'Verified Reward',
       time: w.time || formatTimeAgo(w.drawTimestamp),
-      initials: masked.startsWith('VE') ? 'VE' : masked.slice(0, 2).toUpperCase(),
+      initials: getInitials(w.actualName || w.userName || w.name, 'VE'),
       prize_icon: resolvePrizeIcon(w.prize || w.prizeName),
       ticketNumber: w.ticketNumber
     };

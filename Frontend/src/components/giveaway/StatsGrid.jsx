@@ -18,7 +18,7 @@ export default function StatsGrid() {
           setPlatformStats(data);
         }
       } catch (err) {
-        console.error('[StatsGrid] Failed to fetch live platform stats:', err);
+        // Silently use live giveaway fallback
       }
     };
     loadStats();

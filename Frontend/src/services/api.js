@@ -7,6 +7,7 @@
  */
 
 const LIVE_RENDER_BACKEND = 'https://veloop-giveaway-backend.onrender.com/api';
+const LOCAL_BACKEND = 'http://localhost:5000/api';
 
 const resolveBaseUrl = () => {
   const envUrl = import.meta.env.VITE_API_BASE_URL;
@@ -25,11 +26,11 @@ const resolveBaseUrl = () => {
     return envUrl.trim().replace(/\/$/, '');
   }
 
-  // Local development: use envUrl if explicitly set, else default to live Render backend
+  // Local development: use envUrl if set, otherwise default to local backend cluster
   if (envUrl && envUrl.trim() !== '') {
     return envUrl.trim().replace(/\/$/, '');
   }
-  return LIVE_RENDER_BACKEND;
+  return LOCAL_BACKEND;
 };
 
 export const API_BASE_URL = resolveBaseUrl();
@@ -146,8 +147,13 @@ export async function fetchLeaderboard(filter = 'Weekly') {
 }
 
 export async function fetchPlatformStats() {
-  const res = await request('/stats');
-  return res.data || null;
+  try {
+    const res = await request('/stats');
+    return res.data || null;
+  } catch (err) {
+    // Graceful fallback: return null so caller calculates live metrics from active pools
+    return null;
+  }
 }
 
 export async function fetchMyStatus(giveawayId) {
