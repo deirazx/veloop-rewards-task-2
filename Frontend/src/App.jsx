@@ -33,6 +33,7 @@ function App() {
               <Route path="*" element={<HomePage />} />
             </Routes>
           </main>
+          <Footer />
           {/* Mobile-only persistent bottom navigation bar */}
           <div className="md:hidden">
             <BottomNav />

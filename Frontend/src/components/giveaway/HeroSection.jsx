@@ -196,13 +196,23 @@ export default function HeroSection() {
                 />
 
                 {/* Floating Fintech Info Badges */}
-                <div className="absolute top-3 left-3 px-3 py-1 rounded-xl bg-black/60 backdrop-blur-md border border-white/10 text-[11px] font-semibold text-white flex items-center gap-1.5 shadow-lg">
-                  <span className="w-2 h-2 rounded-full bg-purple-400 animate-pulse" />
-                  Apple iPhone 15 Pro
+                <div className="absolute top-3 left-3 px-3 py-1 rounded-xl bg-black/70 backdrop-blur-md border border-white/10 text-[11px] font-semibold text-white flex items-center gap-1.5 shadow-lg">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                  <span className="truncate max-w-[140px] sm:max-w-[180px]">{featured?.title || 'Apple iPhone 15 Pro'}</span>
                 </div>
 
-                <div className="absolute bottom-3 right-3 px-3 py-1 rounded-xl bg-black/60 backdrop-blur-md border border-purple-500/30 text-[11px] font-bold text-purple-300 shadow-lg">
-                  Natural Titanium
+                <div className="absolute top-3 right-3 px-2.5 py-1 rounded-xl bg-purple-950/75 backdrop-blur-md border border-purple-500/30 text-[10px] font-bold text-purple-300 shadow-lg flex items-center gap-1">
+                  <ShieldCheck className="w-3 h-3 text-emerald-400" />
+                  <span>Audited</span>
+                </div>
+
+                <div className="absolute bottom-3 left-3 px-3 py-1.5 rounded-xl bg-black/75 backdrop-blur-md border border-amber-500/30 text-[11px] font-bold text-amber-300 shadow-lg flex items-center gap-1.5 font-mono">
+                  <span>Entry: {featured?.cost || 250} {featured?.currency || 'VEs'}</span>
+                </div>
+
+                <div className="absolute bottom-3 right-3 px-3 py-1.5 rounded-xl bg-gradient-to-r from-[#6366F1] to-[#a855f7] text-[11px] font-bold text-white shadow-[0_0_12px_rgba(168,85,247,0.5)] flex items-center gap-1 group-hover:scale-105 transition-all">
+                  <span>Enter Draw</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
                 </div>
               </div>
             </motion.div>

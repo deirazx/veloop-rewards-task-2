@@ -1,10 +1,12 @@
 import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Home, Gift, Trophy, BookOpen, User } from 'lucide-react';
+import { Home, Gift, Trophy, Ticket, User } from 'lucide-react';
+import { useGiveaway } from '../../context/GiveawayContext';
 
 export default function BottomNav() {
   const { pathname } = useLocation();
   const navigate = useNavigate();
+  const { joinedGiveaways } = useGiveaway();
 
   const scrollToGiveaways = () => {
     const target = document.getElementById('active-giveaways') || document.getElementById('active-giveaways-grid');
@@ -119,14 +121,19 @@ export default function BottomNav() {
         {/* 4. My Entries Tab */}
         <Link
           to="/entries"
-          className={`flex flex-col items-center justify-center gap-1 py-1 px-3 rounded-2xl min-w-[56px] transition-all duration-200 active:scale-95 ${
+          className={`flex flex-col items-center justify-center gap-1 py-1 px-3 rounded-2xl min-w-[56px] transition-all duration-200 active:scale-95 relative ${
             isEntriesActive
               ? 'text-[#c084fc]'
               : 'text-slate-400 hover:text-slate-200'
           }`}
         >
-          <div className={`p-1 rounded-xl transition-all ${isEntriesActive ? 'bg-purple-500/20 text-[#c084fc] shadow-[0_0_12px_rgba(168,85,247,0.4)]' : ''}`}>
-            <BookOpen className="w-5 h-5" strokeWidth={isEntriesActive ? 2.3 : 1.7} />
+          <div className={`p-1 rounded-xl transition-all relative ${isEntriesActive ? 'bg-purple-500/20 text-[#c084fc] shadow-[0_0_12px_rgba(168,85,247,0.4)]' : ''}`}>
+            <Ticket className="w-5 h-5" strokeWidth={isEntriesActive ? 2.3 : 1.7} />
+            {joinedGiveaways && joinedGiveaways.length > 0 && (
+              <span className="absolute -top-1 -right-1 w-3.5 h-3.5 rounded-full bg-cyan-400 text-black text-[9px] font-black flex items-center justify-center">
+                {joinedGiveaways.length}
+              </span>
+            )}
           </div>
           <span className="text-[10px] font-semibold tracking-tight leading-none">My Entries</span>
         </Link>

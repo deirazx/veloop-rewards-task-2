@@ -28,12 +28,56 @@ export default function Navbar() {
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
   const [bellOpen, setBellOpen] = useState(false);
+  const [activeHash, setActiveHash] = useState(() => (typeof window !== 'undefined' ? window.location.hash : ''));
   const bellRef = useRef(null);
 
   // Close menus on route change
   useEffect(() => {
     setMenuOpen(false);
     setBellOpen(false);
+  }, [location.pathname]);
+
+  // Synchronize active section with scroll & hash when on home route
+  useEffect(() => {
+    if (location.pathname !== '/') {
+      setActiveHash('');
+      return;
+    }
+
+    const syncActiveScroll = () => {
+      const scrollY = window.scrollY;
+      const leaderboardEl = document.getElementById('leaderboard');
+      const giveawaysEl = document.getElementById('active-giveaways');
+
+      // 140px threshold gives natural active transition while scrolling
+      const leaderboardTop = leaderboardEl ? leaderboardEl.offsetTop - 140 : Infinity;
+      const giveawaysTop = giveawaysEl ? giveawaysEl.offsetTop - 140 : Infinity;
+
+      if (scrollY >= leaderboardTop) {
+        setActiveHash('#leaderboard');
+      } else if (scrollY >= giveawaysTop) {
+        setActiveHash('#active-giveaways');
+      } else {
+        setActiveHash('');
+      }
+    };
+
+    if (location.hash) {
+      setActiveHash(location.hash);
+      const targetId = location.hash.replace('#', '');
+      setTimeout(() => {
+        const el = document.getElementById(targetId);
+        if (el) {
+          const y = el.getBoundingClientRect().top + window.pageYOffset - 80;
+          window.scrollTo({ top: y, behavior: 'smooth' });
+        }
+      }, 100);
+    } else {
+      syncActiveScroll();
+    }
+
+    window.addEventListener('scroll', syncActiveScroll, { passive: true });
+    return () => window.removeEventListener('scroll', syncActiveScroll);
   }, [location.pathname]);
 
   // Click outside to close notification dropdown & Escape key listener
@@ -225,24 +269,49 @@ export default function Navbar() {
     { label: 'Discover', path: '/' },
     { label: 'Giveaways', path: '/#active-giveaways', targetId: 'active-giveaways' },
     { label: 'Leaderboard', path: '/#leaderboard', targetId: 'leaderboard' },
-    { label: 'Winners Hub', path: '/winners' },
+    { label: 'Winners', path: '/winners' },
+    {
+      label: 'My Entries',
+      path: '/entries',
+      badge: joinedGiveaways && joinedGiveaways.length > 0 ? joinedGiveaways.length : null
+    },
   ];
+
+  const isLinkActive = (item) => {
+    if (location.pathname === '/') {
+      if (item.targetId) {
+        return activeHash === `#${item.targetId}`;
+      }
+      return (!activeHash || activeHash === '#') && item.path === '/';
+    }
+    return location.pathname === item.path;
+  };
 
   const handleDesktopNavClick = (e, item) => {
     if (item.targetId) {
       if (location.pathname === '/') {
         e.preventDefault();
+        setActiveHash(`#${item.targetId}`);
+        window.history.pushState(null, '', `#${item.targetId}`);
         const el = document.getElementById(item.targetId);
         if (el) {
-          el.scrollIntoView({ behavior: 'smooth' });
+          const y = el.getBoundingClientRect().top + window.pageYOffset - 80;
+          window.scrollTo({ top: y, behavior: 'smooth' });
         }
+      } else {
+        setActiveHash(`#${item.targetId}`);
+      }
+    } else {
+      setActiveHash('');
+      if (item.path === '/' && location.pathname === '/') {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
       }
     }
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full bg-[#09090b] border-b border-white/10">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+    <header className="sticky top-0 z-50 w-full bg-[#09090b]/90 backdrop-blur-xl border-b border-white/10 transition-colors">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3 lg:gap-4">
 
         {/* ── Logo ── */}
         <Link to="/" className="flex items-center gap-2.5 shrink-0 group">
@@ -263,21 +332,35 @@ export default function Navbar() {
         </Link>
 
         {/* ── Desktop nav links ── */}
-        <nav className="hidden md:flex items-center gap-1">
-          {navLinks.map((item) => (
-            <Link
-              key={item.label}
-              to={item.path}
-              onClick={(e) => handleDesktopNavClick(e, item)}
-              className={`px-3.5 py-2 rounded-xl text-sm font-medium transition-all ${
-                location.pathname === item.path && !item.targetId
-                  ? 'bg-purple-500/15 text-purple-300 border border-purple-500/20'
-                  : 'text-slate-400 hover:text-white hover:bg-white/5'
-              }`}
-            >
-              {item.label}
-            </Link>
-          ))}
+        <nav className="hidden md:flex items-center gap-1 lg:gap-1.5">
+          {navLinks.map((item) => {
+            const active = isLinkActive(item);
+            return (
+              <Link
+                key={item.label}
+                to={item.path}
+                onClick={(e) => handleDesktopNavClick(e, item)}
+                className={`relative px-3 py-1.5 lg:px-3.5 lg:py-2 rounded-xl text-xs lg:text-sm font-medium transition-all duration-200 flex items-center gap-1.5 group cursor-pointer ${
+                  active
+                    ? 'bg-gradient-to-r from-purple-500/25 to-indigo-500/20 text-white font-semibold border border-purple-500/40 shadow-[0_0_16px_rgba(168,85,247,0.3)]'
+                    : 'text-slate-400 hover:text-white hover:bg-white/5 border border-transparent'
+                }`}
+              >
+                <span>{item.label}</span>
+                {item.badge != null && (
+                  <span className="px-1.5 py-0.2 rounded-full text-[10px] font-mono font-bold bg-cyan-500/20 border border-cyan-500/40 text-cyan-300">
+                    {item.badge}
+                  </span>
+                )}
+                {active && (
+                  <motion.span
+                    layoutId="desktop-nav-active-indicator"
+                    className="absolute bottom-0 left-3 right-3 h-[2px] bg-gradient-to-r from-purple-400 via-[#a855f7] to-indigo-400 rounded-full shadow-[0_0_8px_rgba(168,85,247,0.8)]"
+                  />
+                )}
+              </Link>
+            );
+          })}
         </nav>
 
         {/* ── Right side controls ── */}
@@ -445,42 +528,56 @@ export default function Navbar() {
           {isAuthenticated && currentUser ? (
             <>
               {/* Balance strip */}
-              <div className="hidden sm:flex items-center gap-2 px-3 py-2 rounded-xl bg-[#13131a] border border-white/8">
-                <span className="w-2 h-2 rounded-full bg-[#a855f7]" />
-                <span className="text-[11px] font-mono text-slate-400">VEs:</span>
-                <span className="text-xs font-bold text-white font-mono">
-                  {(balances.VES ?? balances.VEs ?? 0).toLocaleString()}
-                </span>
-                <div className="w-px h-4 bg-white/10 mx-0.5" />
-                <Coins className="w-3 h-3 text-amber-400" />
-                <span className="text-[11px] font-mono text-slate-400">SVEs:</span>
-                <span className="text-xs font-bold text-amber-300 font-mono">
-                  {(balances.SVES ?? balances.SVEs ?? 0).toLocaleString()}
-                </span>
-                <div className="w-px h-4 bg-white/10 mx-0.5" />
-                <Zap className="w-3 h-3 text-cyan-400" />
-                <span className="text-[11px] font-mono text-slate-400">Tokens:</span>
-                <span className="text-xs font-bold text-cyan-300 font-mono">
-                  {(balances.Tokens ?? 0).toLocaleString()}
-                </span>
+              <div className="hidden xl:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#12121c] border border-white/10 shadow-inner">
+                <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-lg bg-purple-500/10 border border-purple-500/20" title="VES Platform Points">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#a855f7] animate-pulse shadow-[0_0_6px_rgba(168,85,247,0.8)]" />
+                  <span className="text-[10px] font-mono text-slate-400">VEs:</span>
+                  <span className="text-xs font-bold text-white font-mono">
+                    {(balances.VES ?? balances.VEs ?? 0).toLocaleString()}
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-lg bg-amber-500/10 border border-amber-500/20" title="Staked SVEs">
+                  <Coins className="w-3 h-3 text-amber-400" />
+                  <span className="text-[10px] font-mono text-slate-400">SVEs:</span>
+                  <span className="text-xs font-bold text-amber-300 font-mono">
+                    {(balances.SVES ?? balances.SVEs ?? 0).toLocaleString()}
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-lg bg-cyan-500/10 border border-cyan-500/20" title="Community Tokens">
+                  <Zap className="w-3 h-3 text-cyan-400" />
+                  <span className="text-[10px] font-mono text-slate-400">Tokens:</span>
+                  <span className="text-xs font-bold text-cyan-300 font-mono">
+                    {(balances.Tokens ?? 0).toLocaleString()}
+                  </span>
+                </div>
               </div>
 
               {/* User chip */}
-              <Link to="/profile" className="hidden sm:flex items-center gap-2 px-3 py-2 rounded-xl bg-[#13131a] border border-white/8 hover:border-purple-500/30 transition">
-                <div className="w-6 h-6 rounded-full bg-purple-500/25 flex items-center justify-center">
-                  <User className="w-3.5 h-3.5 text-purple-300" />
+              <Link
+                to="/profile"
+                className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#12121c] border border-white/10 hover:border-purple-500/40 hover:bg-[#181826] transition-all group"
+              >
+                <div className="w-7 h-7 rounded-lg bg-gradient-to-tr from-purple-600 to-indigo-500 p-[1.5px] shadow-[0_0_10px_rgba(168,85,247,0.3)]">
+                  <div className="w-full h-full rounded-[6px] bg-[#09090b] flex items-center justify-center">
+                    <User className="w-3.5 h-3.5 text-purple-300 group-hover:text-white transition-colors" />
+                  </div>
                 </div>
-                <div className="leading-none">
-                  <div className="text-xs font-bold text-white font-mono">
+                <div className="leading-none text-left">
+                  <div className="text-xs font-bold text-white font-mono group-hover:text-purple-300 transition-colors">
                     {currentUser.customUserId || 'VE10025'}
                   </div>
-                  <div className="text-[9px] text-emerald-400">Verified</div>
+                  <div className="text-[9px] font-semibold text-emerald-400 flex items-center gap-1 mt-0.5">
+                    <span className="w-1 h-1 rounded-full bg-emerald-400" />
+                    Verified
+                  </div>
                 </div>
               </Link>
 
               <button
                 onClick={logoutUser}
-                className="hidden sm:flex p-2.5 rounded-xl bg-[#13131a] border border-white/8 text-slate-400 hover:text-rose-400 hover:border-rose-500/20 transition"
+                className="hidden sm:flex p-2.5 rounded-xl bg-[#12121c] border border-white/10 text-slate-400 hover:text-rose-400 hover:border-rose-500/30 hover:bg-rose-500/10 transition cursor-pointer"
                 title="Logout"
               >
                 <LogOut className="w-4 h-4" />
@@ -491,19 +588,19 @@ export default function Navbar() {
             <div className="hidden sm:flex items-center gap-2">
               <Link
                 to="/login"
-                className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium text-slate-300 hover:text-white border border-white/8 hover:border-white/15 bg-[#13131a] transition"
+                className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs lg:text-sm font-semibold text-slate-300 hover:text-white border border-white/10 hover:border-white/20 bg-[#12121c] hover:bg-[#181826] transition"
               >
                 <LogIn className="w-3.5 h-3.5" />
                 Login
               </Link>
               <Link
                 to="/register"
-                className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-bold text-white
+                className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs lg:text-sm font-bold text-white
                   bg-gradient-to-r from-[#6366F1] to-[#a855f7]
                   shadow-[0_0_16px_rgba(168,85,247,0.35)]
                   hover:shadow-[0_0_24px_rgba(168,85,247,0.55)]
                   hover:from-[#4F46E5] hover:to-[#9333ea]
-                  transition-all"
+                  transition-all active:scale-[0.98]"
               >
                 <Zap className="w-3.5 h-3.5" />
                 Sign Up
@@ -693,10 +790,24 @@ export default function Navbar() {
                 </button>
 
                 <Link
-                  to="/"
-                  onClick={() => setMenuOpen(false)}
+                  to="/#active-giveaways"
+                  onClick={(e) => {
+                    setMenuOpen(false);
+                    if (location.pathname === '/') {
+                      e.preventDefault();
+                      setActiveHash('#active-giveaways');
+                      window.history.pushState(null, '', '#active-giveaways');
+                      const el = document.getElementById('active-giveaways');
+                      if (el) {
+                        const y = el.getBoundingClientRect().top + window.pageYOffset - 80;
+                        window.scrollTo({ top: y, behavior: 'smooth' });
+                      }
+                    } else {
+                      setActiveHash('#active-giveaways');
+                    }
+                  }}
                   className={`flex items-center justify-between p-3 rounded-xl border transition-all ${
-                    location.pathname === '/'
+                    isLinkActive({ targetId: 'active-giveaways' })
                       ? 'bg-[#1c1730] border-purple-500/60 text-white shadow-[0_0_15px_rgba(168,85,247,0.2)]'
                       : 'bg-[#141422] hover:bg-[#19192b] border-white/10 text-slate-200 hover:text-white'
                   }`}
@@ -715,6 +826,7 @@ export default function Navbar() {
                       <div className="text-[10px] text-slate-400">High-value electronics, cash & supercars</div>
                     </div>
                   </div>
+                  <ChevronRight className="w-4 h-4 text-slate-500" />
                 </Link>
 
                 <Link
@@ -723,11 +835,22 @@ export default function Navbar() {
                     setMenuOpen(false);
                     if (location.pathname === '/') {
                       e.preventDefault();
+                      setActiveHash('#leaderboard');
+                      window.history.pushState(null, '', '#leaderboard');
                       const el = document.getElementById('leaderboard');
-                      if (el) el.scrollIntoView({ behavior: 'smooth' });
+                      if (el) {
+                        const y = el.getBoundingClientRect().top + window.pageYOffset - 80;
+                        window.scrollTo({ top: y, behavior: 'smooth' });
+                      }
+                    } else {
+                      setActiveHash('#leaderboard');
                     }
                   }}
-                  className="flex items-center justify-between p-3 rounded-xl border transition-all bg-[#141422] hover:bg-[#19192b] border-white/10 text-slate-200 hover:text-white"
+                  className={`flex items-center justify-between p-3 rounded-xl border transition-all ${
+                    isLinkActive({ targetId: 'leaderboard' })
+                      ? 'bg-[#1c1730] border-purple-500/60 text-white shadow-[0_0_15px_rgba(168,85,247,0.2)]'
+                      : 'bg-[#141422] hover:bg-[#19192b] border-white/10 text-slate-200 hover:text-white'
+                  }`}
                 >
                   <div className="flex items-center gap-3">
                     <div className="w-9 h-9 rounded-xl bg-[#2b1f13] border border-amber-500/40 flex items-center justify-center text-amber-400">
