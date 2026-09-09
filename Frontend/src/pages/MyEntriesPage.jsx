@@ -22,7 +22,7 @@ export default function MyEntriesPage() {
           Participating Giveaways
         </h1>
         <p className="text-xs text-slate-400">
-          Your active entries secured by on-chain provably fair verification.
+          Your active entries secured by on-chain transparent verification.
         </p>
       </div>
 
@@ -74,7 +74,7 @@ export default function MyEntriesPage() {
               <div className="p-3 rounded-xl bg-[#09090b] border border-white/5 text-xs flex items-center justify-between">
                 <div className="flex items-center gap-1.5 text-slate-400">
                   <ShieldCheck className="w-3.5 h-3.5 text-purple-400" />
-                  <span>Provably Fair Draw</span>
+                  <span>Audited Draw</span>
                 </div>
                 <Link
                   to={`/giveaway/${item.slug || item.id}`}

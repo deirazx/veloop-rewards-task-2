@@ -55,7 +55,11 @@ const winnerSchema = new mongoose.Schema(
       default: 'UNCLAIMED',
       index: true
     },
-    provableSeed: {
+    verificationSeed: {
+      type: String,
+      default: () => '0x' + Math.random().toString(16).substr(2, 16)
+    },
+    drawSeed: {
       type: String,
       default: () => '0x' + Math.random().toString(16).substr(2, 16)
     }

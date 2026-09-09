@@ -55,7 +55,7 @@ export default function LoginPage() {
             Log In to VELOOP Rewards
           </h1>
           <p className="text-xs text-slate-400 mt-1">
-            Access your provably fair giveaway tickets and live reward balances.
+            Access your audited giveaway tickets and live reward balances.
           </p>
         </div>
 

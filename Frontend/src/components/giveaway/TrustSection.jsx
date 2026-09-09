@@ -5,7 +5,7 @@ const trustPillars = [
   {
     icon: Eye,
     tag: '100% Transparent',
-    title: 'Provably Fair RNG',
+    title: 'Transparent & Audited Selection',
     desc: 'Publicly verifiable random numbers prevent tampering and guarantee legitimate winners with immutable cryptographic seed hashes.',
     color: 'purple'
   },

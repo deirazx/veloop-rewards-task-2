@@ -8,7 +8,7 @@ const faqs = [
   },
   {
     q: 'How are winners selected?',
-    a: 'Winners are selected using an audited, provably fair pseudo-random number generator (PRNG). Each draw uses a cryptographic seed hash derived from timestamp and blockhash data. When the countdown reaches zero or all spots are reserved, the PRNG executes automatically to select the winning ticket number. All draw seeds and ticket allocation hashes are published in the Winners Hub for public verification.'
+    a: 'Winners are selected using an audited, transparent verification system (PRNG). Each draw uses a cryptographic seed hash derived from timestamp and blockhash data. When the countdown reaches zero or all spots are reserved, the PRNG executes automatically to select the winning ticket number. All draw seeds and ticket allocation hashes are published in the Winners Hub for public verification.'
   },
   {
     q: 'How do I claim my prize?',

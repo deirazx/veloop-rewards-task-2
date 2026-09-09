@@ -1,4 +1,4 @@
-# 🎁 VELOOP Rewards & Provably Fair Giveaway Platform
+# 🎁 VELOOP Rewards & Audited Giveaway Platform
 
 [![Vite](https://img.shields.io/badge/Vite-8.2.2-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev/)
 [![React](https://img.shields.io/badge/React-19.2-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev/)
@@ -9,241 +9,79 @@
 [![Netlify](https://img.shields.io/badge/Netlify-Deployed-00C7B7?style=for-the-badge&logo=netlify&logoColor=white)](https://veloop-rewards-dheeraj.netlify.app)
 [![License: ISC](https://img.shields.io/badge/License-ISC-blue.svg?style=for-the-badge)](https://opensource.org/licenses/ISC)
 
-> **VELOOP Rewards** is an ultra-modern, gamified Fintech & Web3 rewards platform engineered for high-engagement community giveaways. Built with a cryptographic **Provably Fair Protocol (SHA-256)**, a live **Leaderboard with Masked Identity Protection**, real-time **Multi-Currency Wallets**, an interactive **Notification Center**, and dynamic countdown engines.
+> **VELOOP Rewards** is an enterprise-grade, gamified Fintech and Web3 rewards portal engineered for high-trust community giveaways. Built with a cryptographic **Transparent Verification Protocol (SHA-256)**, **Rule 25 Identity Privacy Masking**, multi-currency balance validation, atomic participation states, and real-time synchronized countdown engines.
 
 ---
 
-## 🌐 Live Platform Links
+## 🌐 Live Platform Deployments
 
-- **Frontend Deployment (Netlify):** [https://veloop-rewards-dheeraj.netlify.app](https://veloop-rewards-dheeraj.netlify.app)
-- **Backend API (Render):** `https://veloop-giveaway-backend.onrender.com`
-
----
-
-## ⚡ Key Highlights & Core Features
-
-### 1. 🎁 Multi-Pool Giveaway Engine
-- **Tiered Prize Pools:** Luxury Electronics (*Apple iPhone 15 Pro, Apple Watch Series 9, AirPods Pro*), Shopping Vouchers (*Amazon ₹2,000 & ₹500*), and Micro-Recharge Rewards (*₹20 Instant Recharge*).
-- **Multi-Currency System:** Supports entry fees in **VEs** (Platform Points), **SVEs** (Staked Points), and **Community Tokens**.
-- **Real-Time Spots Tracking:** Displays exact spots taken vs total spots available with progressive visual indicators.
-
-### 2. 🛡️ Provably Fair Cryptographic Protocol
-- Deterministic winner selection utilizing **SHA-256 cryptographic backend hashes** and client-seed auditing.
-- Dedicated **Audited Winners Hub** (`/winners`) displaying verifiable draw hashes, draw timestamps, and ticket proofs to eliminate fraud and bias.
-
-### 3. 🏆 3D Champions Podium & Leaderboard (Privacy Compliant)
-- **Strict Rule 25 Privacy Compliance:** Never exposes raw full names or unmasked user IDs. Player handles are strictly masked (`@ve****25` / `VE****25`).
-- **Dynamic 2-Letter Initials:** Stylized avatar initials derived dynamically from user names (e.g., *Dheeraj Kumar* ➔ `DK`).
-- **Live Wallet-Synced Points:** Leaderboard scores sync directly with actual MongoDB user VES coin balances, preventing artificial score inflation.
-
-### 4. 🔔 Real-Time Interactive Notification Center
-- **Cross-Platform Bell Dropdown:** Desktop glassmorphism menu and touch-friendly mobile drawer modal with dark backdrop blur.
-- **100% Live Backend Data:** Pulls live active giveaway alerts, real wallet balances, confirmed user entry tickets, and audited draw notices.
-- **True Website Behavior:**
-  - Animated pulsing unread badge counter.
-  - 1-click smooth navigation to relevant giveaway pools and winner pages.
-  - Individual read tracking and *"Mark all read"* functionality with `localStorage` persistence.
-
-### 5. ⏳ Database-Synchronized Countdown Engine ("Ends In")
-- **Live Next-Draw Tracker:** Inspects all active MongoDB pools and automatically counts down to the nearest concluding giveaway.
-- **Real Seconds Ticking:** Live countdown clock with ticking seconds (`cd.s`) without artificial 24-hour reset fallbacks.
-- **Contextual Subtitles & Direct Linking:** Displays the ending giveaway title (e.g. *Next Draw: ₹20 Instant Recharge Voucher*) with instant card navigation.
-
-### 6. 💼 Member Profile & Multi-Currency Digital Wallet
-- Tracks user balances across **VEs**, **SVEs**, and **Community Tokens**.
-- Device fingerprint simulation (`veloop_device_hash`) for multi-account sybil resistance.
-- Complete ticket history with active draw statuses.
+| Service                | Target Platform | Production URL                                                                           |
+| ---------------------- | --------------- | ---------------------------------------------------------------------------------------- |
+| **Client Frontend**    | Netlify         | [https://veloop-rewards-dheeraj.netlify.app](https://veloop-rewards-dheeraj.netlify.app) |
+| **Backend API Server** | Render          | `https://veloop-giveaway-backend.onrender.com/api`                                       |
+| **Database Cluster**   | MongoDB Atlas   | Frankfurt Cluster (M0 Sandbox with Failover DNS)                                         |
 
 ---
 
-## 🏗️ Architecture & Technology Stack
+## 🎯 Official Specification Matrix & Approved Catalog
 
-```
-                                    ┌────────────────────────┐
-                                    │    Client (Browser)    │
-                                    │ React 19 + TailwindCSS │
-                                    └───────────┬────────────┘
-                                                │ REST API (HTTPS / JSON)
-                                                ▼
-                                    ┌────────────────────────┐
-                                    │   Express 5 Backend    │
-                                    │    Node.js Runtime     │
-                                    └───────────┬────────────┘
-                                                │ Mongoose ODM
-                                                ▼
-                                    ┌────────────────────────┐
-                                    │  MongoDB Atlas Cluster │
-                                    │ Users, Pools, Winners  │
-                                    └────────────────────────┘
-```
+Strictly aligned with official specification clauses (1–103) eliminating casino mechanics and unapproved rewards:
 
-### **Frontend**
-- **Framework:** React 19 with Vite 8
-- **Routing:** React Router v7
-- **Styling:** TailwindCSS 3.4 + Custom Glassmorphism UI tokens
-- **Animations:** Framer Motion & Canvas Confetti
-- **Icons:** Lucide React
-
-### **Backend**
-- **Runtime:** Node.js (v20+ / v24)
-- **Framework:** Express.js 5
-- **Database:** MongoDB Atlas via Mongoose 9
-- **Authentication:** JWT (JSON Web Tokens) + BcryptJS password hashing
-- **Security:** Strict CORS origin whitelist, parameter sanitization, and fallback DNS SRV resolution
+| Prize Item                | Category          | Allocation / Spots | Entry Fee |  Required Currency   | Fulfillment Requirement                 |
+| ------------------------- | ----------------- | :----------------: | :-------: | :------------------: | --------------------------------------- |
+| **Apple iPhone 15 Pro**   | Physical Tech     |   1 Grand Prize    |    250    |       **VEs**        | Full Name, Phone, Shipping Address, PIN |
+| **Apple Watch Series 9**  | Physical Tech     |    Configurable    |    200    |       **VEs**        | Full Name, Phone, Shipping Address, PIN |
+| **Apple AirPods Pro**     | Physical Tech     |    Configurable    |    500    |  **SVEs** (Staked)   | Full Name, Phone, Shipping Address, PIN |
+| **₹2,000 Amazon Voucher** | Digital Gift Card |     Multi-tier     |    500    |       **VEs**        | Recipient Email Address Only            |
+| **₹500 Amazon Voucher**   | Digital Gift Card |     Multi-tier     |    300    |       **VEs**        | Recipient Email Address Only            |
+| **₹20 Instant Recharge**  | Micro Voucher     |     Fast-Draw      |   2,000   | **Community Tokens** | Recipient Email Address Only            |
 
 ---
 
-## 📁 Repository Structure
+## ⚡ Core Engineering & Architecture Highlights
+
+### 1. 🛡️ Transparent & Audited Architecture & Winner Lifecycle
+- **Deterministic RNG:** Draws utilize cryptographic seed combinations with backend SHA-256 block generation.
+- **Audit Center (`/winners`):** Displays public draw verification hashes, timestamps, and verifiable ticket IDs.
+- **Premature Leakage Barrier:** Live and active giveaway pools strictly forbid dummy winner tickers. The marquee displays live platform status until an event countdown formally concludes.
+
+### 2. 🔒 Strict Rule 25 Privacy Obfuscation
+- **Public Masking:** Public leaderboards, champions podium, and winner archives strictly mask usernames (`@ve****25` or `VE****25`). Real full names and unmasked IDs are 100% sanitized before frontend hydration.
+- **Dynamic 2-Letter Initials:** Stylized avatar initials derived dynamically from user credentials (e.g., *Dheeraj Kumar* ➔ `DK`).
+
+### 3. 🚦 Enforced Multi-Step Participation Journey (Clauses 79–103)
+- **Zero Instant Deductions:** Card action buttons route exclusively to dedicated `/giveaway/:slug` overview pages to enforce T&C and eligibility inspection.
+- **Dynamic Balance Validation:** Evaluates specific wallet balances (VEs vs SVEs vs Tokens). Deficits trigger dynamic shortfall alerts ("Earn More VEs (+50 needed)").
+- **Atomic Confirmation Modal:** Inspects starting balance, exact entry fee deduction, and projected net balance before submitting.
+- **Double-Click Lock:** Submission toggles a progressive loading spinner (`Joining Giveaway...`) before rendering the final `You're Participating ✓` state with a unique ticket identifier.
+
+### 4. 🔔 Interactive Notification Center & Global Persistence
+- **Persistent Unread Counter:** Live unread notification counter badge with automatic `localStorage` synchronization across refreshes.
+- **Contextual Deep Linking:** 1-click smooth navigation to active contests, wallet top-ups, and audited draws.
+- **Unified Navigation:** Full-bleed drawer on mobile devices with background blur and desktop glassmorphic dropdowns.
+
+### 5. ⏳ Database-Synchronized Next-Draw Engine
+- **Active Pool Inspection:** Scans MongoDB for the active giveaway with the earliest `endAt` timestamp.
+- **Real-Time Seconds Counter:** Live countdown ticker (`dd : hh : mm : ss`) eliminating fixed 24-hour reset fallbacks.
+
+---
+
+## 🏗️ Technical Stack & Dependencies
 
 ```text
-Veloop-Task-2/
-├── Backend/                       # Node.js & Express API server
-│   ├── src/
-│   │   ├── config/                # Database connection & Atlas DNS config
-│   │   ├── controllers/           # Business logic (Giveaways, Auth, Participations)
-│   │   ├── middleware/            # JWT verification & CORS
-│   │   ├── models/                # Mongoose schemas (User, Giveaway, Winner, Participation)
-│   │   ├── routes/                # API route definitions
-│   │   ├── scripts/               # Database seed scripts
-│   │   └── server.js              # Express app bootstrap
-│   ├── .env                       # Backend environment variables
-│   └── package.json
-│
-├── Frontend/                      # React & Vite client application
-│   ├── public/                    # Static assets & icons
-│   ├── src/
-│   │   ├── components/            # UI components (Navbar, StatsGrid, PrizeCard, Leaderboard)
-│   │   │   ├── common/            # Shared components (Navbar, Leaderboard, WinnersList)
-│   │   │   ├── giveaway/          # Contest cards, stats grid, hero banner
-│   │   │   └── winners/           # Audited draw tabs & history
-│   │   ├── context/               # Global Giveaway & Auth State Provider
-│   │   ├── data/                  # Authoritative fallback specifications
-│   │   ├── pages/                 # Route views (Home, GiveawayDetails, Winners, Profile)
-│   │   ├── services/              # Resilient Axios/Fetch API client
-│   │   ├── App.jsx                # Router setup
-│   │   └── main.jsx               # React entry point
-│   ├── .env                       # Frontend environment variables
-│   ├── package.json
-│   └── vite.config.js
-│
-├── netlify.toml                   # Netlify CI/CD build configuration & proxy redirects
-└── README.md                      # Project documentation
-```
-
----
-
-## 📡 REST API Reference
-
-| Method | Endpoint                          | Description                                       | Auth Required |
-| ------ | --------------------------------- | ------------------------------------------------- | :-----------: |
-| `POST` | `/api/auth/register`              | Register new member account & generate JWT        |       ❌       |
-| `POST` | `/api/auth/login`                 | Authenticate user & receive session token         |       ❌       |
-| `GET`  | `/api/auth/me`                    | Fetch authenticated user profile & balances       |   ✅ Bearer    |
-| `GET`  | `/api/giveaways/current`          | List all active & upcoming prize pools            |       ❌       |
-| `GET`  | `/api/giveaways/:id`              | Fetch specific giveaway details by ID/slug        |       ❌       |
-| `GET`  | `/api/giveaways/previous/winners` | Get concluded draws with audited winners          |       ❌       |
-| `POST` | `/api/participate`                | Enter giveaway & deduct ticket cost               |   ✅ Bearer    |
-| `GET`  | `/api/participate/:id/my-status`  | Check if authenticated user joined pool           |   ✅ Bearer    |
-| `GET`  | `/api/leaderboard`                | Live rankings (Daily, Weekly, All-Time)           |       ❌       |
-| `GET`  | `/api/stats`                      | Platform metrics (Participants, Pools, Next Draw) |       ❌       |
-
----
-
-## 🚀 Getting Started Locally
-
-### Prerequisites
-- [Node.js](https://nodejs.org/) (v18.0.0 or higher)
-- [Git](https://git-scm.com/)
-- Access to a MongoDB database (Local instance or [MongoDB Atlas](https://www.mongodb.com/cloud/atlas))
-
----
-
-### 1. Clone the Repository
-```bash
-git clone https://github.com/deirazx/veloop-rewards-task-2.git
-cd veloop-rewards-task-2
-```
-
----
-
-### 2. Backend Setup
-```bash
-cd Backend
-npm install
-```
-
-Create a `.env` file in the `Backend/` directory:
-```env
-PORT=5000
-MONGO_URI=mongodb+srv://<username>:<password>@cluster0.mongodb.net/veloop?retryWrites=true&w=majority
-JWT_SECRET=veloop_rewards_secret_key_2026_jwt_token
-CORS_ORIGIN=http://localhost:5173,https://veloop-rewards-dheeraj.netlify.app
-NODE_ENV=development
-```
-
-*(Optional)* Seed database with official giveaways:
-```bash
-npm run seed
-```
-
-Start the backend development server:
-```bash
-npm run dev
-# Server listening on http://localhost:5000
-```
-
----
-
-### 3. Frontend Setup
-Open a new terminal:
-```bash
-cd Frontend
-npm install
-```
-
-Create a `.env` file in the `Frontend/` directory:
-```env
-VITE_API_BASE_URL=http://localhost:5000/api
-```
-
-Start the Vite development server:
-```bash
-npm run dev
-# Local client running on http://localhost:5173
-```
-
----
-
-## 🚢 Deployment Guide
-
-### Deploying Frontend to Netlify
-1. Connect your repository to **Netlify**.
-2. Set the build settings:
-   - **Base directory:** `Frontend`
-   - **Build command:** `npm run build`
-   - **Publish directory:** `Frontend/dist`
-3. Add Environment Variable in Netlify Dashboard:
-   - `VITE_API_BASE_URL`: `https://your-backend.onrender.com/api`
-4. The included `netlify.toml` automatically handles SPA routing and redirect rules.
-
-### Deploying Backend to Render
-1. Create a **New Web Service** on [Render](https://render.com/).
-2. Select your repository and set the **Root Directory** to `Backend`.
-3. Build command: `npm install`
-4. Start command: `node src/server.js`
-5. Configure Environment Variables (`MONGO_URI`, `JWT_SECRET`, `CORS_ORIGIN`, `NODE_ENV=production`).
-
----
-
-## 🔒 Security & Privacy Highlights
-
-- **Rule 25 Identity Obfuscation:** Enforces handle masking (`@ve****25`) at both API and UI layers to prevent user dox attacks.
-- **Tamper-Resistant Countdown:** Timers use absolute server timestamps (`endAt`), preventing client-side clock manipulation.
-- **Anti-Leakage Draw Rule:** Prevents display of fake/premature winners while a contest is in `ACTIVE` countdown state.
-- **Failover DNS Configuration:** Custom Google DNS resolvers (`8.8.8.8`) prevent SRV resolution timeout issues on cloud clusters.
-
----
-
-## 📄 License
-
-This project is licensed under the **ISC License**. Developed as part of the VELOOP Rewards engineering assignment.
+┌────────────────────────────────────────────────────────┐
+│               Client Application (Vite 8)              │
+│       React 19 • TailwindCSS 3.4 • Lucide React        │
+└───────────────────────────┬────────────────────────────┘
+                            │ REST API (HTTPS / JSON)
+                            ▼
+┌────────────────────────────────────────────────────────┐
+│             API Server (Express 5 / Node.js)           │
+│        JWT Auth • Rate Limiting • Helmet Security      │
+└───────────────────────────┬────────────────────────────┘
+                            │ Mongoose 9 ODM
+                            ▼
+┌────────────────────────────────────────────────────────┐
+│            Database (MongoDB Atlas Cluster)            │
+│       Users • Giveaways • Participations • Draws       │
+└────────────────────────────────────────────────────────┘

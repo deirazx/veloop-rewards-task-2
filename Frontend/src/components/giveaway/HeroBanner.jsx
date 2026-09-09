@@ -14,7 +14,7 @@ export default function HeroBanner() {
         {/* Badge */}
         <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-accent-purple/20 border border-accent-purple/40 text-purple-300 text-xs font-bold uppercase tracking-wider">
           <Sparkles className="w-3.5 h-3.5 text-reward-gold" />
-          <span>Provably Fair Community Giveaways</span>
+          <span>Transparent &amp; Audited Community Giveaways</span>
         </div>
 
         {/* Heading */}
@@ -26,7 +26,7 @@ export default function HeroBanner() {
         </h1>
 
         <p className="text-sm md:text-base text-slate-300 leading-relaxed max-w-2xl">
-          Zero raffle bots, zero opaque decisions. Every winner is audited on-chain via cryptographically verifiable random numbers. Claim physical items directly to your doorstep or receive instant digital gift vouchers.
+          Zero automated bots, zero opaque decisions. Every winner is audited on-chain via cryptographically verifiable random numbers. Claim physical items directly to your doorstep or receive instant digital gift vouchers.
         </p>
 
         {/* Dynamic Stats Row */}
@@ -44,7 +44,7 @@ export default function HeroBanner() {
             <span className="text-xl md:text-2xl font-extrabold text-purple-400 font-mono">5 Live</span>
           </div>
           <div>
-            <span className="text-[11px] font-mono text-slate-400 block uppercase">Fairness Audit</span>
+            <span className="text-[11px] font-mono text-slate-400 block uppercase">Verification Audit</span>
             <span className="text-xl md:text-2xl font-extrabold text-emerald-400 font-mono">100% On-Chain</span>
           </div>
         </div>

@@ -101,7 +101,7 @@ export default function ProfilePage() {
           <div className="space-y-1">
             <h2 className="text-lg font-bold text-white">Join the Community</h2>
             <p className="text-xs text-slate-400 max-w-sm mx-auto leading-relaxed">
-              Log in to track your provably fair tickets, view live token balances, and claim won giveaways.
+              Log in to track your audited tickets, view live token balances, and claim won giveaways.
             </p>
           </div>
 

@@ -37,7 +37,7 @@ export const mockGiveaways = [
     ],
     terms: [
       '1 entry permitted per verified account.',
-      'Cryptographic provably fair draw upon countdown completion.',
+      'Cryptographically audited draw upon countdown completion.',
       'Deduction is final upon confirmation.'
     ],
     winners: []

@@ -129,7 +129,7 @@ export default function ConfirmationModal({ giveaway, isOpen, onClose, onSuccess
                 <div>
                   <h4 className="text-lg font-semibold text-white">Entry Locked Successfully!</h4>
                   <p className="text-sm text-slate-300 mt-1 max-w-sm mx-auto">
-                    Your spot is guaranteed. The provably fair draw will execute once the event concludes.
+                    Your spot is guaranteed. The transparent and audited draw will execute once the event concludes.
                   </p>
                 </div>
                 <div className="p-3 bg-obsidian/60 rounded-xl border border-slate-800 text-xs text-slate-400 font-mono">

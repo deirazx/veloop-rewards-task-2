@@ -89,7 +89,7 @@ export default function GiveawayDetailsPage() {
                 id: item.giveawayId || item.id || item._id,
                 slug: item.slug || item.giveawayId,
                 title: item.title,
-                subtitle: item.subtitle || item.prizes?.[0]?.name || 'Provably Fair Community Giveaway',
+                subtitle: item.subtitle || item.prizes?.[0]?.name || 'Audited Community Giveaway',
                 entryFee: Number(item.entryFee || item.cost || item.prizes?.[0]?.entryFee || 250),
                 cost: Number(item.entryFee || item.cost || item.prizes?.[0]?.entryFee || 250),
                 currency: item.currency || 'VEs',
@@ -250,7 +250,7 @@ export default function GiveawayDetailsPage() {
               ) : (
                 <div className="absolute bottom-4 left-4 flex items-center gap-2 px-3 py-1.5 rounded-xl bg-obsidian/90 backdrop-blur-md border border-slate-700 text-xs text-slate-200">
                   <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                  <span>Provably Fair RNG Audited</span>
+                  <span>Audited Platform Allocation</span>
                 </div>
               )}
             </div>
@@ -372,7 +372,7 @@ export default function GiveawayDetailsPage() {
                 <span className="absolute -left-6 top-0.5 flex items-center justify-center w-5 h-5 rounded-full bg-amber-600 text-[10px] font-extrabold text-white ring-4 ring-[#0f1117]">
                   3
                 </span>
-                <h4 className="text-xs font-bold text-white">Cryptographic Provably Fair Draw</h4>
+                <h4 className="text-xs font-bold text-white">Cryptographically Audited Draw</h4>
                 <p className="text-[11px] text-slate-400 mt-0.5 leading-relaxed">
                   An audited on-chain PRNG seed executes post-countdown to select winning tickets with complete algorithmic transparency.
                 </p>

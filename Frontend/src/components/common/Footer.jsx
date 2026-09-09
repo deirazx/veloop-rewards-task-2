@@ -40,7 +40,7 @@ export default function Footer() {
               </div>
             </Link>
             <p className="text-xs text-slate-400 leading-relaxed">
-              The premier provably fair community rewards protocol. Enter verified draws for luxury electronics, gift cards, and micro-rewards with transparent cryptographic auditing.
+              The premier transparent and audited community rewards protocol. Enter verified draws for luxury electronics, gift cards, and micro-rewards with transparent cryptographic auditing.
             </p>
           </div>
 

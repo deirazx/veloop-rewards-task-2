@@ -205,7 +205,7 @@ export default function Navbar() {
         title: `Draw Complete: ${lastEnded.title}`,
         desc: topWinner
           ? `Official winner: ${winnerDisplay}. Verified on SHA-256 draw seed.`
-          : 'Draw concluded with cryptographic provably fair verification.',
+          : 'Draw concluded with transparent cryptographic verification.',
         time: 'Concluded',
         link: '/winners',
         icon: <Trophy className="w-4 h-4 text-amber-400" />,
@@ -215,7 +215,7 @@ export default function Navbar() {
       list.push({
         id: 'security_fairness_protocol',
         type: 'SECURITY',
-        title: 'Provably Fair Protocol Active',
+        title: 'Transparent Verification System Active',
         desc: `All ${activeGiveaways.length} live giveaways use deterministic SHA-256 seed hashing for transparent winner selection.`,
         time: 'Verified',
         link: '/winners',
@@ -730,7 +730,7 @@ export default function Navbar() {
                     </div>
                     <h3 className="text-sm font-bold text-white">Join Veloop Rewards</h3>
                     <p className="text-[11px] text-slate-400 leading-relaxed mt-0.5">
-                      Enter provably fair giveaways and win luxury prizes daily.
+                      Enter verified community giveaways and win luxury prizes daily.
                     </p>
                   </div>
 
@@ -955,7 +955,7 @@ export default function Navbar() {
               {/* 5. Trust Footer */}
               <div className="pt-2 border-t border-white/10 flex items-center justify-center gap-1.5 text-[10px] text-slate-400 font-mono">
                 <ShieldCheck className="w-3.5 h-3.5 text-purple-400 shrink-0" />
-                <span>100% Provably Fair &bull; Audited Draws</span>
+                <span>100% Transparent Selection &bull; Audited Draws</span>
               </div>
             </motion.div>
           </>

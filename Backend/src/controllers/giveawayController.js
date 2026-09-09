@@ -60,7 +60,7 @@ exports.getGiveawayWinners = async (req, res) => {
 
     // If ENDED or ARCHIVED: Return official audited winners
     const winners = await Winner.find({ giveawayId: giveaway.giveawayId })
-      .select('maskedUserId ticketNumber prizeName prizeType drawTimestamp claimStatus provableSeed customUserId')
+      .select('maskedUserId ticketNumber prizeName prizeType drawTimestamp claimStatus verificationSeed drawSeed customUserId')
       .sort({ createdAt: -1 });
 
     return res.json({

@@ -144,7 +144,7 @@ const normalizeGiveaway = (backendItem) => {
     id: backendItem.id || backendItem.giveawayId || backendItem._id,
     slug: backendItem.slug || backendItem.id || backendItem.giveawayId,
     title: backendItem.title,
-    subtitle: backendItem.subtitle || primaryPrize.name || 'Provably Fair Community Giveaway',
+    subtitle: backendItem.subtitle || primaryPrize.name || 'Audited Community Giveaway',
     entryFee: entryCost,
     cost: entryCost,
     currency: currencyDisplay,
@@ -161,7 +161,7 @@ const normalizeGiveaway = (backendItem) => {
     status: backendItem.status || (backendItem.endedAt || (backendItem.endAt && new Date(backendItem.endAt) <= new Date()) ? 'ENDED' : 'ACTIVE'),
     terms: backendItem.terms || [
       '1 entry permitted per verified account.',
-      'Cryptographic provably fair draw upon countdown completion.',
+      'Cryptographically audited draw upon countdown completion.',
       'Deduction is final upon confirmation.'
     ],
     specifications: backendItem.specifications || [

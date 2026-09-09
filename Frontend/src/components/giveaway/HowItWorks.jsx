@@ -16,7 +16,7 @@ const steps = [
   },
   {
     step: '03',
-    title: 'Provably Fair Draw',
+    title: 'Transparent & Audited Draw',
     desc: 'Once countdown hits zero, on-chain RNG picks the winning ticket number with immutable cryptographic proof.',
     icon: Trophy
   },
