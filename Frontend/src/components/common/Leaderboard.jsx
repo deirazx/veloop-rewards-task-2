@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { 
   Trophy, Crown, Medal, Flame, Sparkles, TrendingUp, Gift, Star, Zap, 
   ShieldCheck, ArrowUp, ArrowDown, Minus, Clock, Search, ChevronDown, 
-  ChevronUp, Award, Target, Coins, Compass 
+  ChevronUp, Award, Target, Coins
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';

@@ -176,6 +176,7 @@ export const GiveawayProvider = ({ children }) => {
   const [giveaways, setGiveaways] = useState([]);
   const [balances, setBalances] = useState({ VES: 1000, SVES: 1500, Tokens: 3000, VEs: 1000, SVEs: 1500 });
   const [joinedGiveaways, setJoinedGiveaways] = useState([]);
+  const [joiningGiveawayId, setJoiningGiveawayId] = useState(null);
   const [claims, setClaims] = useState({});
   const [currentUser, setCurrentUser] = useState(null);
 
@@ -370,6 +371,19 @@ export const GiveawayProvider = ({ children }) => {
     };
   };
 
+  // Add funds utility for testing and rewards
+  const addFunds = (rawCurrency, amount) => {
+    const currency = rawCurrency === 'VEs' ? 'VES' : rawCurrency === 'SVEs' ? 'SVES' : rawCurrency;
+    const addVal = Number(amount || 0);
+    setBalances((prev) => ({
+      ...prev,
+      [currency]: (prev[currency] || 0) + addVal,
+      [rawCurrency]: (prev[rawCurrency] || 0) + addVal,
+      VEs: currency === 'VES' || rawCurrency === 'VEs' ? (prev.VEs || prev.VES || 0) + addVal : prev.VEs,
+      SVEs: currency === 'SVES' || rawCurrency === 'SVEs' ? (prev.SVEs || prev.SVES || 0) + addVal : prev.SVEs
+    }));
+  };
+
   // Join giveaway action: Sends atomic request to backend
   const joinGiveaway = async (giveawayId, cost, rawCurrency, prizeId) => {
     if (!currentUser) {
@@ -381,6 +395,8 @@ export const GiveawayProvider = ({ children }) => {
     const currency = rawCurrency === 'VEs' ? 'VES' : rawCurrency === 'SVEs' ? 'SVES' : rawCurrency;
     const deviceHash = getDeviceHash();
 
+    setJoiningGiveawayId(giveawayId);
+
     try {
       const response = await api.joinGiveaway(giveawayId, prizeId, deviceHash);
 
@@ -390,11 +406,22 @@ export const GiveawayProvider = ({ children }) => {
           setBalances((prev) => ({
             ...prev,
             [currency]: newBalance,
-            [rawCurrency]: newBalance
+            [rawCurrency]: newBalance,
+            VEs: currency === 'VES' ? newBalance : prev.VEs,
+            SVEs: currency === 'SVES' ? newBalance : prev.SVEs
+          }));
+        } else {
+          // Always deduct entry fee upon successful confirmation
+          setBalances((prev) => ({
+            ...prev,
+            [currency]: Math.max(0, (prev[currency] || 0) - cost),
+            [rawCurrency]: Math.max(0, (prev[rawCurrency] || 0) - cost),
+            VEs: currency === 'VES' || rawCurrency === 'VEs' ? Math.max(0, (prev.VEs || prev.VES || 0) - cost) : prev.VEs,
+            SVEs: currency === 'SVES' || rawCurrency === 'SVEs' ? Math.max(0, (prev.SVEs || prev.SVES || 0) - cost) : prev.SVEs
           }));
         }
 
-        setJoinedGiveaways((prev) => [...prev, giveawayId]);
+        setJoinedGiveaways((prev) => Array.from(new Set([...prev, giveawayId])));
 
         const updatedEntries = response.data?.currentEntries;
         const updatedSpots = response.data?.spotsTaken;
@@ -404,7 +431,7 @@ export const GiveawayProvider = ({ children }) => {
             item.id === giveawayId
               ? {
                   ...item,
-                  spotsTaken: typeof updatedSpots === 'number' ? updatedSpots : Math.min(item.totalSpots, item.spotsTaken + 1),
+                  spotsTaken: typeof updatedSpots === 'number' ? updatedSpots : (item.spotsTaken || 0) + 1,
                   currentEntries: typeof updatedEntries === 'number' ? updatedEntries : (item.currentEntries || item.spotsTaken || 0) + 1,
                   participantsCount: typeof updatedParticipants === 'number'
                     ? updatedParticipants
@@ -422,13 +449,29 @@ export const GiveawayProvider = ({ children }) => {
       if (usingMockFallback || err.isNetworkError) {
         setBalances((prev) => ({
           ...prev,
-          [currency]: (prev[currency] || 0) - cost,
-          [rawCurrency]: (prev[rawCurrency] || 0) - cost
+          [currency]: Math.max(0, (prev[currency] || 0) - cost),
+          [rawCurrency]: Math.max(0, (prev[rawCurrency] || 0) - cost),
+          VEs: currency === 'VES' || rawCurrency === 'VEs' ? Math.max(0, (prev.VEs || prev.VES || 0) - cost) : prev.VEs,
+          SVEs: currency === 'SVES' || rawCurrency === 'SVEs' ? Math.max(0, (prev.SVEs || prev.SVES || 0) - cost) : prev.SVEs
         }));
-        setJoinedGiveaways((prev) => [...prev, giveawayId]);
+        setJoinedGiveaways((prev) => Array.from(new Set([...prev, giveawayId])));
+        setGiveaways((prev) =>
+          prev.map((item) =>
+            item.id === giveawayId
+              ? {
+                  ...item,
+                  spotsTaken: (item.spotsTaken || 0) + 1,
+                  currentEntries: (item.currentEntries || 0) + 1,
+                  participantsCount: (item.participantsCount || 0) + 1
+                }
+              : item
+          )
+        );
         return { ticketNumber: 'TK-' + Math.floor(100000 + Math.random() * 900000) };
       }
       throw err;
+    } finally {
+      setJoiningGiveawayId(null);
     }
   };
 
@@ -530,10 +573,12 @@ export const GiveawayProvider = ({ children }) => {
         balances,
         giveaways,
         joinedGiveaways,
+        joiningGiveawayId,
         claims,
         hasJoined,
         getBalanceCheck,
         joinGiveaway,
+        addFunds,
         claimPrize,
         refreshData: () => loadBackendData(false),
         usingMockFallback

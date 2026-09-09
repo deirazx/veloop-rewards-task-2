@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Trophy } from 'lucide-react';
+import { Trophy, Sparkles, ArrowRight } from 'lucide-react';
 import { useGiveaway } from '../../context/GiveawayContext';
 import api from '../../services/api';
 
@@ -29,7 +29,7 @@ export default function LiveWinnersTicker() {
   const [realWinners, setRealWinners] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Fetch real winners strictly from backend API (Rule 21 & 63: No fake live activity!)
+  // Fetch real winners strictly from backend API (Rule 21 & 63: No fake live activity)
   useEffect(() => {
     let isMounted = true;
     async function load() {
@@ -71,12 +71,46 @@ export default function LiveWinnersTicker() {
     return () => { isMounted = false; };
   }, [giveaways]);
 
-  // If no winners exist in database: Display exact premium empty state bar (Rule 21 & 64)
+  // Requirement 1: If winners list is empty, display live platform status update
   if (!loading && realWinners.length === 0) {
+    const liveUpdateText = "Season 1 Giveaways are now LIVE • No winners declared yet • Join now to secure early entries!";
+    const duplicatedNotice = [1, 2, 3, 4];
+
     return (
-      <div className="w-full bg-[#13131a] border-y border-white/5 py-2.5 px-4 mb-6 flex items-center justify-center gap-2 text-xs text-gray-400">
-        <Trophy className="w-3.5 h-3.5 text-slate-500/70" />
-        <span>Previous winners will appear here after a giveaway is completed.</span>
+      <div className="w-full bg-[#110e1f]/90 border-y border-purple-500/20 py-2.5 overflow-hidden flex items-center mb-6 shadow-[0_4px_20px_rgba(0,0,0,0.35)] backdrop-blur-md">
+        {/* Fixed Left Status Badge */}
+        <div className="px-3.5 sm:px-4 shrink-0 flex items-center gap-2 border-r border-white/10 text-[11px] sm:text-xs font-bold text-white uppercase tracking-wider z-10 bg-[#110e1f]">
+          <span className="relative flex h-2 w-2">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+          </span>
+          <span className="text-emerald-400 font-extrabold font-mono flex items-center gap-1">
+            PLATFORM UPDATE:
+          </span>
+        </div>
+
+        {/* Continuous Smooth Scrolling Marquee */}
+        <div className="flex overflow-hidden w-full select-none relative">
+          <motion.div
+            animate={{ x: ['0%', '-50%'] }}
+            transition={{ repeat: Infinity, repeatType: 'loop', duration: 28, ease: 'linear' }}
+            className="flex items-center gap-8 whitespace-nowrap pl-4"
+          >
+            {duplicatedNotice.map((idx) => (
+              <span key={idx} className="flex items-center gap-3 text-xs text-slate-300 font-medium">
+                <span className="text-white font-semibold">{liveUpdateText}</span>
+                <span className="text-purple-400 font-bold">•</span>
+                <a
+                  href="#active-giveaways"
+                  className="text-purple-400 hover:text-purple-300 font-semibold underline underline-offset-2 flex items-center gap-1"
+                >
+                  Explore Pools <ArrowRight className="w-3 h-3" />
+                </a>
+                <span className="text-slate-600">|</span>
+              </span>
+            ))}
+          </motion.div>
+        </div>
       </div>
     );
   }
@@ -85,7 +119,7 @@ export default function LiveWinnersTicker() {
     return null;
   }
 
-  // Duplicate items for continuous smooth ticker loop
+  // Duplicate items for continuous smooth ticker loop when real winners exist
   const displayItems = realWinners.map((w) => ({
     user: w.maskedUserId || 'VE****00',
     prize: w.prize || w.prizeName || 'Verified Reward',
@@ -95,10 +129,10 @@ export default function LiveWinnersTicker() {
   const items = [...displayItems, ...displayItems, ...displayItems, ...displayItems];
 
   return (
-    <div className="w-full bg-[#13131a] border-y border-white/5 py-2 overflow-hidden flex items-center gap-0 mb-6">
+    <div className="w-full bg-[#13131a] border-y border-white/5 py-2 overflow-hidden flex items-center gap-0 mb-6 shadow-sm">
       {/* Label */}
-      <div className="px-3 shrink-0 flex items-center gap-1.5 border-r border-white/10 text-[11px] font-bold text-amber-400 font-mono uppercase tracking-wider">
-        <Trophy className="w-3 h-3 text-amber-400" />
+      <div className="px-3.5 shrink-0 flex items-center gap-1.5 border-r border-white/10 text-[11px] font-bold text-amber-400 font-mono uppercase tracking-wider bg-[#13131a] z-10">
+        <Trophy className="w-3.5 h-3.5 text-amber-400" />
         Audited Winners:
       </div>
 

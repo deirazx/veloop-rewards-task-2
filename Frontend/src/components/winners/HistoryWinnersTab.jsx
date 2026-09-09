@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
-import { Trophy, Gift, ShieldCheck, CheckCircle2, AlertCircle, ArrowRight, Sparkles } from 'lucide-react';
+import { Trophy, Gift, ShieldCheck, CheckCircle2, ArrowRight, Sparkles } from 'lucide-react';
 import { useGiveaway } from '../../context/GiveawayContext';
 import PhysicalClaimModal from '../modals/PhysicalClaimModal';
 import GiftCardClaimModal from '../modals/GiftCardClaimModal';
@@ -22,14 +21,29 @@ export default function HistoryWinnersTab() {
   return (
     <div className="space-y-6">
       {endedGiveaways.length === 0 ? (
-        <div className="rounded-3xl bg-[#13131a] border border-white/5 p-10 sm:p-14 text-center max-w-md mx-auto space-y-3 shadow-[0_0_24px_rgba(0,0,0,0.4)] relative overflow-hidden">
+        <div className="w-full rounded-3xl bg-[#100d1e]/90 border border-purple-500/20 p-8 sm:p-14 text-center max-w-lg mx-auto flex flex-col items-center justify-center space-y-4 shadow-[0_10px_35px_rgba(0,0,0,0.4)] relative overflow-hidden backdrop-blur-xl">
           <div className="absolute inset-0 bg-gradient-to-b from-purple-500/5 via-transparent to-transparent pointer-events-none" />
-          <div className="w-14 h-14 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-slate-500 shadow-inner mx-auto mb-1">
-            <Trophy className="w-7 h-7 text-slate-500/70" />
+          
+          <div className="w-16 h-16 rounded-2xl bg-purple-500/10 border border-purple-500/25 flex items-center justify-center text-purple-400 shadow-[0_0_20px_rgba(168,85,247,0.2)] mb-1">
+            <Trophy className="w-8 h-8 text-purple-400/90 drop-shadow-[0_0_10px_rgba(168,85,247,0.5)]" />
           </div>
-          <p className="text-sm text-gray-400 font-medium">
-            Previous winners will appear here after a giveaway is completed.
-          </p>
+
+          <div className="max-w-md space-y-2">
+            <h3 className="text-xl sm:text-2xl font-black text-white tracking-tight">
+              No Winners Declared Yet
+            </h3>
+            <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
+              Winners are finalized transparently via the backend after the giveaway event countdown concludes.
+            </p>
+          </div>
+
+          <a
+            href="/#active-giveaways"
+            className="mt-2 inline-flex items-center gap-2 px-6 py-2.5 rounded-2xl text-xs sm:text-sm font-bold text-white bg-gradient-to-r from-[#6366F1] via-[#7C3AED] to-[#a855f7] hover:opacity-95 shadow-[0_0_20px_rgba(124,58,237,0.4)] hover:shadow-[0_0_28px_rgba(124,58,237,0.6)] transition-all cursor-pointer active:scale-95"
+          >
+            <span>Explore Active Giveaways</span>
+            <ArrowRight className="w-4 h-4" />
+          </a>
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-6">

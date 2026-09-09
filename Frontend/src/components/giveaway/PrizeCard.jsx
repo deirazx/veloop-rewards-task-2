@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Clock, CheckCircle2, Zap, ArrowRight, Users } from 'lucide-react';
+import { Clock, CheckCircle2, Zap, ArrowRight, Users, Loader2 } from 'lucide-react';
 import { useGiveaway } from '../../context/GiveawayContext';
+import ConfirmationModal from '../modals/ConfirmationModal';
 
 /* ─────────────────────────────────────────────────────────────
    PER-CARD THEME — all Tailwind classes as full literal strings
@@ -144,9 +145,11 @@ function fmt(n) {
    ───────────────────────────────────────────────────────────── */
 export default function PrizeCard({ giveaway }) {
   const navigate = useNavigate();
-  const { hasJoined, getBalanceCheck } = useGiveaway();
+  const { hasJoined, getBalanceCheck, currentUser, isAuthenticated, joiningGiveawayId } = useGiveaway();
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
 
   const isJoined = hasJoined(giveaway.id);
+  const isProcessing = joiningGiveawayId === giveaway.id;
   const balanceCheck = getBalanceCheck(giveaway.cost, giveaway.currency);
   const theme = getCardTheme(giveaway);
   const countdown = useCountdown(giveaway.endsAt);
@@ -161,6 +164,19 @@ export default function PrizeCard({ giveaway }) {
 
   const handleCardClick = () => {
     navigate(`/giveaway/${giveaway.slug || giveaway.id || giveaway._id}`);
+  };
+
+  const handleActionClick = (e) => {
+    e.stopPropagation();
+    if (isEnded || isJoined) {
+      handleCardClick();
+      return;
+    }
+    if (!isAuthenticated || !currentUser) {
+      navigate('/login');
+      return;
+    }
+    setIsConfirmOpen(true);
   };
 
   return (
@@ -304,7 +320,7 @@ export default function PrizeCard({ giveaway }) {
           {isEnded ? (
             <button
               type="button"
-              onClick={handleCardClick}
+              onClick={handleActionClick}
               className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-white/5 border border-white/10 text-slate-400 text-sm font-semibold hover:bg-white/10 active:scale-95 transition-all cursor-pointer"
             >
               <Clock className="w-4 h-4 text-slate-500" />
@@ -313,25 +329,34 @@ export default function PrizeCard({ giveaway }) {
           ) : isJoined ? (
             <button
               type="button"
-              onClick={handleCardClick}
-              className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-emerald-500/15 border border-emerald-500/40 text-emerald-300 text-sm font-semibold hover:bg-emerald-500/25 active:scale-95 transition-all cursor-pointer"
+              onClick={handleActionClick}
+              className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-emerald-500/15 border border-emerald-500/40 text-emerald-300 text-sm font-bold hover:bg-emerald-500/25 active:scale-95 transition-all cursor-pointer shadow-[0_0_15px_rgba(16,185,129,0.15)]"
             >
               <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-              <span>Participating — View Ticket</span>
+              <span>You're Participating ✓ (1 Entry)</span>
+            </button>
+          ) : isProcessing ? (
+            <button
+              type="button"
+              disabled
+              className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-purple-500/20 border border-purple-500/30 text-purple-300 text-sm font-semibold cursor-not-allowed opacity-80"
+            >
+              <Loader2 className="w-4 h-4 animate-spin text-purple-300" />
+              <span>Joining Giveaway...</span>
             </button>
           ) : !balanceCheck.isSufficient ? (
             <button
               type="button"
-              onClick={handleCardClick}
+              onClick={handleActionClick}
               className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-300 text-sm font-semibold hover:bg-amber-500/25 active:scale-95 transition-all cursor-pointer"
             >
-              <span>Insufficient Balance — Details</span>
+              <span>Join for {(giveaway.entryFee ?? giveaway.cost ?? 0).toLocaleString()} {giveaway.currency}</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </button>
           ) : (
             <button
               type="button"
-              onClick={handleCardClick}
+              onClick={handleActionClick}
               className="w-full flex items-center justify-center gap-2 py-3 rounded-xl
                 text-sm font-bold text-white tracking-wide
                 bg-gradient-to-r from-[#6366F1] via-[#7C3AED] to-[#a855f7]
@@ -342,11 +367,20 @@ export default function PrizeCard({ giveaway }) {
                 transition-all duration-200 cursor-pointer"
             >
               <Zap className="w-4 h-4 text-amber-300" />
-              <span>Join Giveaway</span>
+              <span>Join for {(giveaway.entryFee ?? giveaway.cost ?? 0).toLocaleString()} {giveaway.currency}</span>
             </button>
           )}
         </div>
       </div>
+
+      {/* Confirmation Modal */}
+      {isConfirmOpen && (
+        <ConfirmationModal
+          giveaway={giveaway}
+          isOpen={isConfirmOpen}
+          onClose={() => setIsConfirmOpen(false)}
+        />
+      )}
     </motion.div>
   );
 }

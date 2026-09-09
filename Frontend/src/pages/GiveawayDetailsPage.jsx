@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate, Link, useLocation } from 'react-router-dom';
+import { useParams, Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ArrowLeft,
@@ -10,18 +9,16 @@ import {
   CheckCircle2,
   AlertTriangle,
   Sparkles,
-  ExternalLink,
   ChevronRight,
   ChevronDown,
   PlusCircle,
-  Coins,
   Lock,
   LogIn,
   UserPlus,
   Info,
-  Package,
   FileText,
-  Gift
+  Gift,
+  Loader2
 } from 'lucide-react';
 import { useGiveaway } from '../context/GiveawayContext';
 import { mockGiveaways } from '../data/mockGiveaways';
@@ -30,9 +27,8 @@ import CustomLoader from '../components/common/CustomLoader';
 
 export default function GiveawayDetailsPage() {
   const { id, slug } = useParams();
-  const navigate = useNavigate();
   const location = useLocation();
-  const { giveaways, balances, hasJoined, getBalanceCheck, addFunds, isAuthenticated, currentUser, isLoading } = useGiveaway();
+  const { giveaways, hasJoined, getBalanceCheck, addFunds, isAuthenticated, currentUser, isLoading, joiningGiveawayId } = useGiveaway();
 
   const [loading, setLoading] = useState(true);
   const [giveaway, setGiveaway] = useState(null);
@@ -150,6 +146,7 @@ export default function GiveawayDetailsPage() {
 
   const entryCost = Number(giveaway.cost ?? giveaway.entryFee ?? 0);
   const alreadyJoined = hasJoined(giveaway.id);
+  const isProcessing = joiningGiveawayId === giveaway.id;
   const balanceCheck = getBalanceCheck(entryCost, giveaway.currency);
   const currentEntries = Number(giveaway.currentEntries ?? giveaway.spotsTaken ?? 0);
   const maxEntries = Number(giveaway.maxEntries ?? giveaway.totalSpots ?? 1000);
@@ -546,8 +543,7 @@ export default function GiveawayDetailsPage() {
                     <CheckCircle2 className="w-6 h-6" />
                   </div>
                   <h4 className="text-base font-bold text-white flex items-center justify-center gap-1">
-                    <span>You're Already Participating</span>
-                    <span className="text-emerald-400">✓</span>
+                    <span>You're Participating ✓ (1 Entry)</span>
                   </h4>
                   <p className="text-xs text-slate-300">
                     Your ticket is locked in this draw pool. Check the Winners Hub once the round timer concludes.
@@ -559,6 +555,15 @@ export default function GiveawayDetailsPage() {
                     Go to Winners Portal →
                   </Link>
                 </div>
+              ) : isProcessing ? (
+                /* Processing State */
+                <button
+                  disabled
+                  className="w-full py-4 px-6 rounded-2xl font-bold text-purple-200 bg-purple-600/30 border border-purple-500/40 flex items-center justify-center gap-2 cursor-not-allowed opacity-80 shadow-inner"
+                >
+                  <Loader2 className="w-5 h-5 text-purple-300 animate-spin" />
+                  <span>Joining Giveaway...</span>
+                </button>
               ) : balanceCheck.isSufficient ? (
                 /* Sufficient Balance: Enable Confirmation Trigger */
                 <button
@@ -569,11 +574,10 @@ export default function GiveawayDetailsPage() {
                     }
                     setIsModalOpen(true);
                   }}
-                  className="w-full py-4 px-6 rounded-2xl font-bold text-white bg-gradient-to-r from-accent-purple via-purple-600 to-accent-purple hover:opacity-95 transition-all shadow-[0_10px_25px_-5px_rgba(124,58,237,0.5)] flex items-center justify-center gap-2 group"
+                  className="w-full py-4 px-6 rounded-2xl font-bold text-white bg-gradient-to-r from-accent-purple via-purple-600 to-accent-purple hover:opacity-95 transition-all shadow-[0_10px_25px_-5px_rgba(124,58,237,0.5)] flex items-center justify-center gap-2 group cursor-pointer"
                 >
                   <Sparkles className="w-5 h-5 text-reward-gold group-hover:rotate-12 transition-transform" />
-                  <span>Join Giveaway Now</span>
-                  <span className="text-xs opacity-80 font-normal">({entryCost} {giveaway.currency})</span>
+                  <span>Join for {entryCost.toLocaleString()} {giveaway.currency}</span>
                 </button>
               ) : (
                 /* Insufficient Balance: Transform CTA to 'Earn More [Currency]' with exact deficit calculation */

@@ -14,16 +14,6 @@ const AVATAR_GRADIENTS = [
   'from-fuchsia-500 to-purple-700',
 ];
 
-// Approved platform prizes adhering strictly to PDF Rule 62 & Rule 25
-const APPROVED_DUMMY_WINNERS = [
-  { id: 'w-1', name: 'VE****42', prize: 'Apple iPhone 15 Pro (128GB)', time: '12m ago', initials: 'VE', prize_icon: '📱', ticketNumber: 'TK-992142' },
-  { id: 'w-2', name: 'VE****25', prize: 'Apple Watch Series 9 GPS', time: '1h ago', initials: 'VE', prize_icon: '⌚', ticketNumber: 'TK-889412' },
-  { id: 'w-3', name: 'VE****91', prize: 'AirPods Pro (2nd Generation)', time: '3h ago', initials: 'VE', prize_icon: '🎧', ticketNumber: 'TK-118491' },
-  { id: 'w-4', name: 'VE****78', prize: '₹2,000 Amazon Gift Voucher', time: '5h ago', initials: 'VE', prize_icon: '🎁', ticketNumber: 'TK-552178' },
-  { id: 'w-5', name: 'VE****63', prize: '₹500 Amazon Gift Voucher', time: '8h ago', initials: 'VE', prize_icon: '🎁', ticketNumber: 'TK-339063' },
-  { id: 'w-6', name: 'VE****14', prize: '₹20 Instant Recharge Voucher', time: '14h ago', initials: 'VE', prize_icon: '⚡', ticketNumber: 'TK-440214' }
-];
-
 function formatTimeAgo(timestamp) {
   if (!timestamp) return 'Recently';
   try {
@@ -44,7 +34,7 @@ function formatTimeAgo(timestamp) {
   }
 }
 
-// Strictly resolve icons ONLY for approved platform prizes (Rule 62)
+// Strictly resolve icons ONLY for approved platform prizes
 function resolvePrizeIcon(prizeName = '') {
   const p = (prizeName || '').toLowerCase();
   if (p.includes('iphone')) return '📱';
@@ -58,11 +48,11 @@ function resolvePrizeIcon(prizeName = '') {
 export default function WinnersList() {
   const { giveaways } = useGiveaway();
   const [dbWinners, setDbWinners] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [_isLoading, setIsLoading] = useState(true);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
 
-  // Fetch real winners strictly from MongoDB backend API
+  // Fetch real winners strictly from MongoDB backend API (Zero mock data in live state)
   useEffect(() => {
     let isMounted = true;
     async function loadRealWinners() {
@@ -88,12 +78,11 @@ export default function WinnersList() {
                   ticketNumber: w.ticketNumber
                 }))
               );
-            setDbWinners(fromContext.length > 0 ? fromContext : APPROVED_DUMMY_WINNERS);
+            setDbWinners(fromContext);
           }
         }
       } catch (err) {
         console.warn('[WinnersList] Error fetching backend winners:', err.message);
-        // Fallback check from giveaways context or approved platform winners
         const fromContext = (giveaways || [])
           .filter((g) => g.status === 'ENDED' && g.winners?.length > 0)
           .flatMap((g) =>
@@ -108,7 +97,7 @@ export default function WinnersList() {
               ticketNumber: w.ticketNumber
             }))
           );
-        if (isMounted) setDbWinners(fromContext.length > 0 ? fromContext : APPROVED_DUMMY_WINNERS);
+        if (isMounted) setDbWinners(fromContext);
       } finally {
         if (isMounted) setIsLoading(false);
       }
@@ -117,7 +106,7 @@ export default function WinnersList() {
     return () => { isMounted = false; };
   }, [giveaways]);
 
-  // Transform winners adhering strictly to PDF Rule 25 (e.g. VE****42)
+  // Transform winners adhering strictly to privacy standards (e.g. VE****42)
   const pool = dbWinners.map((w, idx) => {
     const masked = w.maskedUserId || w.name || 'VE****00';
     return {
@@ -157,16 +146,16 @@ export default function WinnersList() {
   }
 
   return (
-    <section className="w-full">
-      {/* ── Section Header (Rule 4 & 63: Clean fintech header, no fake live/casino badges) ── */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+    <section className="w-full space-y-5">
+      {/* ── Section Header ── */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div className="flex items-center gap-2.5">
           <div className="w-9 h-9 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400">
             <Megaphone className="w-5 h-5" />
           </div>
           <div>
             <h2 className="text-xl font-bold text-white leading-none">Winner Announcements</h2>
-            <p className="text-xs text-slate-400 mt-1">Recent winners from our completed giveaways</p>
+            <p className="text-xs text-slate-400 mt-1">Official verified winners from concluded giveaways</p>
           </div>
         </div>
 
@@ -192,19 +181,32 @@ export default function WinnersList() {
         </div>
       </div>
 
-      {/* ── Conditional Rendering: Empty State vs Data-Driven Cycling Ticker ── */}
+      {/* ── Conditional Rendering: Empty State vs Real Data-Driven Winners Grid ── */}
       {pool.length === 0 ? (
-        /* PDF Rule 64 & 21: Premium Centered Empty State Card when no previous winners exist in DB */
-        <div className="w-full rounded-2xl bg-[#13131a] border border-white/5 p-10 sm:p-14 text-center flex flex-col items-center justify-center space-y-3 shadow-[0_0_24px_rgba(0,0,0,0.4)] relative overflow-hidden">
+        /* Requirement 2: Clean, High-End Empty State Card */
+        <div className="w-full rounded-3xl bg-[#100d1e]/90 border border-purple-500/20 p-8 sm:p-12 text-center flex flex-col items-center justify-center space-y-4 shadow-[0_10px_35px_rgba(0,0,0,0.4)] relative overflow-hidden backdrop-blur-xl">
           <div className="absolute inset-0 bg-gradient-to-b from-purple-500/5 via-transparent to-transparent pointer-events-none" />
           
-          <div className="w-14 h-14 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-slate-500 shadow-inner mb-1">
-            <Trophy className="w-7 h-7 text-slate-500/70" />
+          <div className="w-16 h-16 rounded-2xl bg-purple-500/10 border border-purple-500/25 flex items-center justify-center text-purple-400 shadow-[0_0_20px_rgba(168,85,247,0.2)] mb-1">
+            <Trophy className="w-8 h-8 text-purple-400/90 drop-shadow-[0_0_10px_rgba(168,85,247,0.5)]" />
           </div>
 
-          <p className="text-sm text-gray-400 font-medium max-w-md">
-            Previous winners will appear here after a giveaway is completed.
-          </p>
+          <div className="max-w-md space-y-2">
+            <h3 className="text-xl sm:text-2xl font-black text-white tracking-tight">
+              No Winners Declared Yet
+            </h3>
+            <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
+              Winners are finalized transparently via the backend after the giveaway event countdown concludes.
+            </p>
+          </div>
+
+          <a
+            href="#active-giveaways"
+            className="mt-2 inline-flex items-center gap-2 px-6 py-2.5 rounded-2xl text-xs sm:text-sm font-bold text-white bg-gradient-to-r from-[#6366F1] via-[#7C3AED] to-[#a855f7] hover:opacity-95 shadow-[0_0_20px_rgba(124,58,237,0.4)] hover:shadow-[0_0_28px_rgba(124,58,237,0.6)] transition-all cursor-pointer active:scale-95"
+          >
+            <span>Explore Active Giveaways</span>
+            <ArrowRight className="w-4 h-4" />
+          </a>
         </div>
       ) : (
         /* Real Data-Driven Winners Grid with Framer Motion */
