@@ -44,7 +44,7 @@ export default function LiveWinnersTicker() {
             .flatMap((g) =>
               g.winners.map((w) => ({
                 id: w._id || w.id,
-                maskedUserId: w.maskedUserId || 'VE****25',
+                maskedUserId: w.maskedUserId || (w.customUserId ? `@${w.customUserId}` : 'Anonymous'),
                 prize: w.prizeName || w.prizeTitle || g.title,
                 drawTimestamp: w.drawTimestamp
               }))
@@ -57,7 +57,7 @@ export default function LiveWinnersTicker() {
           .flatMap((g) =>
             g.winners.map((w) => ({
               id: w._id || w.id,
-              maskedUserId: w.maskedUserId || 'VE****25',
+              maskedUserId: w.maskedUserId || (w.customUserId ? `@${w.customUserId}` : 'Anonymous'),
               prize: w.prizeName || w.prizeTitle || g.title,
               drawTimestamp: w.drawTimestamp
             }))
@@ -73,7 +73,7 @@ export default function LiveWinnersTicker() {
 
   // Requirement 1: If winners list is empty, display live platform status update
   if (!loading && realWinners.length === 0) {
-    const liveUpdateText = "Season 1 Giveaways are now LIVE • No winners declared yet • Join now to secure early entries!";
+    const liveUpdateText = "Season 1 Giveaways are now LIVE • No winners declared yet • Verified winners will appear here automatically upon draw completion!";
     const duplicatedNotice = [1, 2, 3, 4];
 
     return (

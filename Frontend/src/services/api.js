@@ -125,6 +125,11 @@ export async function fetchWinners(giveawayId) {
   return await request(`/giveaways/${giveawayId}/winners`);
 }
 
+export async function fetchGiveawayById(idOrSlug) {
+  const res = await request(`/giveaways/${encodeURIComponent(idOrSlug)}`);
+  return res.data || null;
+}
+
 export async function fetchPreviousWinners() {
   const res = await request('/giveaways/previous/winners');
   return res.data || [];
@@ -135,9 +140,14 @@ export async function fetchAllWinners() {
   return res.data || [];
 }
 
-export async function fetchLeaderboard(filter = 'ALL_TIME') {
-  const res = await request(`/leaderboard?filter=${filter}`);
-  return res.data || [];
+export async function fetchLeaderboard(filter = 'Weekly') {
+  const res = await request(`/leaderboard?filter=${encodeURIComponent(filter)}`);
+  return res || { data: [], userStanding: null };
+}
+
+export async function fetchPlatformStats() {
+  const res = await request('/stats');
+  return res.data || null;
 }
 
 export async function fetchMyStatus(giveawayId) {
@@ -171,10 +181,12 @@ export default {
   login,
   fetchMe,
   fetchCurrentGiveaway,
+  fetchGiveawayById,
   fetchWinners,
   fetchPreviousWinners,
   fetchAllWinners,
   fetchLeaderboard,
+  fetchPlatformStats,
   fetchMyStatus,
   joinGiveaway,
   submitClaim,

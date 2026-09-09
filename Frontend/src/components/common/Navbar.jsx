@@ -20,7 +20,7 @@ import {
 import { useGiveaway } from '../../context/GiveawayContext';
 
 export default function Navbar() {
-  const { balances, currentUser, logoutUser, isAuthenticated } = useGiveaway();
+  const { balances, currentUser, logoutUser, isAuthenticated, giveaways, joinedGiveaways } = useGiveaway();
   const location = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
   const [bellOpen, setBellOpen] = useState(false);
@@ -31,11 +31,39 @@ export default function Navbar() {
     setBellOpen(false);
   }, [location.pathname]);
 
+  const activeGiveaways = (giveaways || []).filter((g) => g.status === 'ACTIVE');
+  const firstActive = activeGiveaways[0];
+
   const notifications = [
-    { id: 1, title: 'iPhone 15 Pro Draw', desc: 'Pool closing in 2 hours! 1 ticket active.', time: '10m ago' },
-    { id: 2, title: 'Recent Winner Alert', desc: 'Rohit Sharma won ₹5,000 Amazon Gift Card!', time: '1h ago' },
-    { id: 3, title: 'Welcome Bonus', desc: '1,000 VEs credited to your test wallet.', time: '2h ago' },
-  ];
+    firstActive ? {
+      id: 'active_pool',
+      title: `${firstActive.title} Live`,
+      desc: `Spots filling fast! Entry fee: ${firstActive.entryFee} ${firstActive.currency}. Join now.`,
+      time: 'Live Now'
+    } : null,
+    isAuthenticated ? {
+      id: 'wallet_status',
+      title: 'Wallet Synced',
+      desc: `${(balances.VES ?? balances.VEs ?? 0).toLocaleString()} VEs ready to use for entries.`,
+      time: 'Just now'
+    } : {
+      id: 'guest_prompt',
+      title: 'Welcome to Veloop',
+      desc: 'Sign in to access your VEs wallet and enter exclusive draws.',
+      time: 'Info'
+    },
+    (joinedGiveaways && joinedGiveaways.length > 0) ? {
+      id: 'joined_status',
+      title: 'Active Tickets',
+      desc: `You have confirmed entries in ${joinedGiveaways.length} giveaway pool(s).`,
+      time: 'Active'
+    } : {
+      id: 'fairness_notice',
+      title: 'Provably Fair Protocol',
+      desc: 'All winners are randomly selected and audited via cryptographic backend hash.',
+      time: 'Verified'
+    }
+  ].filter(Boolean);
 
   const navLinks = [
     { label: 'Discover', path: '/' },

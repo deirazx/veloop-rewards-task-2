@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, useEffect, useCallback } fr
 import api, { getDeviceHash, API_BASE_URL } from '../services/api';
 import CustomLoader from '../components/common/CustomLoader';
 import { RefreshCw, WifiOff } from 'lucide-react';
-import { mockGiveaways, CURRENT_USER } from '../data/mockGiveaways';
+import { mockGiveaways } from '../data/mockGiveaways';
 
 const GiveawayContext = createContext();
 
@@ -238,9 +238,9 @@ export const GiveawayProvider = ({ children }) => {
           console.warn('[GiveawayContext] fetchPreviousWinners failed:', prevErr.message);
         }
 
-        const activeNormalized = Array.isArray(currentList) && currentList.length > 0
+        const activeNormalized = Array.isArray(currentList)
           ? currentList.map(normalizeGiveaway)
-          : mockGiveaways.filter((m) => m.status === 'ACTIVE');
+          : [];
 
         // Strict Rule 21 & 63: Use authoritative backend concluded draws without injecting fake mock winners
         const endedFromApi = Array.isArray(previousList) && previousList.length > 0
@@ -251,7 +251,7 @@ export const GiveawayProvider = ({ children }) => {
         const combined = [...activeNormalized, ...endedNormalized];
 
         setGiveaways(combined);
-        setUsingMockFallback(!Array.isArray(currentList) || currentList.length === 0);
+        setUsingMockFallback(false);
 
         // Fetch user's participation status if token is present
         const token = localStorage.getItem('veloop_token');

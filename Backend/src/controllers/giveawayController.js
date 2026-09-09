@@ -163,3 +163,41 @@ exports.getAllWinners = async (req, res) => {
   }
 };
 
+/**
+ * Get single giveaway by giveawayId or slug
+ * Endpoint: GET /api/giveaways/:id
+ */
+exports.getGiveawayById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const query = [
+      { giveawayId: id },
+      { slug: id }
+    ];
+    if (/^[0-9a-fA-F]{24}$/.test(id)) {
+      query.push({ _id: id });
+    }
+
+    const giveaway = await Giveaway.findOne({ $or: query });
+
+    if (!giveaway) {
+      return res.status(404).json({
+        success: false,
+        message: 'Giveaway not found in database.'
+      });
+    }
+
+    return res.json({
+      success: true,
+      data: giveaway
+    });
+  } catch (error) {
+    console.error('[Get Giveaway By Id Error]', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to retrieve giveaway details.'
+    });
+  }
+};
+
+

@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Gift, ArrowRight, ShieldCheck, Trophy, Zap } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useGiveaway } from '../../context/GiveawayContext';
+import api from '../../services/api';
 
 const AVATARS = [
   'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=64&q=80&auto=format&fit=crop',
@@ -11,14 +12,35 @@ const AVATARS = [
   'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=64&q=80&auto=format&fit=crop',
 ];
 
-const TRUST_BADGES = [
-  { icon: ShieldCheck, label: 'Transparent Selection' },
-  { icon: Trophy,      label: '1,420+ Winners' },
-  { icon: Zap,         label: 'Instant Dispatch' },
-];
-
 export default function HeroSection() {
   const { giveaways } = useGiveaway();
+  const [platformStats, setPlatformStats] = useState(null);
+
+  useEffect(() => {
+    let isMounted = true;
+    api.fetchPlatformStats().then((data) => {
+      if (isMounted && data) setPlatformStats(data);
+    }).catch(() => {});
+    return () => { isMounted = false; };
+  }, []);
+
+  const totalParts = platformStats?.totalParticipants ?? (giveaways || []).reduce(
+    (acc, g) => acc + Number(g.participantsCount || g.spotsTaken || 0),
+    0
+  );
+  const participantsDisplay = totalParts >= 1000
+    ? `${(totalParts / 1000).toFixed(1)}K+`
+    : `${totalParts.toLocaleString()}`;
+
+  const prizesWon = platformStats?.prizesWon ?? (giveaways || []).reduce((acc, g) => acc + (g.winners?.length || 0), 0);
+  const winnersBadge = prizesWon > 0 ? `${prizesWon} Audited Winners` : 'Audited Winners';
+
+  const trustBadges = [
+    { icon: ShieldCheck, label: 'Transparent Selection' },
+    { icon: Trophy,      label: winnersBadge },
+    { icon: Zap,         label: 'Instant Dispatch' },
+  ];
+
   const activeList = (giveaways || []).filter((g) => g.status === 'ACTIVE');
   const featured =
     activeList.find((g) => g.featured) ||
@@ -121,8 +143,8 @@ export default function HeroSection() {
                 ))}
               </div>
               <div className="text-left">
-                <div className="text-sm font-bold text-white">8.5K+</div>
-                <div className="text-xs text-gray-400">Users Participating</div>
+                <div className="text-sm font-bold text-white font-mono">{participantsDisplay}</div>
+                <div className="text-xs text-gray-400">Active Participants</div>
               </div>
             </div>
 
@@ -130,7 +152,7 @@ export default function HeroSection() {
 
             {/* Trust badges (Transparent Selection) */}
             <div className="flex items-center gap-4">
-              {TRUST_BADGES.map(({ icon: Icon, label }) => (
+              {trustBadges.map(({ icon: Icon, label }) => (
                 <div key={label} className="flex items-center gap-1.5 text-xs text-slate-400">
                   <Icon className="w-3.5 h-3.5 text-purple-400" />
                   {label}

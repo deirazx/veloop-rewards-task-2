@@ -1,40 +1,76 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Gift, Users, Trophy, Clock } from 'lucide-react';
 import { useGiveaway } from '../../context/GiveawayContext';
+import api from '../../services/api';
 
 const pad = (n) => String(n).padStart(2, '0');
 
-function useCountdown() {
-  const target = useRef(Date.now() + 1000 * 60 * (60 * 12 + 8 * 60 + 45));
-  const calc = () => {
-    const diff = Math.max(0, target.current - Date.now());
-    const s = Math.floor(diff / 1000);
-    return { d: Math.floor(s / 86400), h: Math.floor((s % 86400) / 3600), m: Math.floor((s % 3600) / 60) };
-  };
-  const [t, setT] = useState(calc);
-  useEffect(() => { const id = setInterval(() => setT(calc()), 1000); return () => clearInterval(id); }, []);
-  return t;
-}
-
 export default function StatsGrid() {
   const { giveaways } = useGiveaway();
-  const cd = useCountdown();
-  const activeCount = giveaways.filter((g) => g.status === 'ACTIVE').length;
-  const dbParticipantsSum = giveaways.reduce((acc, g) => acc + Number(g.participantsCount || g.spotsTaken || 0), 0);
-  const totalParticipants = dbParticipantsSum > 0 ? dbParticipantsSum : 55900;
+  const [platformStats, setPlatformStats] = useState(null);
+
+  useEffect(() => {
+    let isMounted = true;
+    const loadStats = async () => {
+      try {
+        const data = await api.fetchPlatformStats();
+        if (isMounted && data) {
+          setPlatformStats(data);
+        }
+      } catch (err) {
+        console.error('[StatsGrid] Failed to fetch live platform stats:', err);
+      }
+    };
+    loadStats();
+    return () => { isMounted = false; };
+  }, []);
+
+  const activeCount = platformStats?.totalGiveaways ?? (giveaways || []).filter((g) => g.status === 'ACTIVE').length;
+
+  const totalParticipants = platformStats?.totalParticipants ?? (giveaways || []).reduce(
+    (acc, g) => acc + Number(g.participantsCount || g.spotsTaken || 0),
+    0
+  );
   const participantStr = totalParticipants >= 1000
     ? `${(totalParticipants / 1000).toFixed(1)}K+`
-    : `${totalParticipants.toLocaleString()}+`;
+    : `${totalParticipants.toLocaleString()}`;
 
-  const auditedWinnersCount = giveaways.reduce((acc, g) => acc + (g.winners?.length || 0), 0);
-  const prizesWonStr = auditedWinnersCount > 0 ? `${(1240 + auditedWinnersCount).toLocaleString()}+` : '1.2K+';
+  const prizesWon = platformStats?.prizesWon ?? (giveaways || []).reduce((acc, g) => acc + (g.winners?.length || 0), 0);
+  const prizesWonStr = prizesWon >= 1000
+    ? `${(prizesWon / 1000).toFixed(1)}K+`
+    : `${prizesWon.toLocaleString()}`;
+
+  // Live countdown to next draw from database
+  const activeGiveaway = (giveaways || []).find((g) => g.status === 'ACTIVE');
+  const targetTime = platformStats?.nextDrawAt
+    ? new Date(platformStats.nextDrawAt).getTime()
+    : activeGiveaway?.endsAt
+      ? new Date(activeGiveaway.endsAt).getTime()
+      : Date.now() + 86400000;
+
+  const [cd, setCd] = useState({ d: 0, h: 0, m: 0 });
+
+  useEffect(() => {
+    const calc = () => {
+      const diff = Math.max(0, targetTime - Date.now());
+      const s = Math.floor(diff / 1000);
+      return {
+        d: Math.floor(s / 86400),
+        h: Math.floor((s % 86400) / 3600),
+        m: Math.floor((s % 3600) / 60)
+      };
+    };
+    setCd(calc());
+    const interval = setInterval(() => setCd(calc()), 1000);
+    return () => clearInterval(interval);
+  }, [targetTime]);
 
   const stats = [
     {
       icon: Gift,
       iconColor: 'text-[#a855f7]',
       iconBg: 'bg-purple-500/15',
-      value: String(activeCount || 24),
+      value: String(activeCount),
       valueColor: 'text-white',
       title: 'Total Giveaways',
       border: 'border-purple-500/10',

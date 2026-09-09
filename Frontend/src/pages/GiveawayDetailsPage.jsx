@@ -21,7 +21,7 @@ import {
   Loader2
 } from 'lucide-react';
 import { useGiveaway } from '../context/GiveawayContext';
-import { mockGiveaways } from '../data/mockGiveaways';
+import api from '../services/api';
 import ConfirmationModal from '../components/modals/ConfirmationModal';
 import CustomLoader from '../components/common/CustomLoader';
 
@@ -78,15 +78,38 @@ export default function GiveawayDetailsPage() {
         });
       }
 
-      // 3. Fallback to mock data
-      if (!found) {
-        found = mockGiveaways.find(
-          (m) =>
-            m.slug === targetParam ||
-            m.id === targetParam ||
-            normalize(m.slug).includes(cleanTarget) ||
-            cleanTarget.includes(normalize(m.slug))
-        );
+      // 3. Query backend directly if not present in memory cache
+      if (!found && targetParam) {
+        api.fetchGiveawayById(targetParam)
+          .then((item) => {
+            if (item) {
+              setGiveaway({
+                ...item,
+                id: item.giveawayId || item.id || item._id,
+                slug: item.slug || item.giveawayId,
+                title: item.title,
+                subtitle: item.subtitle || item.prizes?.[0]?.name || 'Provably Fair Community Giveaway',
+                entryFee: Number(item.entryFee || item.cost || item.prizes?.[0]?.entryFee || 250),
+                cost: Number(item.entryFee || item.cost || item.prizes?.[0]?.entryFee || 250),
+                currency: item.currency || 'VEs',
+                totalSpots: Number(item.maxEntries || item.totalSpots || 1000),
+                maxEntries: Number(item.maxEntries || item.totalSpots || 1000),
+                spotsTaken: Number(item.currentEntries || item.spotsTaken || 0),
+                currentEntries: Number(item.currentEntries || item.spotsTaken || 0),
+                endsAt: item.endAt || item.endsAt,
+                status: item.status || 'ACTIVE',
+                winners: item.winners || []
+              });
+            } else {
+              setGiveaway(null);
+            }
+            setLoading(false);
+          })
+          .catch(() => {
+            setGiveaway(null);
+            setLoading(false);
+          });
+        return;
       }
 
       setGiveaway(found || null);
@@ -418,9 +441,8 @@ export default function GiveawayDetailsPage() {
                 <span>Important Information & Fairness Disclosures</span>
               </div>
               <ChevronDown
-                className={`w-4 h-4 text-slate-400 transition-transform duration-300 ${
-                  isImportantInfoOpen ? 'rotate-180 text-purple-400' : ''
-                }`}
+                className={`w-4 h-4 text-slate-400 transition-transform duration-300 ${isImportantInfoOpen ? 'rotate-180 text-purple-400' : ''
+                  }`}
               />
             </button>
 

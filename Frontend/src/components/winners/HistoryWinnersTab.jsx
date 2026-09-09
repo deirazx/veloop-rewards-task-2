@@ -29,11 +29,14 @@ export default function HistoryWinnersTab() {
           </div>
 
           <div className="max-w-md space-y-2">
-            <h3 className="text-xl sm:text-2xl font-black text-white tracking-tight">
+            <span className="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-purple-500/15 border border-purple-500/30 text-purple-300">
+              Season 1 Live State
+            </span>
+            <h3 className="text-xl sm:text-2xl font-black text-white tracking-tight mt-1">
               No Winners Declared Yet
             </h3>
             <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
-              Winners are finalized transparently via the backend after the giveaway event countdown concludes.
+              No winners have been declared yet for Season 1. Once a giveaway event concludes and the verified cryptographic draw completes, official winners and claim portals will appear here automatically.
             </p>
           </div>
 

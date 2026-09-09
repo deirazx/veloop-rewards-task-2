@@ -1,90 +1,48 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { 
-  Trophy, Crown, Medal, Flame, Sparkles, TrendingUp, Gift, Star, Zap, 
-  ShieldCheck, ArrowUp, ArrowDown, Minus, Clock, Search, ChevronDown, 
-  ChevronUp, Award, Target, Coins
+import {
+  Trophy, Crown, Medal, Flame, Sparkles, TrendingUp, Gift, Star, Zap,
+  ShieldCheck, ArrowUp, ArrowDown, Minus, Clock, Search, ChevronDown,
+  ChevronUp, Award, Target, Coins, Loader2
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
 import { useGiveaway } from '../../context/GiveawayContext';
-
-/* ─── Multi-Period Curated Leaderboard Datasets ─── */
-const LEADERBOARD_PERIOD_DATA = {
-  'Weekly': [
-    { rank: 1,  masked: '@crypto_king91', initial: 'CK', points: 12480, wins: 8,  entries: 142, change: +14, badge: 'Diamond Warlord', streak: '🔥 8 Win Streak', gradient: 'from-amber-300 via-amber-400 to-yellow-500' },
-    { rank: 2,  masked: '@apex_hunter37', initial: 'AH', points: 10920, wins: 6,  entries: 118, change: +6,  badge: 'Platinum Hunter', streak: '⚡ 6 Win Streak', gradient: 'from-slate-200 via-cyan-100 to-slate-400' },
-    { rank: 3,  masked: '@cyber_wolf04',  initial: 'CW', points:  9340, wins: 5,  entries: 103, change: +2,  badge: 'Gold Striker',    streak: '🎯 5 Win Streak', gradient: 'from-amber-600 via-orange-500 to-amber-700' },
-    { rank: 4,  masked: '@ve****62',      initial: 'V4', points:  8210, wins: 4,  entries:  98, change: -3,  badge: 'Bronze Seeker',   streak: '✨ 4 Wins',       gradient: 'from-violet-500 to-purple-600' },
-    { rank: 5,  masked: '@ve****19',      initial: 'V5', points:  7630, wins: 4,  entries:  91, change: +1,  badge: 'Bronze Seeker',   streak: '✨ 4 Wins',       gradient: 'from-blue-500 to-cyan-500' },
-    { rank: 6,  masked: '@ve****88',      initial: 'V6', points:  6890, wins: 3,  entries:  84, change: 0,   badge: 'Active Hunter',   streak: '⚡ 3 Wins',       gradient: 'from-emerald-500 to-teal-500' },
-    { rank: 7,  masked: '@ve****55',      initial: 'V7', points:  6120, wins: 3,  entries:  77, change: +3,  badge: 'Active Hunter',   streak: '⚡ 3 Wins',       gradient: 'from-rose-500 to-pink-500' },
-    { rank: 8,  masked: '@ve****23',      initial: 'V8', points:  5540, wins: 2,  entries:  69, change: -1,  badge: 'Challenger',      streak: '🎯 2 Wins',       gradient: 'from-indigo-500 to-violet-500' },
-    { rank: 9,  masked: '@ve****71',      initial: 'V9', points:  4980, wins: 2,  entries:  62, change: +5,  badge: 'Challenger',      streak: '🎯 2 Wins',       gradient: 'from-amber-400 to-orange-500' },
-    { rank: 10, masked: '@ve****46',      initial: 'VA', points:  4410, wins: 1,  entries:  58, change: -2,  badge: 'Challenger',      streak: '✨ 1 Win',        gradient: 'from-cyan-500 to-blue-500' },
-  ],
-  'Daily': [
-    { rank: 1,  masked: '@sol_raider22',  initial: 'SR', points:  3850, wins: 4,  entries:  42, change: +22, badge: 'Daily Blitz Ace', streak: '🔥 4 Blitz Wins', gradient: 'from-amber-300 via-amber-400 to-yellow-500' },
-    { rank: 2,  masked: '@crypto_king91', initial: 'CK', points:  3420, wins: 3,  entries:  38, change: +8,  badge: 'Diamond Warlord', streak: '⚡ 3 Blitz Wins', gradient: 'from-slate-200 via-cyan-100 to-slate-400' },
-    { rank: 3,  masked: '@neon_ghost88',  initial: 'NG', points:  3110, wins: 2,  entries:  35, change: +15, badge: 'Speed Demon',     streak: '🎯 2 Blitz Wins', gradient: 'from-amber-600 via-orange-500 to-amber-700' },
-    { rank: 4,  masked: '@luna_spark',    initial: 'LS', points:  2890, wins: 2,  entries:  31, change: +4,  badge: 'Star Hunter',     streak: '✨ 2 Wins',       gradient: 'from-violet-500 to-purple-600' },
-    { rank: 5,  masked: '@cyber_wolf04',  initial: 'CW', points:  2640, wins: 2,  entries:  29, change: -1,  badge: 'Gold Striker',    streak: '✨ 2 Wins',       gradient: 'from-blue-500 to-cyan-500' },
-    { rank: 6,  masked: '@pixel_blade',   initial: 'PB', points:  2350, wins: 1,  entries:  26, change: +5,  badge: 'Rookie Master',   streak: '⚡ 1 Win',        gradient: 'from-emerald-500 to-teal-500' },
-    { rank: 7,  masked: '@shadow_runner', initial: 'SR', points:  2100, wins: 1,  entries:  24, change: +2,  badge: 'Rookie Master',   streak: '⚡ 1 Win',        gradient: 'from-rose-500 to-pink-500' },
-    { rank: 8,  masked: '@apex_hunter37', initial: 'AH', points:  1920, wins: 1,  entries:  21, change: -2,  badge: 'Platinum Hunter', streak: '🎯 1 Win',        gradient: 'from-indigo-500 to-violet-500' },
-    { rank: 9,  masked: '@quantum_zap',   initial: 'QZ', points:  1740, wins: 1,  entries:  19, change: +3,  badge: 'Challenger',      streak: '🎯 1 Win',        gradient: 'from-amber-400 to-orange-500' },
-    { rank: 10, masked: '@nova_pulse',    initial: 'NP', points:  1580, wins: 0,  entries:  18, change: -1,  badge: 'Challenger',      streak: '✨ Active',       gradient: 'from-cyan-500 to-blue-500' },
-  ],
-  'Monthly': [
-    { rank: 1,  masked: '@valkyrie_x',    initial: 'VX', points: 48200, wins: 28, entries: 490, change: +35, badge: 'Apex Overlord',   streak: '👑 28 Wins',      gradient: 'from-amber-300 via-amber-400 to-yellow-500' },
-    { rank: 2,  masked: '@crypto_king91', initial: 'CK', points: 44150, wins: 24, entries: 420, change: +12, badge: 'Diamond Warlord', streak: '⚡ 24 Wins',      gradient: 'from-slate-200 via-cyan-100 to-slate-400' },
-    { rank: 3,  masked: '@apex_hunter37', initial: 'AH', points: 39800, wins: 21, entries: 380, change: +9,  badge: 'Platinum Hunter', streak: '🎯 21 Wins',      gradient: 'from-amber-600 via-orange-500 to-amber-700' },
-    { rank: 4,  masked: '@cyber_wolf04',  initial: 'CW', points: 34500, wins: 19, entries: 330, change: -2,  badge: 'Gold Striker',    streak: '✨ 19 Wins',      gradient: 'from-violet-500 to-purple-600' },
-    { rank: 5,  masked: '@sol_raider22',  initial: 'SR', points: 31200, wins: 16, entries: 295, change: +4,  badge: 'Star Hunter',     streak: '✨ 16 Wins',      gradient: 'from-blue-500 to-cyan-500' },
-    { rank: 6,  masked: '@ve****62',      initial: 'V4', points: 27900, wins: 14, entries: 260, change: +1,  badge: 'Bronze Seeker',   streak: '⚡ 14 Wins',      gradient: 'from-emerald-500 to-teal-500' },
-    { rank: 7,  masked: '@neon_ghost88',  initial: 'NG', points: 24100, wins: 12, entries: 220, change: +6,  badge: 'Active Hunter',   streak: '⚡ 12 Wins',      gradient: 'from-rose-500 to-pink-500' },
-    { rank: 8,  masked: '@ve****88',      initial: 'V6', points: 21800, wins: 10, entries: 195, change: -3,  badge: 'Active Hunter',   streak: '🎯 10 Wins',      gradient: 'from-indigo-500 to-violet-500' },
-    { rank: 9,  masked: '@ve****19',      initial: 'V5', points: 19400, wins: 9,  entries: 175, change: +2,  badge: 'Challenger',      streak: '🎯 9 Wins',       gradient: 'from-amber-400 to-orange-500' },
-    { rank: 10, masked: '@luna_spark',    initial: 'LS', points: 17600, wins: 8,  entries: 160, change: 0,   badge: 'Challenger',      streak: '✨ 8 Wins',       gradient: 'from-cyan-500 to-blue-500' },
-  ],
-  'All-Time': [
-    { rank: 1,  masked: '@genesis_god',   initial: 'GG', points: 185400, wins: 112, entries: 1450, change: +40, badge: 'Immortal Legend', streak: '👑 112 Wins Hall', gradient: 'from-amber-300 via-amber-400 to-yellow-500' },
-    { rank: 2,  masked: '@valkyrie_x',    initial: 'VX', points: 162900, wins: 94,  entries: 1280, change: +18, badge: 'Apex Overlord',   streak: '⚡ 94 Wins Hall',   gradient: 'from-slate-200 via-cyan-100 to-slate-400' },
-    { rank: 3,  masked: '@crypto_king91', initial: 'CK', points: 148320, wins: 85,  entries: 1190, change: +25, badge: 'Diamond Warlord', streak: '🎯 85 Wins Hall',   gradient: 'from-amber-600 via-orange-500 to-amber-700' },
-    { rank: 4,  masked: '@apex_hunter37', initial: 'AH', points: 126400, wins: 72,  entries: 1040, change: +5,  badge: 'Platinum Hunter', streak: '✨ 72 Wins',        gradient: 'from-violet-500 to-purple-600' },
-    { rank: 5,  masked: '@cyber_wolf04',  initial: 'CW', points: 109800, wins: 64,  entries:  920, change: -1,  badge: 'Gold Striker',    streak: '✨ 64 Wins',        gradient: 'from-blue-500 to-cyan-500' },
-    { rank: 6,  masked: '@sol_raider22',  initial: 'SR', points:  94200, wins: 56,  entries:  810, change: +8,  badge: 'Star Hunter',     streak: '⚡ 56 Wins',        gradient: 'from-emerald-500 to-teal-500' },
-    { rank: 7,  masked: '@ve****62',      initial: 'V4', points:  82500, wins: 48,  entries:  720, change: -4,  badge: 'Bronze Seeker',   streak: '⚡ 48 Wins',        gradient: 'from-rose-500 to-pink-500' },
-    { rank: 8,  masked: '@neon_ghost88',  initial: 'NG', points:  73900, wins: 42,  entries:  650, change: +3,  badge: 'Active Hunter',   streak: '🎯 42 Wins',        gradient: 'from-indigo-500 to-violet-500' },
-    { rank: 9,  masked: '@ve****88',      initial: 'V6', points:  66400, wins: 38,  entries:  590, change: +1,  badge: 'Active Hunter',   streak: '🎯 38 Wins',        gradient: 'from-amber-400 to-orange-500' },
-    { rank: 10, masked: '@luna_spark',    initial: 'LS', points:  59800, wins: 34,  entries:  530, change: -2,  badge: 'Challenger',      streak: '✨ 34 Wins',        gradient: 'from-cyan-500 to-blue-500' },
-  ]
-};
-
-const CURRENT_USER_MOCK = {
-  rank: 128, 
-  masked: '@ve****99', 
-  points: 2840, 
-  nextRankPoints: 4410, 
-  nextRank: 10, 
-  badge: 'Rising Contender'
-};
+import api from '../../services/api';
 
 const PERIOD_TABS = ['Weekly', 'Daily', 'Monthly', 'All-Time'];
 
 /* ─── Avatar circle with subtle shine ─── */
-function Avatar({ initial, gradient, size = 'md' }) {
-  const sz = size === 'xl' 
-    ? 'w-16 h-16 sm:w-20 sm:h-20 text-xl sm:text-2xl ring-4' 
-    : size === 'lg' 
-    ? 'w-13 h-13 sm:w-16 sm:h-16 text-base sm:text-lg ring-3' 
-    : size === 'sm' 
-    ? 'w-8 h-8 text-xs ring-1' 
-    : 'w-10 h-10 text-sm ring-2';
+function Avatar({ initial, avatar, gradientStyle, size = 'md' }) {
+  const sz = size === 'xl'
+    ? 'w-16 h-16 sm:w-20 sm:h-20 text-xl sm:text-2xl ring-4'
+    : size === 'lg'
+      ? 'w-13 h-13 sm:w-16 sm:h-16 text-base sm:text-lg ring-3'
+      : size === 'sm'
+        ? 'w-8 h-8 text-xs ring-1'
+        : 'w-10 h-10 text-sm ring-2';
+
+  const [hasImgError, setHasImgError] = useState(false);
+
+  if (avatar && !hasImgError) {
+    return (
+      <div className={`${sz} rounded-2xl bg-[#120f24] shrink-0 shadow-lg ring-white/20 select-none relative overflow-hidden flex items-center justify-center`}>
+        <img
+          src={avatar}
+          alt={initial || 'Hunter'}
+          className="w-full h-full object-cover rounded-2xl"
+          onError={() => setHasImgError(true)}
+        />
+      </div>
+    );
+  }
 
   return (
-    <div className={`${sz} rounded-2xl bg-gradient-to-br ${gradient} flex items-center justify-center font-black text-white shrink-0 shadow-lg ring-white/20 select-none relative overflow-hidden`}>
+    <div
+      style={{ background: gradientStyle || 'linear-gradient(135deg, #6366f1 0%, #a855f7 100%)' }}
+      className={`${sz} rounded-2xl flex items-center justify-center font-black text-white shrink-0 shadow-lg ring-white/20 select-none relative overflow-hidden`}
+    >
       <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-white/20 pointer-events-none" />
-      <span className="relative z-10 drop-shadow-md">{initial}</span>
+      <span className="relative z-10 drop-shadow-md">{initial || 'VE'}</span>
     </div>
   );
 }
@@ -171,6 +129,50 @@ function PodiumCard({ user, position, onCelebrate }) {
   const c = config[position];
   const TrophyIcon = c.trophyIcon;
 
+  // If no user yet at this rank, preserve the full 3D layout with an elegant open state
+  if (!user) {
+    return (
+      <div className={`flex flex-col items-center ${c.order} w-full relative z-10 opacity-75`}>
+        <div className="h-10 flex items-center justify-center mb-1">
+          <TrophyIcon className="w-5 h-5 text-slate-500/70" />
+        </div>
+        <div className="relative mb-3">
+          <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-white/[0.03] border border-dashed border-white/20 flex flex-col items-center justify-center text-slate-400 shadow-inner">
+            <TrophyIcon className="w-5 h-5 text-slate-500 mb-0.5" />
+            <span className="text-[9px] font-bold text-slate-400 uppercase">Open</span>
+          </div>
+          <span className={`absolute -bottom-2 -right-1.5 px-2 py-0.5 rounded-full ${c.labelBg} text-[10px] font-black shadow-md`}>
+            {c.rankTag}
+          </span>
+        </div>
+        <div className="w-full text-center px-2 py-2.5 mb-2 rounded-xl bg-white/[0.02] border border-white/5">
+          <p className="text-xs sm:text-sm font-extrabold text-slate-300">Spot Unclaimed</p>
+          <p className="text-[10px] text-slate-500 font-mono mt-0.5">@unclaimed</p>
+          <span className="inline-block text-[9px] font-semibold text-slate-500 mt-0.5">Open Position</span>
+          <div className="flex items-center justify-center gap-1.5 mt-1">
+            <Coins className="w-3.5 h-3.5 text-slate-600" />
+            <span className="text-base sm:text-xl font-black text-slate-500 font-mono">0</span>
+            <span className="text-[10px] text-slate-600 font-extrabold uppercase">VEs</span>
+          </div>
+          <div className="mt-1.5 flex items-center justify-center gap-2 text-[10px] text-slate-500 font-medium">
+            <span>0W</span>
+            <span className="w-1 h-1 rounded-full bg-white/10" />
+            <span>0E</span>
+          </div>
+        </div>
+        <div className={`w-full rounded-t-2xl sm:rounded-t-3xl border border-b-0 ${c.border} ${c.pedestalBg} ${c.colHeight} flex flex-col items-center justify-between p-3 relative overflow-hidden backdrop-blur-md`}>
+          <span className={`text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full border ${c.pillBorder}`}>
+            {c.title}
+          </span>
+          <span className={`text-4xl sm:text-6xl font-black ${c.numColor} font-mono select-none my-auto`}>
+            {position}
+          </span>
+          <span className="text-[10px] font-bold text-slate-500 uppercase">Available</span>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <motion.div
       layout
@@ -224,7 +226,7 @@ function PodiumCard({ user, position, onCelebrate }) {
       {/* Avatar with Metallic Halo & Glow */}
       <div className="relative mb-3">
         <div className={`rounded-2xl transition-transform duration-300 group-hover:scale-105 ${c.glowColor}`}>
-          <Avatar initial={user.initial} gradient={user.gradient} size={c.avatarSize} />
+          <Avatar initial={user.initial} avatar={user.avatar} gradientStyle={user.gradientStyle} size={c.avatarSize} />
         </div>
 
         {/* Position rank badge anchored to bottom right */}
@@ -236,12 +238,15 @@ function PodiumCard({ user, position, onCelebrate }) {
 
       {/* User Info & Points Card */}
       <div className="w-full text-center px-2 py-2.5 mb-2 rounded-xl bg-white/[0.03] backdrop-blur-md border border-white/5 group-hover:border-white/10 transition-colors">
-        <p className="text-xs sm:text-sm font-bold text-white font-mono truncate tracking-tight">
+        <p className="text-xs sm:text-sm font-extrabold text-white truncate tracking-tight">
+          {user.name || 'Community Hunter'}
+        </p>
+        <p className="text-[10px] text-purple-300/90 font-mono truncate">
           {user.masked}
         </p>
 
         {/* Dynamic Streak Badge */}
-        <span className="inline-block text-[9px] sm:text-[10px] font-semibold text-purple-300/90 mt-0.5">
+        <span className="inline-block text-[9px] sm:text-[10px] font-semibold text-amber-300/90 mt-0.5">
           {user.streak || user.badge}
         </span>
 
@@ -258,29 +263,23 @@ function PodiumCard({ user, position, onCelebrate }) {
           <span>{user.wins}W</span>
           <span className="w-1 h-1 rounded-full bg-white/20" />
           <span>{user.entries}E</span>
-          <span className="w-1 h-1 rounded-full bg-white/20" />
-          <Delta value={user.change} />
         </div>
       </div>
 
       {/* 3D Cyber Pedestal Base */}
-      <div 
+      <div
         className={`w-full rounded-t-2xl sm:rounded-t-3xl border border-b-0 ${c.border} ${c.pedestalBg} ${c.pedestalRim} ${c.colHeight} flex flex-col items-center justify-between p-3 relative overflow-hidden backdrop-blur-xl transition-all duration-300 group-hover:brightness-110`}
       >
-        {/* Subtle Cyber Grid Lines inside Pedestal */}
         <div className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(255,255,255,0.06)_1px,transparent_1px)] bg-[size:100%_12px] opacity-20 pointer-events-none" />
 
-        {/* Podium Subtitle */}
         <span className={`text-[9px] sm:text-[10px] font-black uppercase tracking-widest px-2.5 py-0.5 rounded-full border ${c.pillBorder} shadow-sm z-10`}>
           {c.title}
         </span>
 
-        {/* Giant Embossed Number */}
         <span className={`text-5xl sm:text-7xl font-black ${c.numColor} transition-colors select-none font-mono tracking-tighter leading-none z-0 my-auto drop-shadow-md`}>
           {position}
         </span>
 
-        {/* Rank Label Bottom */}
         <div className="z-10 text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1">
           <Star className="w-3 h-3 text-amber-400/70" />
           Rank #{position}
@@ -297,6 +296,35 @@ export default function Leaderboard() {
   const [searchQuery, setSearchQuery] = useState('');
   const [showAll, setShowAll] = useState(false);
   const [resetCountdown, setResetCountdown] = useState('05h 28m 14s');
+
+  // Backend live states
+  const [leaderboardData, setLeaderboardData] = useState([]);
+  const [userStanding, setUserStanding] = useState(null);
+  const [poolInfo, setPoolInfo] = useState({ prizePool: '250,000 VEs + 3 Rare Mystery Crates', activeHunters: '2,780+' });
+  const [loading, setLoading] = useState(true);
+
+  // Fetch live rankings whenever period changes
+  useEffect(() => {
+    let isMounted = true;
+    const loadLeaderboard = async () => {
+      setLoading(true);
+      try {
+        const res = await api.fetchLeaderboard(period);
+        if (isMounted && res) {
+          setLeaderboardData(res.data || []);
+          if (res.userStanding) setUserStanding(res.userStanding);
+          if (res.poolInfo) setPoolInfo(res.poolInfo);
+        }
+      } catch (err) {
+        console.error('[Leaderboard] Failed to load data from database:', err);
+      } finally {
+        if (isMounted) setLoading(false);
+      }
+    };
+
+    loadLeaderboard();
+    return () => { isMounted = false; };
+  }, [period]);
 
   // Real-time ticking countdown to give live gaming hype
   useEffect(() => {
@@ -338,34 +366,36 @@ export default function Leaderboard() {
     }
   };
 
-  // Get active dataset based on selected period
-  const activeData = useMemo(() => {
-    return LEADERBOARD_PERIOD_DATA[period] || LEADERBOARD_PERIOD_DATA['Weekly'];
-  }, [period]);
-
-  const top3 = useMemo(() => activeData.slice(0, 3), [activeData]);
-  const rest = useMemo(() => activeData.slice(3), [activeData]);
+  const top3 = useMemo(() => (leaderboardData || []).slice(0, 3), [leaderboardData]);
+  const rest = useMemo(() => (leaderboardData || []).slice(3), [leaderboardData]);
 
   // Filtered rows for table
   const filteredRest = useMemo(() => {
     if (!searchQuery.trim()) return rest;
     const q = searchQuery.toLowerCase();
-    return rest.filter((u) => 
-      u.masked.toLowerCase().includes(q) || 
-      u.badge.toLowerCase().includes(q)
+    return rest.filter((u) =>
+      (u.masked && u.masked.toLowerCase().includes(q)) ||
+      (u.badge && u.badge.toLowerCase().includes(q))
     );
   }, [rest, searchQuery]);
 
   const displayedRest = showAll ? filteredRest : filteredRest.slice(0, 4);
 
-  const me = CURRENT_USER_MOCK;
-  const progressPct = Math.min(100, Math.round((me.points / me.nextRankPoints) * 100));
+  const me = userStanding || {
+    rank: 128,
+    masked: currentUser?.customUserId ? `@${currentUser.customUserId.toLowerCase()}` : '@you',
+    points: currentUser?.balances?.VES || 2840,
+    nextRankPoints: 4410,
+    nextRank: 10,
+    badge: currentUser?.tier || 'Rising Contender'
+  };
+  const progressPct = Math.min(100, Math.max(5, Math.round(((me.points || 0) / (me.nextRankPoints || 1)) * 100)));
 
   const PERKS = [
-    { icon: Trophy,    label: 'Grand Champion NFT',   desc: 'Exclusive on-chain gold verifiable badge', color: 'text-amber-400',   bg: 'bg-amber-500/10 border-amber-500/20' },
-    { icon: Zap,       label: '+1,500 Bonus VEs',       desc: 'Weekly instant boost for Top 10 hunters',  color: 'text-violet-400',  bg: 'bg-violet-500/10 border-violet-500/20' },
-    { icon: ShieldCheck, label: 'VIP Priority Queuing', desc: 'Instant verification on all rewards',    color: 'text-emerald-400', bg: 'bg-emerald-500/10 border-emerald-500/20' },
-    { icon: Gift,      label: 'Secret Mystery Drop',    desc: 'Guaranteed high-tier physical loot boxes',color: 'text-pink-400',    bg: 'bg-pink-500/10 border-pink-500/20' },
+    { icon: Trophy, label: 'Grand Champion NFT', desc: 'Exclusive on-chain gold verifiable badge', color: 'text-amber-400', bg: 'bg-amber-500/10 border-amber-500/20' },
+    { icon: Zap, label: '+1,500 Bonus VEs', desc: 'Weekly instant boost for Top 10 hunters', color: 'text-violet-400', bg: 'bg-violet-500/10 border-violet-500/20' },
+    { icon: ShieldCheck, label: 'VIP Priority Queuing', desc: 'Instant verification on all rewards', color: 'text-emerald-400', bg: 'bg-emerald-500/10 border-emerald-500/20' },
+    { icon: Gift, label: 'Secret Mystery Drop', desc: 'Guaranteed high-tier physical loot boxes', color: 'text-pink-400', bg: 'bg-pink-500/10 border-pink-500/20' },
   ];
 
   return (
@@ -373,7 +403,7 @@ export default function Leaderboard() {
 
       {/* ── Top Header Bar ── */}
       <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-5 p-5 sm:p-6 rounded-3xl bg-[#0d0a1a]/80 border border-purple-500/20 backdrop-blur-2xl shadow-[0_10px_35px_rgba(0,0,0,0.35)] relative overflow-hidden">
-        
+
         {/* Glow accent */}
         <div className="absolute top-0 right-1/4 w-96 h-32 bg-purple-600/10 blur-3xl pointer-events-none" />
 
@@ -424,9 +454,8 @@ export default function Leaderboard() {
                 <button
                   key={tab}
                   onClick={() => setPeriod(tab)}
-                  className={`relative px-3.5 py-2 rounded-xl text-xs font-bold transition-colors cursor-pointer select-none ${
-                    active ? 'text-white' : 'text-slate-400 hover:text-slate-200'
-                  }`}
+                  className={`relative px-3.5 py-2 rounded-xl text-xs font-bold transition-colors cursor-pointer select-none ${active ? 'text-white' : 'text-slate-400 hover:text-slate-200'
+                    }`}
                 >
                   {active && (
                     <motion.div
@@ -452,7 +481,7 @@ export default function Leaderboard() {
           <div>
             <p className="text-xs sm:text-sm font-bold text-white flex items-center gap-2">
               <span>🎁 Season {period} Reward Pool:</span>
-              <span className="text-amber-300 font-extrabold font-mono">250,000 VEs + 3 Rare Crates</span>
+              <span className="text-amber-300 font-extrabold font-mono">{poolInfo.prizePool}</span>
             </p>
             <p className="text-[11px] text-slate-400 mt-0.5">Top 3 Champions receive guaranteed physical and on-chain loot drops</p>
           </div>
@@ -461,14 +490,14 @@ export default function Leaderboard() {
         <div className="flex items-center gap-2 self-end sm:self-auto">
           <span className="text-[11px] font-semibold text-purple-300 bg-purple-500/20 border border-purple-500/30 px-3 py-1 rounded-full flex items-center gap-1.5">
             <Flame className="w-3 h-3 text-orange-400 fill-orange-400" />
-            3,842 Hunters Competing
+            {poolInfo.activeHunters} Hunters Competing
           </span>
         </div>
       </div>
 
       {/* ── Top 3 Champions Arena Podium ── */}
       <div className="rounded-3xl bg-gradient-to-b from-[#110c26]/95 via-[#0a0717]/95 to-[#06040f]/98 border border-purple-500/25 p-4 sm:p-8 relative overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.6)]">
-        
+
         {/* Cyber Background Glow Elements */}
         <div className="absolute top-0 inset-x-0 h-40 bg-[radial-gradient(ellipse_80%_60%_at_50%_0%,rgba(124,58,237,0.25)_0%,transparent_70%)] pointer-events-none" />
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-[size:32px_32px] opacity-30 pointer-events-none" />
@@ -495,33 +524,40 @@ export default function Leaderboard() {
         </div>
 
         {/* 3D Staged Podium: 2nd Place | 1st Place (Elevated) | 3rd Place */}
-        <div className="grid grid-cols-3 gap-2 sm:gap-6 items-end max-w-2xl mx-auto pt-4 sm:pt-6 relative z-10">
-          <AnimatePresence mode="wait">
-            <PodiumCard 
-              key={`podium-2-${period}-${top3[1]?.masked}`} 
-              user={top3[1]} 
-              position={2} 
-              onCelebrate={triggerCelebration} 
-            />
-            <PodiumCard 
-              key={`podium-1-${period}-${top3[0]?.masked}`} 
-              user={top3[0]} 
-              position={1} 
-              onCelebrate={triggerCelebration} 
-            />
-            <PodiumCard 
-              key={`podium-3-${period}-${top3[2]?.masked}`} 
-              user={top3[2]} 
-              position={3} 
-              onCelebrate={triggerCelebration} 
-            />
-          </AnimatePresence>
+        <div className="grid grid-cols-3 gap-2 sm:gap-6 items-end max-w-2xl mx-auto pt-4 sm:pt-6 relative z-10 min-h-[300px]">
+          {loading ? (
+            <div className="col-span-3 py-20 flex flex-col items-center justify-center gap-3">
+              <Loader2 className="w-8 h-8 text-purple-400 animate-spin" />
+              <span className="text-xs text-slate-400 font-semibold font-mono">Syncing {period} rankings from database...</span>
+            </div>
+          ) : (
+            <>
+              <PodiumCard
+                key={`podium-2-${period}-${top3[1]?.masked || 'empty-2'}`}
+                user={top3[1] || null}
+                position={2}
+                onCelebrate={triggerCelebration}
+              />
+              <PodiumCard
+                key={`podium-1-${period}-${top3[0]?.masked || 'empty-1'}`}
+                user={top3[0] || null}
+                position={1}
+                onCelebrate={triggerCelebration}
+              />
+              <PodiumCard
+                key={`podium-3-${period}-${top3[2]?.masked || 'empty-3'}`}
+                user={top3[2] || null}
+                position={3}
+                onCelebrate={triggerCelebration}
+              />
+            </>
+          )}
         </div>
       </div>
 
       {/* ── Ranks 4–10 Pro League Table ── */}
       <div className="rounded-3xl bg-[#0a0717]/85 backdrop-blur-2xl border border-white/10 overflow-hidden shadow-xl">
-        
+
         {/* Table Controls & Search */}
         <div className="p-4 sm:p-5 border-b border-white/5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-white/[0.02]">
           <div>
@@ -556,80 +592,107 @@ export default function Leaderboard() {
 
         {/* Table Rows */}
         <div className="divide-y divide-white/5">
-          <AnimatePresence>
-            {displayedRest.map((user, idx) => {
-              const isTop5 = user.rank <= 5;
-
-              return (
-                <motion.div
-                  key={`${period}-${user.rank}-${user.masked}`}
-                  layout
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: 10 }}
-                  transition={{ duration: 0.2, delay: idx * 0.03 }}
-                  className="group px-4 sm:px-5 py-3.5 flex flex-col sm:grid sm:grid-cols-[60px_1fr_120px_110px_70px] gap-3 sm:gap-2 items-start sm:items-center hover:bg-purple-600/[0.08] transition-colors relative"
-                >
-                  {/* Left accent hover glow */}
-                  <div className="absolute left-0 inset-y-0 w-1 bg-gradient-to-b from-purple-500 to-indigo-500 opacity-0 group-hover:opacity-100 transition-opacity" />
-
-                  {/* Rank Column */}
-                  <div className="flex items-center gap-2">
-                    <div className={`w-8 h-8 rounded-xl flex items-center justify-center text-xs font-black font-mono transition-transform group-hover:scale-110 ${
-                      isTop5 
-                        ? 'bg-purple-500/20 text-purple-300 border border-purple-500/40 shadow-[0_0_10px_rgba(168,85,247,0.25)]' 
-                        : 'bg-white/5 text-slate-400 border border-white/10'
-                    }`}>
-                      #{user.rank}
-                    </div>
+          {loading ? (
+            <div className="p-8 flex flex-col items-center justify-center gap-2">
+              <Loader2 className="w-5 h-5 text-purple-400 animate-spin" />
+              <span className="text-xs text-slate-400">Loading contender rankings...</span>
+            </div>
+          ) : displayedRest.length === 0 ? (
+            <div className="p-8 text-center">
+              {searchQuery ? (
+                <span className="text-xs text-slate-400">No hunters found matching "{searchQuery}".</span>
+              ) : (
+                <div className="flex flex-col items-center justify-center gap-2 py-4">
+                  <div className="w-10 h-10 rounded-2xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 shadow-inner">
+                    <Flame className="w-5 h-5" />
                   </div>
+                  <p className="text-sm font-bold text-white">Ranks 4 – 10 are Open</p>
+                  <p className="text-xs text-slate-400 max-w-sm">
+                    Enter live giveaways to earn VEs and claim your rank on the contender leaderboard.
+                  </p>
+                </div>
+              )}
+            </div>
+          ) : (
+            <AnimatePresence>
+              {displayedRest.map((user, idx) => {
+                const isTop5 = user.rank <= 5;
 
-                  {/* User & Avatar Info */}
-                  <div className="flex items-center gap-3 min-w-0 w-full">
-                    <Avatar initial={user.initial} gradient={user.gradient} size="sm" />
-                    <div className="min-w-0">
-                      <p className="text-xs sm:text-sm font-bold text-white font-mono truncate group-hover:text-purple-300 transition-colors">
-                        {user.masked}
-                      </p>
-                      <div className="flex items-center gap-2 mt-0.5">
-                        <span className="text-[10px] font-semibold text-slate-400 px-2 py-0.5 rounded-md bg-white/5 border border-white/5">
-                          {user.badge}
-                        </span>
-                        <span className="text-[10px] text-purple-400/80 font-medium">
-                          {user.streak}
-                        </span>
+                return (
+                  <motion.div
+                    key={`${period}-${user.rank}-${user.masked}`}
+                    layout
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 10 }}
+                    transition={{ duration: 0.2, delay: idx * 0.03 }}
+                    className="group px-4 sm:px-5 py-3.5 flex flex-col sm:grid sm:grid-cols-[60px_1fr_120px_110px_70px] gap-3 sm:gap-2 items-start sm:items-center hover:bg-purple-600/[0.08] transition-colors relative"
+                  >
+                    {/* Left accent hover glow */}
+                    <div className="absolute left-0 inset-y-0 w-1 bg-gradient-to-b from-purple-500 to-indigo-500 opacity-0 group-hover:opacity-100 transition-opacity" />
+
+                    {/* Rank Column */}
+                    <div className="flex items-center gap-2">
+                      <div className={`w-8 h-8 rounded-xl flex items-center justify-center text-xs font-black font-mono transition-transform group-hover:scale-110 ${isTop5
+                        ? 'bg-purple-500/20 text-purple-300 border border-purple-500/40 shadow-[0_0_10px_rgba(168,85,247,0.25)]'
+                        : 'bg-white/5 text-slate-400 border border-white/10'
+                        }`}>
+                        #{user.rank}
                       </div>
                     </div>
-                  </div>
 
-                  {/* Stats (Performance) */}
-                  <div className="flex sm:justify-center items-center gap-2 text-xs font-semibold text-slate-400">
-                    <span className="px-2 py-0.5 rounded-lg bg-white/5 border border-white/5 text-[11px] text-slate-300">
-                      🏆 {user.wins} Wins
-                    </span>
-                    <span className="text-slate-600">•</span>
-                    <span className="text-[11px] text-slate-400">
-                      {user.entries} Entries
-                    </span>
-                  </div>
+                    {/* User & Avatar Info */}
+                    <div className="flex items-center gap-3 min-w-0 w-full">
+                      <Avatar initial={user.initial} avatar={user.avatar} gradientStyle={user.gradientStyle} size="sm" />
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-2">
+                          <p className="text-xs sm:text-sm font-bold text-white truncate group-hover:text-purple-300 transition-colors">
+                            {user.name || 'Hunter'}
+                          </p>
+                          <span className="text-[10px] text-purple-400/90 font-mono">
+                            {user.masked}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2 mt-0.5">
+                          <span className="text-[10px] font-semibold text-slate-400 px-2 py-0.5 rounded-md bg-white/5 border border-white/5">
+                            {user.badge}
+                          </span>
+                          <span className="text-[10px] text-purple-400/80 font-medium">
+                            {user.streak}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
 
-                  {/* VEs Earned Column */}
-                  <div className="flex sm:justify-end items-center gap-1.5 text-right w-full sm:w-auto">
-                    <Coins className="w-3.5 h-3.5 text-purple-400" />
-                    <span className="text-sm sm:text-base font-black text-purple-300 font-mono tracking-tight">
-                      {user.points.toLocaleString()}
-                    </span>
-                    <span className="text-[9px] font-bold text-slate-500 uppercase">VEs</span>
-                  </div>
+                    {/* Stats (Performance) */}
+                    <div className="flex sm:justify-center items-center gap-2 text-xs font-semibold text-slate-400">
+                      <span className="px-2 py-0.5 rounded-lg bg-white/5 border border-white/5 text-[11px] text-slate-300">
+                        🏆 {user.wins} Wins
+                      </span>
+                      <span className="text-slate-600">•</span>
+                      <span className="text-[11px] text-slate-400">
+                        {user.entries} Entries
+                      </span>
+                    </div>
 
-                  {/* Trend Delta */}
-                  <div className="flex sm:justify-end items-center">
-                    <Delta value={user.change} />
-                  </div>
-                </motion.div>
-              );
-            })}
-          </AnimatePresence>
+                    {/* VEs Earned Column */}
+                    <div className="flex sm:justify-end items-center gap-1.5 text-right w-full sm:w-auto">
+                      <Coins className="w-3.5 h-3.5 text-purple-400" />
+                      <span className="text-sm sm:text-base font-black text-purple-300 font-mono tracking-tight">
+                        {user.points.toLocaleString()}
+                      </span>
+                      <span className="text-[9px] font-bold text-slate-500 uppercase">VEs</span>
+                    </div>
+
+                    {/* Trend Delta */}
+                    <div className="flex sm:justify-end items-center">
+                      <Delta value={user.change} />
+                    </div>
+                  </motion.div>
+                );
+              })}
+            </AnimatePresence>
+          )}
         </div>
 
         {/* Show More / Show Less Toggle */}
@@ -738,7 +801,6 @@ export default function Leaderboard() {
           ))}
         </div>
       </div>
-
     </section>
   );
 }

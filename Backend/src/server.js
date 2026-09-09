@@ -89,6 +89,7 @@ app.use('/api/giveaways', require('./routes/giveawayRoutes'));
 app.use('/api/participation', require('./routes/participationRoutes'));
 app.use('/api/claim', require('./routes/claimRoutes'));
 app.use('/api/leaderboard', require('./routes/leaderboardRoutes'));
+app.use('/api/stats', require('./routes/statsRoutes'));
 app.use('/api/winners', (req, res, next) => {
   const giveawayController = require('./controllers/giveawayController');
   return giveawayController.getAllWinners(req, res, next);
