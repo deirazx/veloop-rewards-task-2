@@ -168,15 +168,8 @@ export default function PrizeCard({ giveaway }) {
 
   const handleActionClick = (e) => {
     e.stopPropagation();
-    if (isEnded || isJoined) {
-      handleCardClick();
-      return;
-    }
-    if (!isAuthenticated || !currentUser) {
-      navigate('/login');
-      return;
-    }
-    setIsConfirmOpen(true);
+    // Rule 79, 80, 103: Always route to dedicated details page to review full T&Cs, eligibility & duration
+    handleCardClick();
   };
 
   return (

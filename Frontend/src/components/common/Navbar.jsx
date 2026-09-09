@@ -67,8 +67,22 @@ export default function Navbar() {
 
   const navLinks = [
     { label: 'Discover', path: '/' },
-    { label: 'Winners', path: '/winners' },
+    { label: 'Giveaways', path: '/#active-giveaways', targetId: 'active-giveaways' },
+    { label: 'Leaderboard', path: '/#leaderboard', targetId: 'leaderboard' },
+    { label: 'Winners Hub', path: '/winners' },
   ];
+
+  const handleDesktopNavClick = (e, item) => {
+    if (item.targetId) {
+      if (location.pathname === '/') {
+        e.preventDefault();
+        const el = document.getElementById(item.targetId);
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth' });
+        }
+      }
+    }
+  };
 
   return (
     <header className="sticky top-0 z-50 w-full bg-[#09090b] border-b border-white/10">
@@ -94,17 +108,18 @@ export default function Navbar() {
 
         {/* ── Desktop nav links ── */}
         <nav className="hidden md:flex items-center gap-1">
-          {navLinks.map(({ label, path }) => (
+          {navLinks.map((item) => (
             <Link
-              key={path}
-              to={path}
-              className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
-                location.pathname === path
+              key={item.label}
+              to={item.path}
+              onClick={(e) => handleDesktopNavClick(e, item)}
+              className={`px-3.5 py-2 rounded-xl text-sm font-medium transition-all ${
+                location.pathname === item.path && !item.targetId
                   ? 'bg-purple-500/15 text-purple-300 border border-purple-500/20'
                   : 'text-slate-400 hover:text-white hover:bg-white/5'
               }`}
             >
-              {label}
+              {item.label}
             </Link>
           ))}
         </nav>
@@ -381,6 +396,34 @@ export default function Navbar() {
                         </span>
                       </div>
                       <div className="text-[10px] text-slate-400">High-value electronics, cash & supercars</div>
+                    </div>
+                  </div>
+                </Link>
+
+                <Link
+                  to="/#leaderboard"
+                  onClick={(e) => {
+                    setMenuOpen(false);
+                    if (location.pathname === '/') {
+                      e.preventDefault();
+                      const el = document.getElementById('leaderboard');
+                      if (el) el.scrollIntoView({ behavior: 'smooth' });
+                    }
+                  }}
+                  className="flex items-center justify-between p-3 rounded-xl border transition-all bg-[#141422] hover:bg-[#19192b] border-white/10 text-slate-200 hover:text-white"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-xl bg-[#2b1f13] border border-amber-500/40 flex items-center justify-center text-amber-400">
+                      <Trophy className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <div className="text-xs font-bold text-white flex items-center gap-2">
+                        Leaderboard Rankings
+                        <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-[#1b1509] text-amber-300 border border-amber-500/30">
+                          LIVE 3D
+                        </span>
+                      </div>
+                      <div className="text-[10px] text-slate-400">Podium champions & points leaderboard</div>
                     </div>
                   </div>
                   <ChevronRight className="w-4 h-4 text-slate-500" />

@@ -42,12 +42,16 @@ export default function LiveWinnersTicker() {
           const fromCtx = (giveaways || [])
             .filter((g) => g.status === 'ENDED' && g.winners?.length > 0)
             .flatMap((g) =>
-              g.winners.map((w) => ({
-                id: w._id || w.id,
-                maskedUserId: w.maskedUserId || (w.customUserId ? `@${w.customUserId}` : 'Anonymous'),
-                prize: w.prizeName || w.prizeTitle || g.title,
-                drawTimestamp: w.drawTimestamp
-              }))
+              g.winners.map((w) => {
+                const rawId = w.customUserId || w.userId || '';
+                const masked = w.maskedUserId || (rawId ? `${rawId.slice(0, 2)}****${rawId.slice(-2)}` : 'VE****00');
+                return {
+                  id: w._id || w.id,
+                  maskedUserId: masked,
+                  prize: w.prizeName || w.prizeTitle || g.title,
+                  drawTimestamp: w.drawTimestamp
+                };
+              })
             );
           if (isMounted) setRealWinners(fromCtx);
         }
@@ -55,12 +59,16 @@ export default function LiveWinnersTicker() {
         const fromCtx = (giveaways || [])
           .filter((g) => g.status === 'ENDED' && g.winners?.length > 0)
           .flatMap((g) =>
-            g.winners.map((w) => ({
-              id: w._id || w.id,
-              maskedUserId: w.maskedUserId || (w.customUserId ? `@${w.customUserId}` : 'Anonymous'),
-              prize: w.prizeName || w.prizeTitle || g.title,
-              drawTimestamp: w.drawTimestamp
-            }))
+            g.winners.map((w) => {
+              const rawId = w.customUserId || w.userId || '';
+              const masked = w.maskedUserId || (rawId ? `${rawId.slice(0, 2)}****${rawId.slice(-2)}` : 'VE****00');
+              return {
+                id: w._id || w.id,
+                maskedUserId: masked,
+                prize: w.prizeName || w.prizeTitle || g.title,
+                drawTimestamp: w.drawTimestamp
+              };
+            })
           );
         if (isMounted) setRealWinners(fromCtx);
       } finally {

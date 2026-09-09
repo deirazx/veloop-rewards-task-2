@@ -67,16 +67,20 @@ export default function WinnersList() {
             const fromContext = (giveaways || [])
               .filter((g) => g.status === 'ENDED' && g.winners?.length > 0)
               .flatMap((g) =>
-                g.winners.map((w, idx) => ({
-                  id: w._id || w.id || `ctx-${idx}`,
-                  maskedUserId: w.maskedUserId || (w.customUserId ? `@${w.customUserId}` : 'Anonymous'),
-                  name: w.maskedUserId || (w.customUserId ? `@${w.customUserId}` : 'Anonymous'),
-                  prize: w.prizeName || w.prizeTitle || g.title,
-                  prizeName: w.prizeName || g.title,
-                  prizeType: w.prizeType || 'PHYSICAL',
-                  drawTimestamp: w.drawTimestamp,
-                  ticketNumber: w.ticketNumber
-                }))
+                g.winners.map((w, idx) => {
+                  const rawId = w.customUserId || w.userId || '';
+                  const masked = w.maskedUserId || (rawId ? `${rawId.slice(0, 2)}****${rawId.slice(-2)}` : 'VE****00');
+                  return {
+                    id: w._id || w.id || `ctx-${idx}`,
+                    maskedUserId: masked,
+                    name: masked,
+                    prize: w.prizeName || w.prizeTitle || g.title,
+                    prizeName: w.prizeName || g.title,
+                    prizeType: w.prizeType || 'PHYSICAL',
+                    drawTimestamp: w.drawTimestamp,
+                    ticketNumber: w.ticketNumber
+                  };
+                })
               );
             setDbWinners(fromContext);
           }
@@ -86,16 +90,20 @@ export default function WinnersList() {
         const fromContext = (giveaways || [])
           .filter((g) => g.status === 'ENDED' && g.winners?.length > 0)
           .flatMap((g) =>
-            g.winners.map((w, idx) => ({
-              id: w._id || w.id || `ctx-${idx}`,
-              maskedUserId: w.maskedUserId || (w.customUserId ? `@${w.customUserId}` : 'Anonymous'),
-              name: w.maskedUserId || (w.customUserId ? `@${w.customUserId}` : 'Anonymous'),
-              prize: w.prizeName || w.prizeTitle || g.title,
-              prizeName: w.prizeName || g.title,
-              prizeType: w.prizeType || 'PHYSICAL',
-              drawTimestamp: w.drawTimestamp,
-              ticketNumber: w.ticketNumber
-            }))
+            g.winners.map((w, idx) => {
+              const rawId = w.customUserId || w.userId || '';
+              const masked = w.maskedUserId || (rawId ? `${rawId.slice(0, 2)}****${rawId.slice(-2)}` : 'VE****00');
+              return {
+                id: w._id || w.id || `ctx-${idx}`,
+                maskedUserId: masked,
+                name: masked,
+                prize: w.prizeName || w.prizeTitle || g.title,
+                prizeName: w.prizeName || g.title,
+                prizeType: w.prizeType || 'PHYSICAL',
+                drawTimestamp: w.drawTimestamp,
+                ticketNumber: w.ticketNumber
+              };
+            })
           );
         if (isMounted) setDbWinners(fromContext);
       } finally {

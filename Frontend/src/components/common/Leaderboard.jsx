@@ -11,8 +11,21 @@ import api from '../../services/api';
 
 const PERIOD_TABS = ['Weekly', 'Daily', 'Monthly', 'All-Time'];
 
-/* ─── Avatar circle with subtle shine ─── */
-function Avatar({ initial, avatar, gradientStyle, size = 'md' }) {
+/* ─── Rule 25 Compliant Masked Handle Generator ─── */
+function formatMaskedHandle(user) {
+  if (!user) return '@ve****99';
+  const raw = user.customUserId || user.masked || user.username || user.userId || user.id || '';
+  const clean = String(raw).replace(/^@/, '');
+  if (clean.length >= 4) {
+    const prefix = clean.slice(0, 2).toLowerCase();
+    const suffix = clean.slice(-2).toLowerCase();
+    return `@${prefix}****${suffix}`;
+  }
+  return '@ve****25';
+}
+
+/* ─── Avatar circle with subtle shine — Rule 25 Compliant (Stylized Cyber Badge, Zero Real Photos) ─── */
+function Avatar({ gradientStyle, size = 'md' }) {
   const sz = size === 'xl'
     ? 'w-16 h-16 sm:w-20 sm:h-20 text-xl sm:text-2xl ring-4'
     : size === 'lg'
@@ -21,28 +34,13 @@ function Avatar({ initial, avatar, gradientStyle, size = 'md' }) {
         ? 'w-8 h-8 text-xs ring-1'
         : 'w-10 h-10 text-sm ring-2';
 
-  const [hasImgError, setHasImgError] = useState(false);
-
-  if (avatar && !hasImgError) {
-    return (
-      <div className={`${sz} rounded-2xl bg-[#120f24] shrink-0 shadow-lg ring-white/20 select-none relative overflow-hidden flex items-center justify-center`}>
-        <img
-          src={avatar}
-          alt={initial || 'Hunter'}
-          className="w-full h-full object-cover rounded-2xl"
-          onError={() => setHasImgError(true)}
-        />
-      </div>
-    );
-  }
-
   return (
     <div
       style={{ background: gradientStyle || 'linear-gradient(135deg, #6366f1 0%, #a855f7 100%)' }}
       className={`${sz} rounded-2xl flex items-center justify-center font-black text-white shrink-0 shadow-lg ring-white/20 select-none relative overflow-hidden`}
     >
       <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-white/20 pointer-events-none" />
-      <span className="relative z-10 drop-shadow-md">{initial || 'VE'}</span>
+      <span className="relative z-10 drop-shadow-md">VE</span>
     </div>
   );
 }
@@ -223,10 +221,10 @@ function PodiumCard({ user, position, onCelebrate }) {
         )}
       </div>
 
-      {/* Avatar with Metallic Halo & Glow */}
+      {/* Avatar with Metallic Halo & Glow — Rule 25 Compliant Generic Cyber Insignia */}
       <div className="relative mb-3">
         <div className={`rounded-2xl transition-transform duration-300 group-hover:scale-105 ${c.glowColor}`}>
-          <Avatar initial={user.initial} avatar={user.avatar} gradientStyle={user.gradientStyle} size={c.avatarSize} />
+          <Avatar gradientStyle={user.gradientStyle} size={c.avatarSize} />
         </div>
 
         {/* Position rank badge anchored to bottom right */}
@@ -236,18 +234,15 @@ function PodiumCard({ user, position, onCelebrate }) {
         </span>
       </div>
 
-      {/* User Info & Points Card */}
+      {/* User Info & Points Card — Rule 25 Strict Masked Handle */}
       <div className="w-full text-center px-2 py-2.5 mb-2 rounded-xl bg-white/[0.03] backdrop-blur-md border border-white/5 group-hover:border-white/10 transition-colors">
-        <p className="text-xs sm:text-sm font-extrabold text-white truncate tracking-tight">
-          {user.name || 'Community Hunter'}
-        </p>
-        <p className="text-[10px] text-purple-300/90 font-mono truncate">
-          {user.masked}
+        <p className="text-xs sm:text-sm font-extrabold text-white truncate tracking-tight font-mono">
+          {formatMaskedHandle(user)}
         </p>
 
         {/* Dynamic Streak Badge */}
         <span className="inline-block text-[9px] sm:text-[10px] font-semibold text-amber-300/90 mt-0.5">
-          {user.streak || user.badge}
+          {user.streak || user.badge || 'Active Hunter'}
         </span>
 
         {/* Glowing Points Counter */}
@@ -311,7 +306,33 @@ export default function Leaderboard() {
       try {
         const res = await api.fetchLeaderboard(period);
         if (isMounted && res) {
-          setLeaderboardData(res.data || []);
+          const rawList = (res.data || []).map((u) => {
+            const rawPts = u.pointsRaw !== undefined
+              ? Number(u.pointsRaw)
+              : Number(String(u.points || 0).replace(/[^0-9.-]+/g, '')) || 0;
+            return {
+              ...u,
+              points: rawPts,
+              pointsRaw: rawPts
+            };
+          });
+
+          // Strictly sort descending by numeric points; tie-break on entries then wins
+          rawList.sort((a, b) => {
+            const diff = b.points - a.points;
+            if (diff !== 0) return diff;
+            const entriesDiff = (b.entries || 0) - (a.entries || 0);
+            if (entriesDiff !== 0) return entriesDiff;
+            return (b.wins || 0) - (a.wins || 0);
+          });
+
+          // Assign correct 1-indexed ranks
+          const sortedRanked = rawList.map((u, idx) => ({
+            ...u,
+            rank: idx + 1
+          }));
+
+          setLeaderboardData(sortedRanked);
           if (res.userStanding) setUserStanding(res.userStanding);
           if (res.poolInfo) setPoolInfo(res.poolInfo);
         }
@@ -366,8 +387,52 @@ export default function Leaderboard() {
     }
   };
 
-  const top3 = useMemo(() => (leaderboardData || []).slice(0, 3), [leaderboardData]);
-  const rest = useMemo(() => (leaderboardData || []).slice(3), [leaderboardData]);
+  // Strict descending sort: highest points ALWAYS at Rank #1
+  const sortedLeaderboard = useMemo(() => {
+    if (!leaderboardData || leaderboardData.length === 0) return [];
+
+    const items = leaderboardData.map((u) => {
+      let numericPoints = 0;
+      if (u.pointsRaw !== undefined && u.pointsRaw !== null) {
+        numericPoints = Number(u.pointsRaw) || 0;
+      } else if (typeof u.points === 'number') {
+        numericPoints = u.points;
+      } else if (typeof u.points === 'string') {
+        numericPoints = Number(u.points.replace(/[^0-9.-]+/g, '')) || 0;
+      }
+
+      const masked = u.masked || u.username || (u.customUserId ? `@${u.customUserId}` : '@hunter');
+      const initial = u.initial || u.initials || (u.name ? u.name.slice(0, 2).toUpperCase() : 'VE');
+
+      return {
+        ...u,
+        points: numericPoints,
+        pointsRaw: numericPoints,
+        masked,
+        initial,
+        wins: Number(u.wins) || 0,
+        entries: Number(u.entries) || 0
+      };
+    });
+
+    // Sort strictly descending by points (Highest points first)
+    items.sort((a, b) => {
+      const diff = b.points - a.points;
+      if (diff !== 0) return diff;
+      const entriesDiff = (b.entries || 0) - (a.entries || 0);
+      if (entriesDiff !== 0) return entriesDiff;
+      return (b.wins || 0) - (a.wins || 0);
+    });
+
+    // Reassign sequential ranks starting at 1
+    return items.map((u, idx) => ({
+      ...u,
+      rank: idx + 1
+    }));
+  }, [leaderboardData]);
+
+  const top3 = useMemo(() => (sortedLeaderboard || []).slice(0, 3), [sortedLeaderboard]);
+  const rest = useMemo(() => (sortedLeaderboard || []).slice(3), [sortedLeaderboard]);
 
   // Filtered rows for table
   const filteredRest = useMemo(() => {
@@ -381,15 +446,81 @@ export default function Leaderboard() {
 
   const displayedRest = showAll ? filteredRest : filteredRest.slice(0, 4);
 
-  const me = userStanding || {
-    rank: 128,
-    masked: currentUser?.customUserId ? `@${currentUser.customUserId.toLowerCase()}` : '@you',
-    points: currentUser?.balances?.VES || 2840,
-    nextRankPoints: 4410,
-    nextRank: 10,
-    badge: currentUser?.tier || 'Rising Contender'
-  };
-  const progressPct = Math.min(100, Math.max(5, Math.round(((me.points || 0) / (me.nextRankPoints || 1)) * 100)));
+  const me = useMemo(() => {
+    // 1. Authenticated User Standing
+    if (currentUser?.customUserId || currentUser?.id) {
+      const match = (sortedLeaderboard || []).find(
+        (u) =>
+          u.customUserId === currentUser.customUserId ||
+          String(u.id) === String(currentUser.id || currentUser._id)
+      );
+
+      if (match) {
+        const isLeader = match.rank === 1;
+        const nextTargetUser = (sortedLeaderboard || []).find((u) => u.rank === match.rank - 1);
+        const nextTargetPoints = nextTargetUser ? nextTargetUser.points : match.points + 50;
+
+        return {
+          isAuthenticated: true,
+          rank: match.rank,
+          name: currentUser.name || match.name || 'You',
+          masked: `@${currentUser.customUserId || match.masked?.replace('@', '')}`,
+          points: match.points,
+          wins: match.wins || 0,
+          entries: match.entries || 0,
+          nextRankPoints: nextTargetPoints,
+          nextRank: isLeader ? 1 : match.rank - 1,
+          isLeader,
+          badge: currentUser.tier || match.badge || 'Contender',
+          avatar: match.avatar || currentUser.avatar || null,
+          initials: (currentUser.name || currentUser.customUserId || 'ME').slice(0, 2).toUpperCase()
+        };
+      }
+
+      // Authenticated but fresh (e.g. 0 points or not in top list)
+      const userPoints = currentUser.stats?.points ?? currentUser.balances?.VES ?? 0;
+      const userEntries = currentUser.stats?.entries ?? 0;
+      const firstPlacePoints = sortedLeaderboard[0]?.points || 50;
+
+      return {
+        isAuthenticated: true,
+        rank: (sortedLeaderboard || []).length + 1,
+        name: currentUser.name || 'You',
+        masked: `@${currentUser.customUserId || 'member'}`,
+        points: userPoints,
+        wins: currentUser.stats?.wins || 0,
+        entries: userEntries,
+        nextRankPoints: firstPlacePoints,
+        nextRank: 1,
+        isLeader: false,
+        badge: currentUser.tier || 'New Contender',
+        avatar: currentUser.avatar || null,
+        initials: (currentUser.name || currentUser.customUserId || 'ME').slice(0, 2).toUpperCase()
+      };
+    }
+
+    // 2. Guest User Standing (Unauthenticated)
+    const targetPoints = sortedLeaderboard[0]?.points || 50;
+    return {
+      isAuthenticated: false,
+      rank: 'Unranked',
+      name: 'Guest Visitor',
+      masked: '@guest',
+      points: 0,
+      wins: 0,
+      entries: 0,
+      nextRankPoints: targetPoints,
+      nextRank: 1,
+      isLeader: false,
+      badge: 'Unranked Visitor',
+      avatar: null,
+      initials: 'GU'
+    };
+  }, [currentUser, sortedLeaderboard]);
+
+  const progressPct = me.isLeader
+    ? 100
+    : Math.min(100, Math.max(0, Math.round(((me.points || 0) / (me.nextRankPoints || 50)) * 100)));
 
   const PERKS = [
     { icon: Trophy, label: 'Grand Champion NFT', desc: 'Exclusive on-chain gold verifiable badge', color: 'text-amber-400', bg: 'bg-amber-500/10 border-amber-500/20' },
@@ -399,7 +530,7 @@ export default function Leaderboard() {
   ];
 
   return (
-    <section className="w-full space-y-7 relative">
+    <section id="leaderboard" className="w-full space-y-7 relative scroll-mt-20">
 
       {/* ── Top Header Bar ── */}
       <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-5 p-5 sm:p-6 rounded-3xl bg-[#0d0a1a]/80 border border-purple-500/20 backdrop-blur-2xl shadow-[0_10px_35px_rgba(0,0,0,0.35)] relative overflow-hidden">
@@ -641,17 +772,14 @@ export default function Leaderboard() {
                       </div>
                     </div>
 
-                    {/* User & Avatar Info */}
+                    {/* User & Avatar Info — Rule 25 Compliant */}
                     <div className="flex items-center gap-3 min-w-0 w-full">
-                      <Avatar initial={user.initial} avatar={user.avatar} gradientStyle={user.gradientStyle} size="sm" />
+                      <Avatar gradientStyle={user.gradientStyle} size="sm" />
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-2">
-                          <p className="text-xs sm:text-sm font-bold text-white truncate group-hover:text-purple-300 transition-colors">
-                            {user.name || 'Hunter'}
+                          <p className="text-xs sm:text-sm font-bold text-white truncate group-hover:text-purple-300 transition-colors font-mono">
+                            {formatMaskedHandle(user)}
                           </p>
-                          <span className="text-[10px] text-purple-400/90 font-mono">
-                            {user.masked}
-                          </span>
                         </div>
                         <div className="flex items-center gap-2 mt-0.5">
                           <span className="text-[10px] font-semibold text-slate-400 px-2 py-0.5 rounded-md bg-white/5 border border-white/5">
@@ -721,44 +849,71 @@ export default function Leaderboard() {
           {/* User Info */}
           <div className="flex items-center gap-4">
             <div className="relative">
-              <div className="w-13 h-13 rounded-2xl bg-gradient-to-br from-[#6366F1] to-[#7C3AED] flex items-center justify-center text-white font-black text-base shadow-[0_0_20px_rgba(124,58,237,0.5)] ring-2 ring-purple-400/40">
-                {currentUser ? currentUser.customUserId?.slice(-2).toUpperCase() || 'ME' : 'ME'}
-              </div>
+              {me.avatar ? (
+                <div className="w-13 h-13 rounded-2xl overflow-hidden border border-purple-400/40 shadow-[0_0_20px_rgba(124,58,237,0.5)] shrink-0">
+                  <img src={me.avatar} alt={me.name} className="w-full h-full object-cover" />
+                </div>
+              ) : (
+                <div className="w-13 h-13 rounded-2xl bg-gradient-to-br from-[#6366F1] to-[#7C3AED] flex items-center justify-center text-white font-black text-base shadow-[0_0_20px_rgba(124,58,237,0.5)] ring-2 ring-purple-400/40 shrink-0">
+                  {me.initials}
+                </div>
+              )}
               <span className="absolute -bottom-1 -right-1 px-1.5 py-0.2 rounded-md bg-purple-600 text-[9px] font-black text-white uppercase tracking-wider shadow">
-                YOU
+                {me.isAuthenticated ? 'YOU' : 'GUEST'}
               </span>
             </div>
 
             <div>
-              <div className="flex items-center gap-2">
-                <p className="text-base font-extrabold text-white">Your Leaderboard Standing</p>
-                <span className="px-2.5 py-0.5 rounded-full text-xs font-black bg-purple-500/25 border border-purple-500/40 text-purple-200">
-                  Rank #{me.rank}
+              <div className="flex items-center gap-2 flex-wrap">
+                <p className="text-base font-extrabold text-white">{me.name}</p>
+                <span className={`px-2.5 py-0.5 rounded-full text-xs font-black ${
+                  me.isLeader
+                    ? 'bg-amber-500/25 border border-amber-500/40 text-amber-300 shadow-[0_0_12px_rgba(245,158,11,0.3)]'
+                    : me.isAuthenticated
+                      ? 'bg-purple-500/25 border border-purple-500/40 text-purple-200'
+                      : 'bg-white/10 border border-white/10 text-slate-400'
+                }`}>
+                  {me.isLeader ? '👑 Rank #1 Leader' : me.isAuthenticated ? `Rank #${me.rank}` : 'Unranked'}
                 </span>
               </div>
               <p className="text-xs text-slate-400 font-mono mt-0.5">
-                {currentUser?.customUserId ? `@${currentUser.customUserId}` : me.masked} • <span className="text-purple-300 font-semibold">{me.badge}</span>
+                {me.masked} • <span className="text-purple-300 font-semibold">{me.badge}</span>
+                {me.entries > 0 && <span className="text-slate-500"> • {me.entries} {me.entries === 1 ? 'Entry' : 'Entries'}</span>}
               </p>
             </div>
           </div>
 
-          {/* Progress bar towards Top 10 */}
+          {/* Progress bar towards Next Rank */}
           <div className="flex-1 w-full lg:max-w-md">
             <div className="flex justify-between items-center text-xs mb-1.5">
               <span className="text-slate-300 font-bold">{me.points.toLocaleString()} VEs Earned</span>
-              <span className="text-purple-400 font-bold">Target Rank #{me.nextRank}: {me.nextRankPoints.toLocaleString()} VEs</span>
+              <span className="text-purple-400 font-bold">
+                {me.isLeader ? '👑 Holding #1 Spot' : `Target Rank #${me.nextRank}: ${me.nextRankPoints.toLocaleString()} VEs`}
+              </span>
             </div>
             <div className="w-full h-3 rounded-full bg-white/10 p-0.5 overflow-hidden ring-1 ring-white/10">
               <motion.div
                 initial={{ width: 0 }}
                 animate={{ width: `${progressPct}%` }}
                 transition={{ duration: 1.2, ease: 'easeOut', delay: 0.2 }}
-                className="h-full rounded-full bg-gradient-to-r from-[#6366F1] via-[#a855f7] to-[#ec4899] shadow-[0_0_12px_rgba(168,85,247,0.8)]"
+                className={`h-full rounded-full ${
+                  me.isLeader
+                    ? 'bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 shadow-[0_0_15px_rgba(245,158,11,0.8)]'
+                    : 'bg-gradient-to-r from-[#6366F1] via-[#a855f7] to-[#ec4899] shadow-[0_0_12px_rgba(168,85,247,0.8)]'
+                }`}
               />
             </div>
             <div className="flex justify-between items-center mt-1.5 text-[11px]">
-              <span className="text-slate-400 font-medium">{progressPct}% of Top 10 Entry</span>
-              <span className="text-emerald-400 font-semibold">Needs +{(me.nextRankPoints - me.points).toLocaleString()} VEs to break Top 10!</span>
+              <span className="text-slate-400 font-medium">
+                {me.isLeader ? '100% Top Position' : `${progressPct}% to Rank #${me.nextRank}`}
+              </span>
+              <span className={me.isLeader ? 'text-amber-300 font-semibold' : 'text-emerald-400 font-semibold'}>
+                {me.isLeader
+                  ? 'Active Champion of Season 1!'
+                  : me.isAuthenticated
+                    ? `Needs +${Math.max(0, me.nextRankPoints - me.points).toLocaleString()} VEs to climb!`
+                    : 'Enter live giveaways to earn rank!'}
+              </span>
             </div>
           </div>
 
@@ -769,7 +924,7 @@ export default function Leaderboard() {
               className="w-full sm:w-auto px-5 py-2.5 rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white text-xs font-bold text-center shadow-[0_0_20px_rgba(124,58,237,0.4)] transition-all hover:scale-105 active:scale-95 flex items-center justify-center gap-2 cursor-pointer"
             >
               <Zap className="w-4 h-4 text-yellow-300 fill-yellow-300" />
-              Boost My Rank Now
+              {me.isAuthenticated ? 'Boost My Rank' : 'Enter Live Draws'}
             </a>
           </div>
         </div>

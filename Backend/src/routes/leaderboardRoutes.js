@@ -64,28 +64,23 @@ router.get('/', async (req, res) => {
         points = stats.weeklyPoints || Math.round((stats.points || 0) * 0.4) || 0;
       }
 
-      const masked = u.customUserId
-        ? `@${u.customUserId}`
-        : `@user_${String(u._id).slice(-4)}`;
+      const rawId = u.customUserId || String(u._id);
+      const clean = rawId.replace(/^@/, '');
+      const masked = clean.length >= 4
+        ? `@${clean.slice(0, 2).toLowerCase()}****${clean.slice(-2).toLowerCase()}`
+        : '@ve****99';
 
-      const initials = (u.name || 'Hunter')
-        .split(' ')
-        .map((p) => p[0])
-        .join('')
-        .toUpperCase()
-        .slice(0, 2);
-
-      const avatar = stats.avatar || u.avatar || null;
       const streak = (stats.wins && stats.wins > 0) ? `⚡ ${stats.wins} Win Streak` : 'Active Hunter';
 
       return {
         id: u._id,
-        customUserId: u.customUserId,
-        name: u.name || 'Community Hunter',
+        customUserId: masked,
+        name: masked,
         masked,
-        avatar,
-        initial: initials,
+        avatar: null, // Rule 25: Never expose real user photos
+        initial: 'VE', // Rule 25: Generic stylized cyber badge
         points: Number(points) || 0,
+        pointsRaw: Number(points) || 0,
         wins: Number(stats.wins) || 0,
         entries: Number(stats.entries) || 0,
         change: 0,
@@ -95,8 +90,14 @@ router.get('/', async (req, res) => {
       };
     });
 
-    // Sort descending by points
-    computedUsers.sort((a, b) => b.points - a.points);
+    // Strictly sort descending by points (Highest points first, with tie-breakers)
+    computedUsers.sort((a, b) => {
+      const diff = Number(b.points) - Number(a.points);
+      if (diff !== 0) return diff;
+      const entriesDiff = Number(b.entries) - Number(a.entries);
+      if (entriesDiff !== 0) return entriesDiff;
+      return Number(b.wins) - Number(a.wins);
+    });
 
     // Assign rank and reliable CSS gradients
     const STYLES = [

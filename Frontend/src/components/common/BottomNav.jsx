@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Home, Gift, Sparkles, BookOpen, User } from 'lucide-react';
+import { Home, Gift, Trophy, BookOpen, User } from 'lucide-react';
 
 export default function BottomNav() {
   const { pathname } = useLocation();
@@ -15,6 +15,15 @@ export default function BottomNav() {
     }
   };
 
+  const scrollToLeaderboard = () => {
+    const target = document.getElementById('leaderboard') || document.querySelector('[id*="leaderboard"]');
+    if (target) {
+      target.scrollIntoView({ behavior: 'smooth' });
+    } else {
+      window.scrollTo({ top: 900, behavior: 'smooth' });
+    }
+  };
+
   const handleGiveawaysClick = (e) => {
     if (e) e.preventDefault();
     if (pathname === '/' || pathname === '/giveaways') {
@@ -23,6 +32,18 @@ export default function BottomNav() {
       navigate('/');
       setTimeout(() => {
         scrollToGiveaways();
+      }, 150);
+    }
+  };
+
+  const handleRankingsClick = (e) => {
+    if (e) e.preventDefault();
+    if (pathname === '/') {
+      scrollToLeaderboard();
+    } else {
+      navigate('/');
+      setTimeout(() => {
+        scrollToLeaderboard();
       }, 150);
     }
   };
@@ -75,23 +96,24 @@ export default function BottomNav() {
           <span className="text-[10px] font-semibold tracking-tight leading-none">Giveaways</span>
         </button>
 
-        {/* 3. Center Floating Luxury CTA */}
+        {/* 3. Center Floating Luxury Trophy / Rankings CTA */}
         <div className="relative -top-5 flex flex-col items-center">
           <button
             type="button"
-            onClick={handleGiveawaysClick}
-            className="w-13 h-13 rounded-full bg-gradient-to-tr from-[#6366F1] via-[#8B5CF6] to-[#ec4899]
-              p-[2px] shadow-[0_0_25px_rgba(147,51,234,0.65)]
-              hover:shadow-[0_0_35px_rgba(147,51,234,0.9)]
+            onClick={handleRankingsClick}
+            className="w-13 h-13 rounded-full bg-gradient-to-tr from-amber-400 via-purple-600 to-[#ec4899]
+              p-[2px] shadow-[0_0_25px_rgba(245,158,11,0.5)]
+              hover:shadow-[0_0_35px_rgba(245,158,11,0.8)]
               active:scale-90 transition-all duration-150 cursor-pointer group"
-            aria-label="Join Active Giveaways"
-            title="Join Active Giveaways"
+            aria-label="View Leaderboard & Rankings"
+            title="View Leaderboard & Rankings"
           >
-            <div className="w-full h-full rounded-full bg-[#0e0a1c] flex items-center justify-center group-hover:bg-opacity-80 transition-colors">
-              <Sparkles className="w-6 h-6 text-white group-hover:rotate-12 transition-transform drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]" />
+            <div className="w-full h-full rounded-full bg-[#0e0a1c] flex items-center justify-center group-hover:bg-[#18112e] transition-colors relative overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-t from-amber-500/20 via-transparent to-transparent opacity-60" />
+              <Trophy className="w-6 h-6 text-amber-300 group-hover:scale-110 transition-transform drop-shadow-[0_0_8px_rgba(245,158,11,0.8)] relative z-10" />
             </div>
           </button>
-          <span className="text-[9px] font-extrabold tracking-wider text-purple-300 mt-1 uppercase">Win</span>
+          <span className="text-[9px] font-extrabold tracking-wider text-amber-300 mt-1 uppercase">Rankings</span>
         </div>
 
         {/* 4. My Entries Tab */}
