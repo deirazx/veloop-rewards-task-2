@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Bell,
@@ -15,15 +15,20 @@ import {
   Ticket,
   Sparkles,
   ChevronRight,
-  ShieldCheck
+  ShieldCheck,
+  CheckCheck,
+  CheckCircle2,
+  ArrowRight
 } from 'lucide-react';
 import { useGiveaway } from '../../context/GiveawayContext';
 
 export default function Navbar() {
   const { balances, currentUser, logoutUser, isAuthenticated, giveaways, joinedGiveaways } = useGiveaway();
   const location = useLocation();
+  const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
   const [bellOpen, setBellOpen] = useState(false);
+  const bellRef = useRef(null);
 
   // Close menus on route change
   useEffect(() => {
@@ -31,39 +36,190 @@ export default function Navbar() {
     setBellOpen(false);
   }, [location.pathname]);
 
-  const activeGiveaways = (giveaways || []).filter((g) => g.status === 'ACTIVE');
-  const firstActive = activeGiveaways[0];
-
-  const notifications = [
-    firstActive ? {
-      id: 'active_pool',
-      title: `${firstActive.title} Live`,
-      desc: `Spots filling fast! Entry fee: ${firstActive.entryFee} ${firstActive.currency}. Join now.`,
-      time: 'Live Now'
-    } : null,
-    isAuthenticated ? {
-      id: 'wallet_status',
-      title: 'Wallet Synced',
-      desc: `${(balances.VES ?? balances.VEs ?? 0).toLocaleString()} VEs ready to use for entries.`,
-      time: 'Just now'
-    } : {
-      id: 'guest_prompt',
-      title: 'Welcome to Veloop',
-      desc: 'Sign in to access your VEs wallet and enter exclusive draws.',
-      time: 'Info'
-    },
-    (joinedGiveaways && joinedGiveaways.length > 0) ? {
-      id: 'joined_status',
-      title: 'Active Tickets',
-      desc: `You have confirmed entries in ${joinedGiveaways.length} giveaway pool(s).`,
-      time: 'Active'
-    } : {
-      id: 'fairness_notice',
-      title: 'Provably Fair Protocol',
-      desc: 'All winners are randomly selected and audited via cryptographic backend hash.',
-      time: 'Verified'
+  // Click outside to close notification dropdown & Escape key listener
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (bellRef.current && !bellRef.current.contains(e.target)) {
+        setBellOpen(false);
+      }
+    };
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') setBellOpen(false);
+    };
+    if (bellOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener('keydown', handleKeyDown);
     }
-  ].filter(Boolean);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [bellOpen]);
+
+  // Read notifications state stored in localStorage for authentic website UX
+  const [readIds, setReadIds] = useState(() => {
+    try {
+      const saved = localStorage.getItem('veloop_read_notifs');
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
+
+  const activeGiveaways = (giveaways || []).filter((g) => g.status === 'ACTIVE');
+  const endedGiveaways = (giveaways || []).filter((g) => g.status === 'ENDED' || g.status === 'ARCHIVED');
+
+  const notifications = useMemo(() => {
+    const list = [];
+
+    // 1. Live Active Giveaways from Backend Database (Top active pools)
+    activeGiveaways.slice(0, 2).forEach((g) => {
+      const taken = Number(g.spotsTaken ?? g.currentEntries ?? 0);
+      const total = Number(g.totalSpots ?? g.maxEntries ?? 1000);
+      list.push({
+        id: 'gw_live_' + (g.slug || g.id || g.giveawayId),
+        type: 'GIVEAWAY',
+        title: `${g.title} Live`,
+        desc: `${taken} of ${total} entries taken (${Math.round((taken / (total || 1)) * 100)}%). Entry fee: ${g.cost ?? g.entryFee} ${g.currency}.`,
+        time: 'Live',
+        link: `/giveaway/${g.slug || g.id || g.giveawayId}`,
+        icon: <Gift className="w-4 h-4 text-purple-400" />,
+        iconBg: 'bg-purple-500/15 border-purple-500/30'
+      });
+    });
+
+    // 2. Real User Wallet Status from Backend User Record
+    if (isAuthenticated && currentUser) {
+      list.push({
+        id: `wallet_${currentUser.customUserId || currentUser.id || 'auth'}_${balances.VES ?? balances.VEs ?? 0}_${balances.Tokens ?? 0}`,
+        type: 'WALLET',
+        title: `Wallet Synced (${currentUser.customUserId || 'Member'})`,
+        desc: `Live balance: ${(balances.VES ?? balances.VEs ?? 0).toLocaleString()} VEs, ${(balances.SVES ?? balances.SVEs ?? 0).toLocaleString()} SVEs & ${(balances.Tokens ?? 0).toLocaleString()} Tokens available.`,
+        time: 'Live',
+        link: '/profile',
+        icon: <Coins className="w-4 h-4 text-amber-400" />,
+        iconBg: 'bg-amber-500/15 border-amber-500/30'
+      });
+    } else {
+      list.push({
+        id: 'guest_auth_prompt',
+        type: 'AUTH',
+        title: 'Welcome to VELOOP Rewards',
+        desc: `Sign in to access your VEs wallet and enter any of the ${activeGiveaways.length} live giveaway pools.`,
+        time: 'Info',
+        link: '/login',
+        icon: <Zap className="w-4 h-4 text-purple-400" />,
+        iconBg: 'bg-purple-500/15 border-purple-500/30'
+      });
+    }
+
+    // 3. Real User Tickets / Participations from Backend
+    if (isAuthenticated && currentUser && joinedGiveaways && joinedGiveaways.length > 0) {
+      const enteredPools = (giveaways || []).filter(
+        (g) =>
+          joinedGiveaways.includes(g.id) ||
+          joinedGiveaways.includes(g.giveawayId) ||
+          joinedGiveaways.includes(g.slug)
+      );
+      const names = enteredPools.map((g) => g.title).filter(Boolean);
+      const entrySummary =
+        names.length > 0
+          ? `Confirmed in: ${names.slice(0, 2).join(', ')}${names.length > 2 ? ` +${names.length - 2} more` : ''}. Countdown active!`
+          : `You have ${joinedGiveaways.length} confirmed draw ticket(s) locked in. Good luck!`;
+
+      list.push({
+        id: `tickets_joined_${joinedGiveaways.length}_${joinedGiveaways.slice(0, 3).join('_')}`,
+        type: 'TICKETS',
+        title: `${joinedGiveaways.length} Active Ticket(s) in Play`,
+        desc: entrySummary,
+        time: 'Active',
+        link: '/entries',
+        icon: <Ticket className="w-4 h-4 text-cyan-400" />,
+        iconBg: 'bg-cyan-500/15 border-cyan-500/30'
+      });
+    } else if (isAuthenticated && currentUser) {
+      list.push({
+        id: 'no_tickets_reminder',
+        type: 'TICKETS',
+        title: 'No Active Tickets Yet',
+        desc: `You have 0 active draw entries. Use your ${(balances.VES ?? balances.VEs ?? 0).toLocaleString()} VEs to enter an active pool now.`,
+        time: 'Tip',
+        link: '/#active-giveaways',
+        icon: <Ticket className="w-4 h-4 text-cyan-400" />,
+        iconBg: 'bg-cyan-500/15 border-cyan-500/30'
+      });
+    }
+
+    // 4. Concluded Draws from Backend (if any ended) OR Live Security Protocol
+    if (endedGiveaways.length > 0) {
+      const lastEnded = endedGiveaways[0];
+      const topWinner = lastEnded.winners?.[0];
+      const winnerDisplay = topWinner?.maskedUserId || topWinner?.customUserId || 'Audited Player';
+      list.push({
+        id: 'ended_draw_' + (lastEnded.slug || lastEnded.id || lastEnded.giveawayId),
+        type: 'WINNER',
+        title: `Draw Complete: ${lastEnded.title}`,
+        desc: topWinner
+          ? `Official winner: ${winnerDisplay}. Verified on SHA-256 draw seed.`
+          : 'Draw concluded with cryptographic provably fair verification.',
+        time: 'Concluded',
+        link: '/winners',
+        icon: <Trophy className="w-4 h-4 text-amber-400" />,
+        iconBg: 'bg-amber-500/15 border-amber-500/30'
+      });
+    } else {
+      list.push({
+        id: 'security_fairness_protocol',
+        type: 'SECURITY',
+        title: 'Provably Fair Protocol Active',
+        desc: `All ${activeGiveaways.length} live giveaways use deterministic SHA-256 seed hashing for transparent winner selection.`,
+        time: 'Verified',
+        link: '/winners',
+        icon: <ShieldCheck className="w-4 h-4 text-emerald-400" />,
+        iconBg: 'bg-emerald-500/15 border-emerald-500/30'
+      });
+    }
+
+    return list;
+  }, [activeGiveaways, endedGiveaways, isAuthenticated, currentUser, balances, joinedGiveaways, giveaways]);
+
+  const unreadCount = notifications.filter((n) => !readIds.includes(n.id)).length;
+
+  const markAsRead = (id) => {
+    setReadIds((prev) => {
+      const updated = Array.from(new Set([...prev, id]));
+      localStorage.setItem('veloop_read_notifs', JSON.stringify(updated));
+      return updated;
+    });
+  };
+
+  const markAllAsRead = () => {
+    const allIds = notifications.map((n) => n.id);
+    setReadIds(allIds);
+    localStorage.setItem('veloop_read_notifs', JSON.stringify(allIds));
+  };
+
+  const handleNotificationClick = (notif) => {
+    markAsRead(notif.id);
+    setBellOpen(false);
+    if (notif.link) {
+      if (notif.link.startsWith('/#')) {
+        const targetId = notif.link.replace('/#', '');
+        if (location.pathname === '/') {
+          const el = document.getElementById(targetId);
+          if (el) el.scrollIntoView({ behavior: 'smooth' });
+        } else {
+          navigate('/');
+          setTimeout(() => {
+            const el = document.getElementById(targetId);
+            if (el) el.scrollIntoView({ behavior: 'smooth' });
+          }, 200);
+        }
+      } else {
+        navigate(notif.link);
+      }
+    }
+  };
 
   const navLinks = [
     { label: 'Discover', path: '/' },
@@ -127,46 +283,162 @@ export default function Navbar() {
         {/* ── Right side controls ── */}
         <div className="flex items-center gap-2 sm:gap-2.5">
           {/* Notifications button */}
-          <div className="relative">
+          <div className="relative" ref={bellRef}>
             <button
               onClick={() => {
                 setBellOpen((v) => !v);
                 setMenuOpen(false);
               }}
-              className="p-2 sm:p-2.5 rounded-xl text-slate-400 hover:text-white transition relative cursor-pointer border border-transparent hover:border-white/10"
+              className={`p-2 sm:p-2.5 rounded-xl transition-all relative cursor-pointer border ${
+                bellOpen
+                  ? 'bg-purple-500/20 text-purple-300 border-purple-500/40 shadow-[0_0_15px_rgba(168,85,247,0.3)]'
+                  : 'text-slate-400 hover:text-white border-transparent hover:border-white/10 hover:bg-white/5'
+              }`}
               title="Notifications"
             >
               <Bell className="w-4 h-4 sm:w-5 sm:h-5" strokeWidth={1.5} />
-              <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-[#a855f7] animate-pulse" />
+              {unreadCount > 0 ? (
+                <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-gradient-to-r from-[#6366F1] to-[#a855f7] text-white text-[10px] font-black flex items-center justify-center shadow-[0_0_12px_rgba(168,85,247,0.8)] border border-white/20 animate-pulse">
+                  {unreadCount}
+                </span>
+              ) : null}
             </button>
 
-            {bellOpen && (
-              <div className="absolute right-0 mt-2 w-80 max-w-[calc(100vw-2rem)] rounded-2xl bg-[#13131a] border border-white/10 shadow-2xl p-4 z-50 space-y-3">
-                <div className="flex items-center justify-between pb-2 border-b border-white/5">
-                  <span className="text-xs font-bold text-white flex items-center gap-1.5">
-                    <Bell className="w-3.5 h-3.5 text-[#a855f7]" /> Notifications
-                  </span>
-                  <button
+            <AnimatePresence>
+              {bellOpen && (
+                <>
+                  {/* Backdrop for mobile to easily dismiss by tapping outside */}
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.15 }}
                     onClick={() => setBellOpen(false)}
-                    className="text-[10px] text-slate-400 hover:text-white"
-                  >
-                    Close
-                  </button>
-                </div>
+                    className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 sm:hidden"
+                  />
 
-                <div className="space-y-2 max-h-60 overflow-y-auto">
-                  {notifications.map((n) => (
-                    <div key={n.id} className="p-2.5 rounded-xl bg-[#09090b] border border-white/5 space-y-1 text-left">
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs font-bold text-white truncate">{n.title}</span>
-                        <span className="text-[10px] text-slate-500">{n.time}</span>
+                  <motion.div
+                    initial={{ opacity: 0, y: 8, scale: 0.96 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 8, scale: 0.96 }}
+                    transition={{ duration: 0.16, ease: 'easeOut' }}
+                    className="fixed left-3 right-3 top-[70px] sm:top-full sm:mt-2 sm:absolute sm:left-auto sm:right-0 sm:w-96 rounded-2xl bg-[#11111a] border border-purple-500/30 shadow-[0_20px_60px_rgba(0,0,0,0.95)] p-4 z-50 space-y-3 backdrop-blur-2xl"
+                  >
+                    {/* Header */}
+                    <div className="flex items-center justify-between pb-2.5 border-b border-white/10">
+                      <div className="flex items-center gap-2">
+                        <div className="w-6 h-6 rounded-lg bg-purple-500/20 border border-purple-500/30 flex items-center justify-center">
+                          <Bell className="w-3.5 h-3.5 text-purple-400" />
+                        </div>
+                        <span className="text-xs font-black text-white tracking-wide uppercase">
+                          Notifications
+                        </span>
+                        {unreadCount > 0 ? (
+                          <span className="px-1.5 py-0.2 rounded-full bg-purple-500/20 border border-purple-500/40 text-[10px] font-mono font-bold text-purple-300 animate-pulse">
+                            {unreadCount} New
+                          </span>
+                        ) : null}
                       </div>
-                      <p className="text-[11px] text-slate-400 leading-snug">{n.desc}</p>
+
+                      <div className="flex items-center gap-2">
+                        {unreadCount > 0 ? (
+                          <button
+                            onClick={markAllAsRead}
+                            className="text-[11px] font-semibold text-purple-400 hover:text-purple-300 hover:underline flex items-center gap-1 cursor-pointer"
+                          >
+                            <CheckCheck className="w-3.5 h-3.5" />
+                            <span>Mark all read</span>
+                          </button>
+                        ) : (
+                          <span className="text-[10px] text-slate-500 font-mono flex items-center gap-1">
+                            <CheckCheck className="w-3 h-3 text-emerald-400" /> All read
+                          </span>
+                        )}
+                        <button
+                          onClick={() => setBellOpen(false)}
+                          className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 transition cursor-pointer"
+                          title="Close"
+                        >
+                          <X className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
                     </div>
-                  ))}
-                </div>
-              </div>
-            )}
+
+                    {/* List of notifications */}
+                    <div className="space-y-2 max-h-72 overflow-y-auto pr-0.5">
+                      {notifications.length === 0 ? (
+                        <div className="py-8 text-center flex flex-col items-center justify-center gap-2">
+                          <div className="w-10 h-10 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
+                            <CheckCircle2 className="w-5 h-5" />
+                          </div>
+                          <p className="text-xs font-bold text-white">You're all caught up!</p>
+                          <p className="text-[10px] text-slate-400">No new notifications at this moment.</p>
+                        </div>
+                      ) : (
+                        notifications.map((n) => {
+                          const isRead = readIds.includes(n.id);
+                          return (
+                            <div
+                              key={n.id}
+                              onClick={() => handleNotificationClick(n)}
+                              className={`p-3 rounded-xl border transition-all cursor-pointer flex items-start gap-3 group relative ${
+                                isRead
+                                  ? 'bg-white/[0.02] border-white/5 hover:border-white/10 opacity-75 hover:opacity-100'
+                                  : 'bg-[#181826] border-purple-500/30 hover:border-purple-500/50 shadow-md'
+                              }`}
+                            >
+                              {/* Icon badge */}
+                              <div className={`w-8 h-8 rounded-xl border flex items-center justify-center shrink-0 mt-0.5 ${n.iconBg}`}>
+                                {n.icon}
+                              </div>
+
+                              {/* Content */}
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center justify-between gap-1 mb-0.5">
+                                  <span className={`text-xs font-bold truncate group-hover:text-purple-300 transition-colors ${isRead ? 'text-slate-300' : 'text-white'}`}>
+                                    {n.title}
+                                  </span>
+                                  <span className="text-[10px] font-mono text-slate-500 shrink-0">
+                                    {n.time}
+                                  </span>
+                                </div>
+                                <p className="text-[11px] text-slate-400 leading-snug line-clamp-2">
+                                  {n.desc}
+                                </p>
+                              </div>
+
+                              {/* Action Arrow & Unread indicator */}
+                              <div className="flex flex-col items-center gap-1.5 shrink-0 pt-0.5">
+                                {!isRead && (
+                                  <span className="w-2 h-2 rounded-full bg-purple-400 shadow-[0_0_8px_rgba(168,85,247,0.8)] animate-pulse" />
+                                )}
+                                <ArrowRight className="w-3.5 h-3.5 text-slate-500 group-hover:text-purple-400 group-hover:translate-x-0.5 transition-all" />
+                              </div>
+                            </div>
+                          );
+                        })
+                      )}
+                    </div>
+
+                    {/* Footer */}
+                    <div className="pt-2.5 border-t border-white/5 flex items-center justify-between text-[11px] text-slate-400">
+                      <span className="flex items-center gap-1 font-mono text-[10px]">
+                        <ShieldCheck className="w-3 h-3 text-emerald-400" />
+                        <span>Live Event Alerts</span>
+                      </span>
+                      <Link
+                        to="/winners"
+                        onClick={() => setBellOpen(false)}
+                        className="text-purple-400 hover:text-purple-300 font-bold flex items-center gap-1 hover:underline"
+                      >
+                        <span>Winners Hub</span>
+                        <ArrowRight className="w-3 h-3" />
+                      </Link>
+                    </div>
+                  </motion.div>
+                </>
+              )}
+            </AnimatePresence>
           </div>
 
           {/* Desktop Authenticated View */}
@@ -391,6 +663,34 @@ export default function Navbar() {
                 <div className="text-[10px] font-mono uppercase tracking-widest text-slate-500 font-bold px-1">
                   Explore Platform
                 </div>
+
+                {/* Mobile Drawer Notification Trigger */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMenuOpen(false);
+                    setBellOpen(true);
+                  }}
+                  className="w-full flex items-center justify-between p-3 rounded-xl border transition-all bg-[#141422] hover:bg-[#19192b] border-purple-500/30 text-slate-200 hover:text-white cursor-pointer"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-xl bg-purple-500/20 border border-purple-500/40 flex items-center justify-center text-purple-400">
+                      <Bell className="w-4 h-4" />
+                    </div>
+                    <div className="text-left">
+                      <div className="text-xs font-bold text-white flex items-center gap-2">
+                        Notifications Center
+                        {unreadCount > 0 && (
+                          <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-purple-500/30 text-purple-300 border border-purple-500/40 animate-pulse">
+                            {unreadCount} New
+                          </span>
+                        )}
+                      </div>
+                      <div className="text-[10px] text-slate-400">Live draw alerts, wallet updates & tickets</div>
+                    </div>
+                  </div>
+                  <ChevronRight className="w-4 h-4 text-slate-500" />
+                </button>
 
                 <Link
                   to="/"
