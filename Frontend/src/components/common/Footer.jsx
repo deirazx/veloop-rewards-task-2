@@ -3,14 +3,12 @@ import {
   Gift,
   ShieldCheck,
   Trophy,
-  Ticket,
   Coins,
   Zap,
-  Sparkles,
-  ArrowUpRight,
   Lock,
   CheckCircle2,
-  Heart
+  Mail,
+  HelpCircle
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
@@ -24,7 +22,7 @@ export default function Footer() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 space-y-10">
         
-        {/* ── Top Row: Brand & Live Protocol Status ── */}
+        {/* ── Top Row: Brand & Support Query Banner ── */}
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 pb-8 border-b border-white/10">
           <div className="space-y-2 max-w-md">
             <Link to="/" className="flex items-center gap-2.5 group w-fit">
@@ -46,53 +44,63 @@ export default function Footer() {
             </p>
           </div>
 
-          {/* Status Pills */}
-          <div className="flex flex-wrap items-center gap-3">
-            <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-mono text-[11px] font-semibold shadow-[0_0_12px_rgba(16,185,129,0.15)]">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-              <span>Protocol: 100% Operational</span>
+          {/* Section 101 Compliance: Exact Support Contact Banner */}
+          <div className="p-4 rounded-2xl bg-[#120f24] border border-purple-500/25 flex flex-col sm:flex-row items-start sm:items-center gap-3.5 shadow-lg">
+            <div className="w-10 h-10 rounded-xl bg-purple-500/15 border border-purple-500/30 flex items-center justify-center text-purple-400 shrink-0">
+              <HelpCircle className="w-5 h-5" />
             </div>
-
-            <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-purple-500/10 border border-purple-500/30 text-purple-300 font-mono text-[11px] font-semibold">
-              <ShieldCheck className="w-3.5 h-3.5 text-purple-400" />
-              <span>SHA-256 PRNG Audited</span>
+            <div>
+              <p className="text-xs text-slate-300 font-semibold">
+                Have questions? Contact VELOOP Rewards support.
+              </p>
+              <a
+                href="mailto:support@veloop.io"
+                className="inline-flex items-center gap-1.5 text-xs text-purple-400 hover:text-purple-300 font-bold mt-1 transition-colors group"
+              >
+                <Mail className="w-3.5 h-3.5" />
+                <span>support@veloop.io</span>
+              </a>
+            </div>
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-mono text-[10px] font-semibold sm:ml-auto">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+              <span>24/7 Live Agent</span>
             </div>
           </div>
         </div>
 
-        {/* ── Middle Grid: Rich Navigation Directories ── */}
+        {/* ── Middle Grid: Quick Links & Directories (Section 101) ── */}
         <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-8">
           
-          {/* Col 1: Platform */}
+          {/* Col 1: Mandatory Quick Links (Section 101) */}
           <div className="space-y-3">
             <h4 className="text-xs font-mono uppercase tracking-widest text-white font-bold flex items-center gap-1.5">
-              <Gift className="w-3.5 h-3.5 text-purple-400" /> Platform Pools
+              <Gift className="w-3.5 h-3.5 text-purple-400" /> Quick Links
             </h4>
             <ul className="space-y-2 text-xs">
               <li>
-                <Link to="/#active-giveaways" className="hover:text-purple-300 transition flex items-center gap-1">
-                  Active Giveaways <span className="text-[9px] font-bold px-1.5 py-0.2 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">LIVE</span>
+                <Link to="/" className="hover:text-purple-300 transition flex items-center gap-1">
+                  Giveaway Home
                 </Link>
               </li>
               <li>
-                <Link to="/giveaway/apple-iphone-15-pro-256gb" className="hover:text-purple-300 transition">
-                  Apple iPhone 15 Pro
-                </Link>
+                <a href="/#rules" className="hover:text-purple-300 transition flex items-center gap-1">
+                  Rules
+                </a>
               </li>
               <li>
-                <Link to="/giveaway/amazon-2000-shopping-gift-voucher" className="hover:text-purple-300 transition">
-                  Amazon ₹2,000 Voucher
-                </Link>
+                <a href="/#rules" className="hover:text-purple-300 transition flex items-center gap-1">
+                  Terms
+                </a>
               </li>
               <li>
-                <Link to="/giveaway/apple-watch-series-9-gps" className="hover:text-purple-300 transition">
-                  Apple Watch Series 9
-                </Link>
+                <a href="/#rules" className="hover:text-purple-300 transition flex items-center gap-1">
+                  Privacy
+                </a>
               </li>
               <li>
-                <Link to="/giveaway/20-instant-recharge-voucher" className="hover:text-purple-300 transition">
-                  Daily Micro-Recharge
-                </Link>
+                <a href="mailto:support@veloop.io" className="hover:text-purple-300 transition flex items-center gap-1">
+                  Support
+                </a>
               </li>
             </ul>
           </div>
@@ -100,28 +108,28 @@ export default function Footer() {
           {/* Col 2: Hubs & Draws */}
           <div className="space-y-3">
             <h4 className="text-xs font-mono uppercase tracking-widest text-white font-bold flex items-center gap-1.5">
-              <Trophy className="w-3.5 h-3.5 text-amber-400" /> Hubs & Draws
+              <Trophy className="w-3.5 h-3.5 text-amber-400" /> Hubs &amp; Draws
             </h4>
             <ul className="space-y-2 text-xs">
               <li>
-                <Link to="/#leaderboard" className="hover:text-purple-300 transition flex items-center gap-1">
+                <a href="/#leaderboard" className="hover:text-purple-300 transition">
                   3D Champions Podium
+                </a>
+              </li>
+              <li>
+                <Link to="/winners" className="hover:text-purple-300 transition">
+                  Audited Winners Hub
                 </Link>
               </li>
               <li>
-                <Link to="/winners" className="hover:text-purple-300 transition flex items-center gap-1">
-                  Audited Winners Hub <ArrowUpRight className="w-3 h-3 text-slate-500" />
+                <Link to="/entries" className="hover:text-purple-300 transition">
+                  My Tickets &amp; Entries
                 </Link>
               </li>
               <li>
-                <Link to="/entries" className="hover:text-purple-300 transition flex items-center gap-1">
-                  My Tickets & Entries
-                </Link>
-              </li>
-              <li>
-                <Link to="/profile" className="hover:text-purple-300 transition">
-                  Member Wallet & Balances
-                </Link>
+                <a href="/#faq" className="hover:text-purple-300 transition">
+                  Frequently Asked Questions
+                </a>
               </li>
             </ul>
           </div>
@@ -129,7 +137,7 @@ export default function Footer() {
           {/* Col 3: Currencies */}
           <div className="space-y-3">
             <h4 className="text-xs font-mono uppercase tracking-widest text-white font-bold flex items-center gap-1.5">
-              <Coins className="w-3.5 h-3.5 text-amber-400" /> Currencies
+              <Coins className="w-3.5 h-3.5 text-amber-400" /> Reward Economy
             </h4>
             <ul className="space-y-2 text-xs">
               <li className="flex items-center gap-2">
@@ -144,10 +152,8 @@ export default function Footer() {
                 <Zap className="w-3 h-3 text-cyan-400" />
                 <span className="text-slate-300 font-medium">Community Tokens</span>
               </li>
-              <li className="pt-1">
-                <span className="text-[11px] text-slate-400 block leading-snug">
-                  Earn tokens through daily logins, activities, and community challenges.
-                </span>
+              <li className="pt-1 text-[11px] text-slate-400">
+                Non-monetary credits allocated strictly for community reward participation.
               </li>
             </ul>
           </div>
@@ -155,24 +161,24 @@ export default function Footer() {
           {/* Col 4: Trust & Security */}
           <div className="space-y-3">
             <h4 className="text-xs font-mono uppercase tracking-widest text-white font-bold flex items-center gap-1.5">
-              <Lock className="w-3.5 h-3.5 text-emerald-400" /> Security & Trust
+              <Lock className="w-3.5 h-3.5 text-emerald-400" /> Security &amp; Trust
             </h4>
             <ul className="space-y-2 text-xs">
               <li className="flex items-center gap-1.5 text-slate-300">
                 <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                <span>Provably Fair SHA-256</span>
+                <span>100% Transparent Audits</span>
               </li>
               <li className="flex items-center gap-1.5 text-slate-300">
                 <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                <span>Masked Identity Protection</span>
+                <span>Encrypted Claims Delivery</span>
               </li>
               <li className="flex items-center gap-1.5 text-slate-300">
                 <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                <span>Tamper-Proof Draw Seed</span>
+                <span>Rule 25 Masked Privacy</span>
               </li>
               <li className="flex items-center gap-1.5 text-slate-300">
                 <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                <span>Anti-Sybil Device Locks</span>
+                <span>Fair 1 Entry Limit Policy</span>
               </li>
             </ul>
           </div>
@@ -191,7 +197,7 @@ export default function Footer() {
 
           <div className="flex items-center gap-2 text-slate-400 shrink-0">
             <span>Built with precision for</span>
-            <span className="font-semibold text-purple-300">Verified Web3 Rewards</span>
+            <span className="font-semibold text-purple-300">Verified Community Rewards</span>
           </div>
         </div>
 
