@@ -1,4 +1,4 @@
-# 🎁 VELOOP Rewards & Audited Giveaway Platform
+# 🎁 VELOOP Rewards – Enterprise Giveaway & Transparent Allocation Platform
 
 [![Vite](https://img.shields.io/badge/Vite-8.2.2-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev/)
 [![React](https://img.shields.io/badge/React-19.2-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev/)
@@ -9,7 +9,7 @@
 [![Netlify](https://img.shields.io/badge/Netlify-Deployed-00C7B7?style=for-the-badge&logo=netlify&logoColor=white)](https://veloop-rewards-dheeraj.netlify.app)
 [![License: ISC](https://img.shields.io/badge/License-ISC-blue.svg?style=for-the-badge)](https://opensource.org/licenses/ISC)
 
-> **VELOOP Rewards** is an enterprise-grade, gamified Fintech and Web3 rewards portal engineered for high-trust community giveaways. Built with a cryptographic **Transparent Verification Protocol (SHA-256)**, **Rule 25 Identity Privacy Masking**, multi-currency balance validation, atomic participation states, and real-time synchronized countdown engines.
+> **VELOOP Rewards** is an enterprise-grade, gamified Fintech rewards portal engineered for transparent, high-trust community giveaways. Built with an **Audited Platform Allocation System**, **Rule 25 Identity Privacy Masking**, multi-currency balance validation, atomic participation states, and real-time synchronized countdown engines.
 
 ---
 
@@ -25,7 +25,7 @@
 
 ## 🎯 Official Specification Matrix & Approved Catalog
 
-Strictly aligned with official specification clauses (1–103) eliminating casino mechanics and unapproved rewards:
+Strictly aligned with official specification clauses (1–103), eliminating casino mechanics, betting jargon, and unapproved rewards:
 
 | Prize Item                | Category          | Allocation / Spots | Entry Fee |  Required Currency   | Fulfillment Requirement                 |
 | ------------------------- | ----------------- | :----------------: | :-------: | :------------------: | --------------------------------------- |
@@ -40,10 +40,10 @@ Strictly aligned with official specification clauses (1–103) eliminating casin
 
 ## ⚡ Core Engineering & Architecture Highlights
 
-### 1. 🛡️ Transparent & Audited Architecture & Winner Lifecycle
-- **Deterministic RNG:** Draws utilize cryptographic seed combinations with backend SHA-256 block generation.
-- **Audit Center (`/winners`):** Displays public draw verification hashes, timestamps, and verifiable ticket IDs.
-- **Premature Leakage Barrier:** Live and active giveaway pools strictly forbid dummy winner tickers. The marquee displays live platform status until an event countdown formally concludes.
+### 1. 🛡️ Transparent Allocation Architecture & Winner Lifecycle
+- **Audited Selection Engine:** Draws utilize cryptographic seed combinations with backend SHA-256 block hash generation for independent verification.
+- **Audited Winners Hub (`/winners`):** Displays public draw verification hashes, timestamps, and verifiable ticket IDs.
+- **Premature Leakage Barrier:** Active giveaway pools strictly forbid dummy winner tickers. The status marquee displays verified platform updates until an event countdown formally concludes.
 
 ### 2. 🔒 Strict Rule 25 Privacy Obfuscation
 - **Public Masking:** Public leaderboards, champions podium, and winner archives strictly mask usernames (`@ve****25` or `VE****25`). Real full names and unmasked IDs are 100% sanitized before frontend hydration.
@@ -84,4 +84,4 @@ Strictly aligned with official specification clauses (1–103) eliminating casin
 ┌────────────────────────────────────────────────────────┐
 │            Database (MongoDB Atlas Cluster)            │
 │       Users • Giveaways • Participations • Draws       │
-└────────────────────────────────────────────────────────┘
+└───────────────────────────┘
