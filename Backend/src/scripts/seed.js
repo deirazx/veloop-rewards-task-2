@@ -43,11 +43,11 @@ const seedData = async () => {
         tier: 'Platinum Elite',
         isKycVerified: true,
         stats: {
-          points: 15420,
-          weeklyPoints: 3650,
-          entries: 142,
-          wins: 9,
-          badge: 'Legendary',
+          points: 0,
+          weeklyPoints: 0,
+          entries: 0,
+          wins: 0,
+          badge: 'Contender',
           avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=120&auto=format&fit=crop&q=80'
         }
       },
@@ -61,11 +61,11 @@ const seedData = async () => {
         tier: 'Gold',
         isKycVerified: true,
         stats: {
-          points: 12850,
-          weeklyPoints: 4210,
-          entries: 118,
-          wins: 7,
-          badge: 'Master',
+          points: 0,
+          weeklyPoints: 0,
+          entries: 0,
+          wins: 0,
+          badge: 'Contender',
           avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=120&auto=format&fit=crop&q=80'
         }
       },
@@ -79,11 +79,11 @@ const seedData = async () => {
         tier: 'Gold',
         isKycVerified: true,
         stats: {
-          points: 10940,
-          weeklyPoints: 2940,
-          entries: 95,
-          wins: 5,
-          badge: 'Elite',
+          points: 0,
+          weeklyPoints: 0,
+          entries: 0,
+          wins: 0,
+          badge: 'Contender',
           avatar: 'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=120&auto=format&fit=crop&q=80'
         }
       },
@@ -97,11 +97,11 @@ const seedData = async () => {
         tier: 'Silver',
         isKycVerified: true,
         stats: {
-          points: 8730,
-          weeklyPoints: 2510,
-          entries: 74,
-          wins: 4,
-          badge: 'Diamond',
+          points: 0,
+          weeklyPoints: 0,
+          entries: 0,
+          wins: 0,
+          badge: 'Contender',
           avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=120&auto=format&fit=crop&q=80'
         }
       },
@@ -115,11 +115,11 @@ const seedData = async () => {
         tier: 'Silver',
         isKycVerified: true,
         stats: {
-          points: 7150,
-          weeklyPoints: 3890,
-          entries: 62,
-          wins: 3,
-          badge: 'Platinum',
+          points: 0,
+          weeklyPoints: 0,
+          entries: 0,
+          wins: 0,
+          badge: 'Contender',
           avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=120&auto=format&fit=crop&q=80'
         }
       }
@@ -145,10 +145,10 @@ const seedData = async () => {
         currency: 'VEs',
         retailPrice: '₹1,34,900',
         totalSpots: 500,
-        spotsTaken: 413,
-        currentEntries: 413,
+        spotsTaken: 0,
+        currentEntries: 0,
         maxEntries: 500,
-        participantsCount: 8500,
+        participantsCount: 0,
         image: '/assets/iphone-prize.jpg',
         description: 'Titanium craftsmanship with A17 Pro chip. 100% genuine insured delivery.',
         prizes: [
@@ -177,10 +177,10 @@ const seedData = async () => {
         currency: 'VEs',
         retailPrice: '₹44,900',
         totalSpots: 350,
-        spotsTaken: 278,
-        currentEntries: 278,
+        spotsTaken: 0,
+        currentEntries: 0,
         maxEntries: 350,
-        participantsCount: 4320,
+        participantsCount: 0,
         image: '/assets/apple-watch.jpg',
         description: 'Advanced health metrics, ECG, and S9 SiP processor.',
         prizes: [
@@ -209,10 +209,10 @@ const seedData = async () => {
         currency: 'SVEs',
         retailPrice: '₹24,900',
         totalSpots: 200,
-        spotsTaken: 184,
-        currentEntries: 184,
+        spotsTaken: 0,
+        currentEntries: 0,
         maxEntries: 200,
-        participantsCount: 3180,
+        participantsCount: 0,
         image: '/assets/airpods.jpg',
         description: 'Pro Active Noise Cancellation and USB-C MagSafe case.',
         prizes: [
@@ -241,10 +241,10 @@ const seedData = async () => {
         currency: 'VEs',
         retailPrice: '₹2,000',
         totalSpots: 1000,
-        spotsTaken: 650,
-        currentEntries: 650,
+        spotsTaken: 0,
+        currentEntries: 0,
         maxEntries: 1000,
-        participantsCount: 6450,
+        participantsCount: 0,
         image: '/assets/amazon-2000.jpg',
         description: 'Direct digital voucher pin dispatched instantly to verified email.',
         prizes: [
@@ -273,10 +273,10 @@ const seedData = async () => {
         currency: 'VEs',
         retailPrice: '₹500',
         totalSpots: 3000,
-        spotsTaken: 2150,
-        currentEntries: 2150,
+        spotsTaken: 0,
+        currentEntries: 0,
         maxEntries: 3000,
-        participantsCount: 4200,
+        participantsCount: 0,
         image: '/assets/amazon-500.png',
         description: 'Quick shopping boost. Instant digital gift card voucher for Amazon Pay.',
         prizes: [
@@ -305,10 +305,10 @@ const seedData = async () => {
         currency: 'Tokens',
         retailPrice: '₹20',
         totalSpots: 5000,
-        spotsTaken: 3400,
-        currentEntries: 3400,
+        spotsTaken: 0,
+        currentEntries: 0,
         maxEntries: 5000,
-        participantsCount: 12800,
+        participantsCount: 0,
         image: '/assets/recharge-voucher.png',
         description: 'Exchange platform tokens for quick liquid recharge vouchers.',
         prizes: [
@@ -326,154 +326,15 @@ const seedData = async () => {
       }
     ]);
 
-    // 3. Seed Exactly 2 Concluded Giveaways with Past Dates for Audited Winners Hub (Rule 62)
-    console.log('[Seed] Seeding 2 completed giveaways with approved platform prizes...');
-    const endedGiveaway1 = await Giveaway.create({
-      giveawayId: 'giveaway-ended-watch',
-      title: 'Apple Watch Series 9 GPS (Round 1 Completed)',
-      slug: 'apple-watch-series-9-ended',
-      status: 'ENDED',
-      startAt: new Date(now.getTime() - 1000 * 60 * 60 * 96),
-      endAt: new Date(now.getTime() - 1000 * 60 * 60 * 12),
-      category: 'Wearables',
-      entryFee: 200,
-      currency: 'VEs',
-      retailPrice: '₹44,900',
-      totalSpots: 350,
-      spotsTaken: 350,
-      currentEntries: 350,
-      maxEntries: 350,
-      participantsCount: 4320,
-      prizes: [
-        {
-          prizeId: 'prize-watch-ended',
-          name: 'Apple Watch Series 9 GPS',
-          type: 'PHYSICAL',
-          currency: 'VEs',
-          entryFee: 200,
-          retailPrice: '₹44,900',
-          winnerCount: 1,
-          image: '/assets/apple-watch.jpg'
-        }
-      ]
-    });
-
-    const endedGiveaway2 = await Giveaway.create({
-      giveawayId: 'giveaway-ended-amazon',
-      title: '₹2,000 Amazon Gift Voucher (Round 1 Completed)',
-      slug: 'amazon-gift-voucher-2000-ended',
-      status: 'ENDED',
-      startAt: new Date(now.getTime() - 1000 * 60 * 60 * 144),
-      endAt: new Date(now.getTime() - 1000 * 60 * 60 * 24),
-      category: 'Digital Voucher',
-      entryFee: 500,
-      currency: 'VEs',
-      retailPrice: '₹2,000',
-      totalSpots: 1000,
-      spotsTaken: 1000,
-      currentEntries: 1000,
-      maxEntries: 1000,
-      participantsCount: 8450,
-      prizes: [
-        {
-          prizeId: 'prize-amazon-2000-ended',
-          name: '₹2,000 Amazon Gift Voucher',
-          type: 'GIFT_CARD',
-          currency: 'VEs',
-          entryFee: 500,
-          retailPrice: '₹2,000',
-          winnerCount: 2,
-          image: '/assets/amazon-2000.jpg'
-        },
-        {
-          prizeId: 'prize-amazon-500-ended',
-          name: '₹500 Amazon Gift Voucher',
-          type: 'GIFT_CARD',
-          currency: 'VEs',
-          entryFee: 300,
-          retailPrice: '₹500',
-          winnerCount: 2,
-          image: '/assets/amazon-500.png'
-        }
-      ]
-    });
-
-    // 4. Seed 5 Audited Winners linked strictly to Approved Platform Prizes (Rule 25 & 62)
-    console.log('[Seed] Seeding 5 audited Winner records with approved platform prizes...');
-    const winners = await Winner.create([
-      {
-        giveawayId: endedGiveaway1.giveawayId,
-        giveawayDocId: endedGiveaway1._id,
-        userId: users[0]._id,
-        customUserId: users[0].customUserId,
-        maskedUserId: 'VE****25',
-        ticketNumber: 'TK-889412',
-        prizeId: 'prize-watch-ended',
-        prizeName: 'Apple Watch Series 9 GPS',
-        prizeType: 'PHYSICAL',
-        drawTimestamp: new Date(now.getTime() - 1000 * 60 * 60 * 10),
-        claimStatus: 'UNCLAIMED'
-      },
-      {
-        giveawayId: endedGiveaway2.giveawayId,
-        giveawayDocId: endedGiveaway2._id,
-        userId: users[1]._id,
-        customUserId: users[1].customUserId,
-        maskedUserId: 'VE****42',
-        ticketNumber: 'TK-774042',
-        prizeId: 'prize-amazon-2000-ended',
-        prizeName: '₹2,000 Amazon Gift Voucher',
-        prizeType: 'GIFT_CARD',
-        drawTimestamp: new Date(now.getTime() - 1000 * 60 * 60 * 22),
-        claimStatus: 'CLAIMED'
-      },
-      {
-        giveawayId: endedGiveaway2.giveawayId,
-        giveawayDocId: endedGiveaway2._id,
-        userId: users[2]._id,
-        customUserId: users[2].customUserId,
-        maskedUserId: 'VE****91',
-        ticketNumber: 'TK-118491',
-        prizeId: 'prize-amazon-2000-ended',
-        prizeName: '₹2,000 Amazon Gift Voucher',
-        prizeType: 'GIFT_CARD',
-        drawTimestamp: new Date(now.getTime() - 1000 * 60 * 60 * 20),
-        claimStatus: 'CLAIMED'
-      },
-      {
-        giveawayId: endedGiveaway2.giveawayId,
-        giveawayDocId: endedGiveaway2._id,
-        userId: users[3]._id,
-        customUserId: users[3].customUserId,
-        maskedUserId: 'VE****78',
-        ticketNumber: 'TK-552178',
-        prizeId: 'prize-amazon-500-ended',
-        prizeName: '₹500 Amazon Gift Voucher',
-        prizeType: 'GIFT_CARD',
-        drawTimestamp: new Date(now.getTime() - 1000 * 60 * 60 * 18),
-        claimStatus: 'CLAIMED'
-      },
-      {
-        giveawayId: endedGiveaway2.giveawayId,
-        giveawayDocId: endedGiveaway2._id,
-        userId: users[4]._id,
-        customUserId: users[4].customUserId,
-        maskedUserId: 'VE****63',
-        ticketNumber: 'TK-339063',
-        prizeId: 'prize-amazon-500-ended',
-        prizeName: '₹500 Amazon Gift Voucher',
-        prizeType: 'GIFT_CARD',
-        drawTimestamp: new Date(now.getTime() - 1000 * 60 * 60 * 16),
-        claimStatus: 'CLAIMED'
-      }
-    ]);
+    // 3. Season 1 Live State: Zero dummy completed giveaways or fake winners
+    console.log('[Seed] Season 1 active: 0 completed giveaways and 0 artificial winners seeded.');
 
     console.log('\n=================================================');
     console.log('✅ SEED COMPLETED SUCCESSFULLY!');
     console.log(`Demo Users Seeded: ${users.length} (Primary: ${primaryUser.customUserId})`);
     console.log(`Active Giveaways Seeded: ${activeGiveaways.length} (gw-1 to gw-6)`);
-    console.log(`Completed Giveaways Seeded: 2 (${endedGiveaway1.slug}, ${endedGiveaway2.slug})`);
-    console.log(`Audited Winners Seeded: ${winners.length} (Masked IDs: ${winners.map(w => w.maskedUserId).join(', ')})`);
+    console.log(`Completed Giveaways Seeded: 0 (Pure live state)`);
+    console.log(`Audited Winners Seeded: 0 (Awaiting real draw outcomes)`);
     console.log('=================================================\n');
 
     process.exit(0);

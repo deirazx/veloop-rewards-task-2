@@ -1,4 +1,5 @@
 import { useParams, Link, useLocation } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ArrowLeft,
@@ -186,7 +187,7 @@ export default function GiveawayDetailsPage() {
           className="inline-flex items-center gap-2 text-sm font-semibold text-slate-300 hover:text-white transition-colors group px-3.5 py-1.5 rounded-xl bg-white/5 border border-white/10 hover:border-purple-500/40"
         >
           <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform text-purple-400" />
-          <span>← Giveaway Home</span>
+          <span>Giveaway Home</span>
         </Link>
 
         <div className="flex items-center gap-2 text-xs text-slate-500">
