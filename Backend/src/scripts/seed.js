@@ -139,7 +139,7 @@ const seedData = async () => {
         slug: 'iphone-15-pro',
         status: 'ACTIVE',
         startAt: new Date(now.getTime() - 1000 * 60 * 60 * 24),
-        endAt: new Date(now.getTime() + 15 * 24 * 60 * 60 * 1000), // 15 days left
+        endAt: new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000), // Grand Pool: 30-Day Monthly Cycle
         category: 'Flagship Tech',
         entryFee: 250,
         currency: 'VEs',
@@ -171,7 +171,7 @@ const seedData = async () => {
         slug: 'apple-watch-series-9',
         status: 'ACTIVE',
         startAt: new Date(now.getTime() - 1000 * 60 * 60 * 12),
-        endAt: new Date(now.getTime() + 12 * 24 * 60 * 60 * 1000), // 12 days left
+        endAt: new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000), // Weekly Pool: 7-Day Cycle
         category: 'Wearables',
         entryFee: 200,
         currency: 'VEs',
@@ -203,7 +203,7 @@ const seedData = async () => {
         slug: 'airpods-pro-2nd-gen',
         status: 'ACTIVE',
         startAt: new Date(now.getTime() - 1000 * 60 * 60 * 6),
-        endAt: new Date(now.getTime() + 5 * 24 * 60 * 60 * 1000), // 5 days left
+        endAt: new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000), // Weekly Pool: 7-Day Cycle
         category: 'Audio',
         entryFee: 500,
         currency: 'SVEs',
@@ -235,7 +235,7 @@ const seedData = async () => {
         slug: 'amazon-gift-voucher-2000',
         status: 'ACTIVE',
         startAt: new Date(now.getTime() - 1000 * 60 * 60 * 10),
-        endAt: new Date(now.getTime() + 10 * 24 * 60 * 60 * 1000), // 10 days left
+        endAt: new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000), // Weekly Pool: 7-Day Cycle
         category: 'Digital Voucher',
         entryFee: 500,
         currency: 'VEs',
@@ -267,7 +267,7 @@ const seedData = async () => {
         slug: 'amazon-gift-voucher-500',
         status: 'ACTIVE',
         startAt: new Date(now.getTime() - 1000 * 60 * 60 * 8),
-        endAt: new Date(now.getTime() + 8 * 24 * 60 * 60 * 1000), // 8 days left
+        endAt: new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000), // Bi-Weekly Pool: 3-Day Cycle
         category: 'Digital Voucher',
         entryFee: 300,
         currency: 'VEs',
@@ -299,7 +299,7 @@ const seedData = async () => {
         slug: 'micro-voucher-20',
         status: 'ACTIVE',
         startAt: new Date(now.getTime() - 1000 * 60 * 60 * 4),
-        endAt: new Date(now.getTime() + 2 * 24 * 60 * 60 * 1000), // 2 days left
+        endAt: new Date(now.getTime() + 1 * 24 * 60 * 60 * 1000), // Fast-Draw Pool: 24-Hour Daily Cycle
         category: 'Community Token Draw',
         entryFee: 2000,
         currency: 'Tokens',

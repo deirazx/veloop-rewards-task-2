@@ -5,6 +5,7 @@ const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const connectDB = require('./config/db');
+const { initLifecycleCron } = require('./services/cronService');
 
 // Load environment variables
 dotenv.config();
@@ -139,6 +140,10 @@ if (process.env.NODE_ENV !== 'test') {
     console.log(`🚀 VELOOP Rewards Backend running on http://localhost:${PORT}`);
     console.log(`📡 Health Check: http://localhost:${PORT}/api/health`);
     console.log(`======================================================\n`);
+
+    // Boot the Automated Pool Lifecycle Engine (cron-based)
+    // Initialized here (post-listen) to ensure DB is fully ready before first tick
+    initLifecycleCron();
   });
 }
 
