@@ -9,8 +9,17 @@
 const LIVE_RENDER_BACKEND = 'https://veloop-giveaway-backend.onrender.com/api';
 const LOCAL_BACKEND = 'http://localhost:5000/api';
 
+const normalizeUrl = (url) => {
+  if (!url) return '';
+  let cleaned = url.trim().replace(/\/+$/, '');
+  if (!cleaned.endsWith('/api')) {
+    cleaned += '/api';
+  }
+  return cleaned;
+};
+
 const resolveBaseUrl = () => {
-  const envUrl = import.meta.env.VITE_API_BASE_URL;
+  const envUrl = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL;
   const isProduction =
     typeof window !== 'undefined' &&
     window.location.hostname !== 'localhost' &&
@@ -23,12 +32,12 @@ const resolveBaseUrl = () => {
       );
       return LIVE_RENDER_BACKEND;
     }
-    return envUrl.trim().replace(/\/$/, '');
+    return normalizeUrl(envUrl);
   }
 
   // Local development: use envUrl if set, otherwise default to local backend cluster
   if (envUrl && envUrl.trim() !== '') {
-    return envUrl.trim().replace(/\/$/, '');
+    return normalizeUrl(envUrl);
   }
   return LOCAL_BACKEND;
 };

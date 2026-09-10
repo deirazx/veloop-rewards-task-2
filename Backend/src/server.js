@@ -22,6 +22,7 @@ const configuredOrigins = process.env.CORS_ORIGIN
   : [];
 
 const defaultAllowedOrigins = [
+  'https://veloop-rewards-task-2.vercel.app',
   'https://veloop-rewards-dheeraj.netlify.app',
   'http://localhost:5173',
   'http://localhost:3000',
@@ -40,6 +41,7 @@ app.use(cors({
     if (
       allowedOrigins.includes(cleaned) ||
       allowedOrigins.includes('*') ||
+      cleaned.endsWith('.vercel.app') ||
       cleaned.endsWith('.netlify.app') ||
       cleaned.includes('localhost') ||
       cleaned.includes('127.0.0.1')
@@ -80,21 +82,44 @@ app.get('/', (req, res) => {
   res.status(200).json(healthPayload());
 });
 
+app.get('/health', (req, res) => {
+  res.status(200).json(healthPayload());
+});
+
 app.get('/api/health', (req, res) => {
   res.status(200).json(healthPayload());
 });
 
-// Mount Routes strictly as specified
-app.use('/api/auth', require('./routes/authRoutes'));
-app.use('/api/giveaways', require('./routes/giveawayRoutes'));
-app.use('/api/participation', require('./routes/participationRoutes'));
-app.use('/api/claim', require('./routes/claimRoutes'));
-app.use('/api/leaderboard', require('./routes/leaderboardRoutes'));
-app.use('/api/stats', require('./routes/statsRoutes'));
-app.use('/api/winners', (req, res, next) => {
-  const giveawayController = require('./controllers/giveawayController');
-  return giveawayController.getAllWinners(req, res, next);
-});
+// Mount Routes - both with /api and direct aliases to ensure compatibility with all frontends
+const authRoutes = require('./routes/authRoutes');
+const giveawayRoutes = require('./routes/giveawayRoutes');
+const participationRoutes = require('./routes/participationRoutes');
+const claimRoutes = require('./routes/claimRoutes');
+const leaderboardRoutes = require('./routes/leaderboardRoutes');
+const statsRoutes = require('./routes/statsRoutes');
+const giveawayController = require('./controllers/giveawayController');
+
+app.use('/api/auth', authRoutes);
+app.use('/auth', authRoutes);
+
+app.use('/api/giveaways', giveawayRoutes);
+app.use('/giveaways', giveawayRoutes);
+
+app.use('/api/participation', participationRoutes);
+app.use('/participation', participationRoutes);
+
+app.use('/api/claim', claimRoutes);
+app.use('/claim', claimRoutes);
+
+app.use('/api/leaderboard', leaderboardRoutes);
+app.use('/leaderboard', leaderboardRoutes);
+
+app.use('/api/stats', statsRoutes);
+app.use('/stats', statsRoutes);
+
+const winnersHandler = (req, res, next) => giveawayController.getAllWinners(req, res, next);
+app.use('/api/winners', winnersHandler);
+app.use('/winners', winnersHandler);
 
 
 // 404 Route Handler
