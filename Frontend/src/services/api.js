@@ -19,24 +19,34 @@ const normalizeUrl = (url) => {
 };
 
 const resolveBaseUrl = () => {
-  const envUrl = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL;
   const isProduction =
     typeof window !== 'undefined' &&
     window.location.hostname !== 'localhost' &&
     window.location.hostname !== '127.0.0.1';
 
+  const envUrl = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL;
+
   if (isProduction) {
-    if (!envUrl || envUrl.includes('localhost') || envUrl.includes('127.0.0.1')) {
+    if (
+      !envUrl ||
+      envUrl.includes('localhost') ||
+      envUrl.includes('127.0.0.1') ||
+      envUrl.includes('vercel.app') ||
+      envUrl.includes('netlify.app')
+    ) {
       console.info(
-        '[VELOP API] Running in production. Directing requests to live Render backend: ' + LIVE_RENDER_BACKEND
+        '[VELOP API] Directing requests to live Render backend: ' + LIVE_RENDER_BACKEND
       );
       return LIVE_RENDER_BACKEND;
     }
     return normalizeUrl(envUrl);
   }
 
-  // Local development: use envUrl if set, otherwise default to local backend cluster
+  // Local development: use envUrl if set and not pointing to static frontend
   if (envUrl && envUrl.trim() !== '') {
+    if (envUrl.includes('vercel.app') || envUrl.includes('netlify.app')) {
+      return LIVE_RENDER_BACKEND;
+    }
     return normalizeUrl(envUrl);
   }
   return LOCAL_BACKEND;
