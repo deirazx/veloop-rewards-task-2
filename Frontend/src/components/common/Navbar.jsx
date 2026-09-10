@@ -270,11 +270,7 @@ export default function Navbar() {
     { label: 'Giveaways', path: '/#active-giveaways', targetId: 'active-giveaways' },
     { label: 'Leaderboard', path: '/#leaderboard', targetId: 'leaderboard' },
     { label: 'Winners', path: '/winners' },
-    {
-      label: 'My Entries',
-      path: '/entries',
-      badge: joinedGiveaways && joinedGiveaways.length > 0 ? joinedGiveaways.length : null
-    },
+    { label: 'My Entries', path: '/entries' }
   ];
 
   const isLinkActive = (item) => {
@@ -340,22 +336,17 @@ export default function Navbar() {
                 key={item.label}
                 to={item.path}
                 onClick={(e) => handleDesktopNavClick(e, item)}
-                className={`relative px-3 py-1.5 lg:px-3.5 lg:py-2 rounded-xl text-xs lg:text-sm font-medium transition-all duration-200 flex items-center gap-1.5 group cursor-pointer ${
+                className={`relative px-3 py-1.5 rounded-xl text-xs lg:text-[13px] font-medium transition-all duration-200 flex items-center justify-center h-8 group cursor-pointer whitespace-nowrap ${
                   active
                     ? 'bg-gradient-to-r from-purple-500/25 to-indigo-500/20 text-white font-semibold border border-purple-500/40 shadow-[0_0_16px_rgba(168,85,247,0.3)]'
                     : 'text-slate-400 hover:text-white hover:bg-white/5 border border-transparent'
                 }`}
               >
                 <span>{item.label}</span>
-                {item.badge != null && (
-                  <span className="px-1.5 py-0.2 rounded-full text-[10px] font-mono font-bold bg-cyan-500/20 border border-cyan-500/40 text-cyan-300">
-                    {item.badge}
-                  </span>
-                )}
                 {active && (
                   <motion.span
                     layoutId="desktop-nav-active-indicator"
-                    className="absolute bottom-0 left-3 right-3 h-[2px] bg-gradient-to-r from-purple-400 via-[#a855f7] to-indigo-400 rounded-full shadow-[0_0_8px_rgba(168,85,247,0.8)]"
+                    className="absolute bottom-0 left-2.5 right-2.5 h-[2px] bg-gradient-to-r from-purple-400 via-[#a855f7] to-indigo-400 rounded-full shadow-[0_0_8px_rgba(168,85,247,0.8)]"
                   />
                 )}
               </Link>
