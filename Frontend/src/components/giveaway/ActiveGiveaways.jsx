@@ -1,4 +1,4 @@
-﻿import React, { useState, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import { ArrowRight, Star, Package, CreditCard, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useGiveaway } from '../../context/GiveawayContext';
 import PrizeCard from './PrizeCard';
@@ -24,7 +24,7 @@ export default function ActiveGiveaways() {
 
   const scrollBy = (dir) => {
     if (!scrollRef.current) return;
-    scrollRef.current.scrollBy({ left: dir * 360, behavior: 'smooth' });
+    scrollRef.current.scrollBy({ left: dir * 320, behavior: 'smooth' });
   };
 
   return (
@@ -89,13 +89,13 @@ export default function ActiveGiveaways() {
           <div
             ref={scrollRef}
             id="active-giveaways-grid"
-            className="flex overflow-x-auto gap-5 pb-4 snap-x snap-mandatory scroll-smooth px-1"
+            className="flex items-stretch overflow-x-auto gap-4 pb-4 snap-x snap-mandatory scroll-smooth px-1"
             style={{ scrollbarWidth: 'none', msOverflowStyle: 'none', touchAction: 'pan-x', WebkitOverflowScrolling: 'touch' }}
           >
             {filtered.map((giveaway) => (
               <div
                 key={giveaway.id}
-                className="flex-shrink-0 w-[290px] sm:w-[330px] snap-start"
+                className="flex-shrink-0 w-[300px] snap-start flex"
               >
                 <PrizeCard giveaway={giveaway} />
               </div>

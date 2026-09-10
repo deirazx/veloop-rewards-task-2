@@ -17,7 +17,7 @@ export default function HomePage() {
       <LiveWinnersTicker />
 
       {/* Main page content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-24 md:pb-16 flex flex-col gap-12 sm:gap-16 md:gap-20">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6 pb-28 md:pb-16 flex flex-col gap-10 sm:gap-14 md:gap-20">
 
         {/* 1. Hero */}
         <HeroSection />

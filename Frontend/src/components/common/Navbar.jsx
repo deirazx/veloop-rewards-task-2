@@ -315,7 +315,7 @@ export default function Navbar() {
 
         {/* ── Logo ── */}
         <Link to="/" className="flex items-center gap-2.5 shrink-0 group">
-          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full overflow-hidden bg-black flex items-center justify-center border border-white/10 shadow-[0_0_16px_rgba(168,85,247,0.35)] group-hover:shadow-[0_0_24px_rgba(168,85,247,0.65)] transition-all">
+          <div className="w-10 h-10 sm:w-10 sm:h-10 rounded-full overflow-hidden bg-black flex items-center justify-center border border-purple-500/30 shadow-[0_0_18px_rgba(168,85,247,0.45)] group-hover:shadow-[0_0_28px_rgba(168,85,247,0.75)] transition-all shrink-0">
             <img
               src="/logo.jpeg"
               alt="VELOOP Logo"
@@ -326,8 +326,8 @@ export default function Navbar() {
             />
           </div>
           <div className="flex flex-col leading-none">
-            <span className="text-sm sm:text-base font-extrabold tracking-wide text-white">VELOOP</span>
-            <span className="text-[9px] sm:text-[10px] font-extrabold tracking-[0.22em] text-[#a855f7] mt-0.5">REWARDS</span>
+            <span className="text-base sm:text-lg font-black tracking-wider text-white drop-shadow-[0_0_12px_rgba(168,85,247,0.5)]">VELOOP</span>
+            <span className="text-[10px] sm:text-[11px] font-black tracking-[0.28em] text-[#a855f7] mt-[2px]">REWARDS</span>
           </div>
         </Link>
 
