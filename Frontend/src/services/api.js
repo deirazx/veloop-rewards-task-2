@@ -10,8 +10,14 @@ const LIVE_RENDER_BACKEND = 'https://veloop-giveaway-backend.onrender.com/api';
 const LOCAL_BACKEND = 'http://localhost:5000/api';
 
 const normalizeUrl = (url) => {
-  if (!url) return '';
-  let cleaned = url.trim().replace(/\/+$/, '');
+  if (!url || typeof url !== 'string') return LIVE_RENDER_BACKEND;
+  // Match any http(s) URL, automatically stripping markdown brackets [url](url), quotes, or tags
+  const match = url.match(/https?:\/\/[^\s\)\"\'\]>]+/);
+  let cleaned = match ? match[0] : url.trim();
+  cleaned = cleaned.replace(/\/+$/, '');
+  if (!cleaned.startsWith('http://') && !cleaned.startsWith('https://')) {
+    return LIVE_RENDER_BACKEND;
+  }
   if (!cleaned.endsWith('/api')) {
     cleaned += '/api';
   }
@@ -19,23 +25,21 @@ const normalizeUrl = (url) => {
 };
 
 const resolveBaseUrl = () => {
-  const envUrl = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL;
   const isProduction =
     typeof window !== 'undefined' &&
     window.location.hostname !== 'localhost' &&
     window.location.hostname !== '127.0.0.1';
 
+  const envUrl = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL;
+
   if (isProduction) {
     if (!envUrl || envUrl.includes('localhost') || envUrl.includes('127.0.0.1')) {
-      console.info(
-        '[VELOP API] Running in production. Directing requests to live Render backend: ' + LIVE_RENDER_BACKEND
-      );
       return LIVE_RENDER_BACKEND;
     }
     return normalizeUrl(envUrl);
   }
 
-  // Local development: use envUrl if set, otherwise default to local backend cluster
+  // Local development
   if (envUrl && envUrl.trim() !== '') {
     return normalizeUrl(envUrl);
   }
