@@ -83,15 +83,17 @@ export default function ActiveGiveaways() {
 
       {filtered.length > 0 ? (
         <div className="relative">
-          <div className="pointer-events-none absolute left-0 top-0 bottom-4 w-6 z-10 bg-gradient-to-r from-[#09090b] to-transparent" />
-          <div className="pointer-events-none absolute right-0 top-0 bottom-4 w-10 z-10 bg-gradient-to-l from-[#09090b] to-transparent" />
+          {/* Only right fade — left fade was cutting off first card */}
+          <div className="pointer-events-none absolute right-0 top-0 bottom-4 w-12 z-10 bg-gradient-to-l from-[#09090b] to-transparent" />
 
           <div
             ref={scrollRef}
             id="active-giveaways-grid"
-            className="flex items-stretch overflow-x-auto gap-4 pb-4 snap-x snap-mandatory scroll-smooth px-1"
+            className="flex items-stretch overflow-x-auto gap-4 pb-4 snap-x snap-mandatory scroll-smooth"
             style={{ scrollbarWidth: 'none', msOverflowStyle: 'none', touchAction: 'pan-x', WebkitOverflowScrolling: 'touch' }}
           >
+            {/* Leading spacer so first card has breathing room */}
+            <div className="flex-shrink-0 w-1" aria-hidden="true" />
             {filtered.map((giveaway) => (
               <div
                 key={giveaway.id}
@@ -100,7 +102,8 @@ export default function ActiveGiveaways() {
                 <PrizeCard giveaway={giveaway} />
               </div>
             ))}
-            <div className="flex-shrink-0 w-4" aria-hidden="true" />
+            {/* Trailing spacer for last card */}
+            <div className="flex-shrink-0 w-6" aria-hidden="true" />
           </div>
 
           <style>{`#active-giveaways-grid::-webkit-scrollbar { display: none; }`}</style>
