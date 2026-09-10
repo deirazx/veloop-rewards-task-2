@@ -9,13 +9,18 @@
 const LIVE_RENDER_BACKEND = 'https://veloop-giveaway-backend.onrender.com/api';
 const LOCAL_BACKEND = 'http://localhost:5000/api';
 
-const normalizeUrl = (url) => {
-  if (!url) return '';
-  let cleaned = url.trim().replace(/\/+$/, '');
-  if (!cleaned.endsWith('/api')) {
-    cleaned += '/api';
+const cleanUrl = (raw) => {
+  if (!raw || typeof raw !== 'string') return LIVE_RENDER_BACKEND;
+  const match = raw.match(/https?:\/\/[a-zA-Z0-9\-\.:]+/);
+  if (!match) return LIVE_RENDER_BACKEND;
+  let base = match[0].replace(/\/+$/, '');
+  if (base.includes('vercel.app') || base.includes('netlify.app')) {
+    return LIVE_RENDER_BACKEND;
   }
-  return cleaned;
+  if (!base.endsWith('/api')) {
+    base += '/api';
+  }
+  return base;
 };
 
 const resolveBaseUrl = () => {
@@ -27,27 +32,12 @@ const resolveBaseUrl = () => {
   const envUrl = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL;
 
   if (isProduction) {
-    if (
-      !envUrl ||
-      envUrl.includes('localhost') ||
-      envUrl.includes('127.0.0.1') ||
-      envUrl.includes('vercel.app') ||
-      envUrl.includes('netlify.app')
-    ) {
-      console.info(
-        '[VELOP API] Directing requests to live Render backend: ' + LIVE_RENDER_BACKEND
-      );
-      return LIVE_RENDER_BACKEND;
-    }
-    return normalizeUrl(envUrl);
+    return cleanUrl(envUrl);
   }
 
-  // Local development: use envUrl if set and not pointing to static frontend
+  // Local development
   if (envUrl && envUrl.trim() !== '') {
-    if (envUrl.includes('vercel.app') || envUrl.includes('netlify.app')) {
-      return LIVE_RENDER_BACKEND;
-    }
-    return normalizeUrl(envUrl);
+    return cleanUrl(envUrl);
   }
   return LOCAL_BACKEND;
 };
