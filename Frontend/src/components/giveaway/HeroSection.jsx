@@ -1,16 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Gift, ArrowRight, ShieldCheck, Trophy, Zap, Users } from 'lucide-react';
+import { Gift, ArrowRight, ShieldCheck, Trophy, Zap } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useGiveaway } from '../../context/GiveawayContext';
 import api from '../../services/api';
-
-const AVATARS = [
-  'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=64&q=80&auto=format&fit=crop',
-  'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=64&q=80&auto=format&fit=crop',
-  'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=64&q=80&auto=format&fit=crop',
-  'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=64&q=80&auto=format&fit=crop',
-];
 
 export default function HeroSection() {
   const { giveaways } = useGiveaway();
@@ -24,22 +17,9 @@ export default function HeroSection() {
     return () => { isMounted = false; };
   }, []);
 
-  const totalParts = platformStats?.totalParticipants ?? (giveaways || []).reduce(
-    (acc, g) => acc + Number(g.participantsCount || g.spotsTaken || 0),
-    0
-  );
-  const participantsDisplay = totalParts >= 1000
-    ? `${(totalParts / 1000).toFixed(1)}K+`
-    : `${totalParts.toLocaleString()}`;
-
   const prizesWon = platformStats?.prizesWon ?? (giveaways || []).reduce((acc, g) => acc + (g.winners?.length || 0), 0);
   const winnersBadge = prizesWon > 0 ? `${prizesWon} Audited Winners` : 'Audited Winners';
 
-  const trustBadges = [
-    { icon: ShieldCheck, label: 'Transparent Selection' },
-    { icon: Trophy,      label: winnersBadge },
-    { icon: Zap,         label: 'Instant Dispatch' },
-  ];
 
   const activeList = (giveaways || []).filter((g) => g.status === 'ACTIVE');
   const featured =
@@ -133,39 +113,22 @@ export default function HeroSection() {
             </Link>
           </div>
 
-          {/* Social proof + trust badges */}
-          <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 justify-center lg:justify-start pt-1">
-            {/* Avatars + participant count */}
-            <div className="flex items-center gap-3">
-              <div className="flex -space-x-2.5">
-                {AVATARS.map((src, i) => (
-                  <img
-                    key={i}
-                    src={src}
-                    alt="user"
-                    className="w-8 h-8 sm:w-9 sm:h-9 rounded-full border-2 border-[#14092b] object-cover"
-                  />
-                ))}
-              </div>
-              <div className="text-left">
-                <div className="text-sm font-bold text-white font-mono flex items-center gap-1.5">
-                  <Users className="w-3.5 h-3.5 text-purple-400" />
-                  {participantsDisplay}
-                </div>
-                <div className="text-xs text-gray-400">Active Participants</div>
-              </div>
+          {/* Trust & Transparency Badges — Unified sleek pill layout */}
+          <div className="flex flex-wrap items-center justify-center lg:justify-start gap-2.5 sm:gap-3 pt-2">
+            <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/25 text-xs font-semibold text-emerald-300 shadow-sm">
+              <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
+              <span>Cryptographically Audited</span>
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse shrink-0" />
             </div>
 
-            <div className="hidden sm:block w-px h-8 bg-white/10" />
+            <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-purple-500/10 border border-purple-500/25 text-xs font-medium text-purple-300 shadow-sm">
+              <Trophy className="w-4 h-4 text-amber-400 shrink-0" />
+              <span>{winnersBadge}</span>
+            </div>
 
-            {/* Trust badges — wraps cleanly on mobile */}
-            <div className="flex flex-wrap items-center justify-center lg:justify-start gap-x-4 gap-y-2">
-              {trustBadges.map(({ icon: Icon, label }) => (
-                <div key={label} className="flex items-center gap-1.5 text-xs text-slate-400">
-                  <Icon className="w-3.5 h-3.5 text-purple-400 shrink-0" />
-                  {label}
-                </div>
-              ))}
+            <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/[0.04] border border-white/10 text-xs font-medium text-slate-300 shadow-sm">
+              <Zap className="w-4 h-4 text-cyan-400 shrink-0" />
+              <span>Instant Dispatch</span>
             </div>
           </div>
         </motion.div>
